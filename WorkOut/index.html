@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workout WebApp</title>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #191919;
+      font-family: 'Montserrat', sans-serif;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+    /* Header styles */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      background: rgb(0, 0, 0);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(144, 144, 144, 0.351);
+    }
+    .header-left, .header-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    #clockTime {
+      font-size: 1.2em;
+      font-weight: 600;
+    }
+    #sessionStopwatch, #streakDisplay {
+      font-size: 1.2em;
+    }
+    /* Button Styles */
+    button {
+      background-color: #117b90;
+      border: none;
+      color: #ffffff;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: transform 0.2s, background-color 0.3s;
+    }
+    button:hover {
+      transform: scale(1.05);
+      background-color: #00bbff;
+    }
+    /* Container for main content (with margin-top to avoid header overlap) */
+    .container {
+      margin-top: 80px;
+      padding: 20px;
+      text-align: center;
+      min-height: calc(100vh - 90px);
+      transition: background 0.5s;
+    }
+    .big-text {
+      font-size: 2em;
+      margin: 20px 0;
+      font-weight: 600;
+    }
+    .display-box {
+      font-size: 1.5em;
+      margin: 10px;
+    }
+    .slider-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    input[type="range"] {
+      width: 60%;
+      margin: 0 10px;
+    }
+    /* Gradient themes */
+    .gradient-upper {
+      background: linear-gradient(0deg, #000000, #00272b);
+    }
+    .gradient-lower {
+      background: linear-gradient(45deg, #000000, #110343);
+    }
+    .gradient-core {
+      background: linear-gradient(45deg, #000000, #3f3403);
+    }
+    .gradient-break {
+      background: linear-gradient(45deg, #000000, #4b0202);
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+      animation: fadeIn 0.3s;
+    }
+    .modal-content {
+      background-color: #1e1e1e;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #3a3a3a;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .modal-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .logo {
+  mix-blend-mode: screen;
+  height: 50px; /* adjust the size as needed */
+  margin-right: 15px;
+}
+
+  </style>
+  <link rel="icon" type="image/png" href="workoutlogo.png">
+</head>
+<body>
+  <!-- Fixed Header -->
+  <header id="header">
+    <div class="header-left">
+      <img src="workoutlogo.png" alt="Logo" class="logo">
+      <div id="clockTime">--:--</div>
+    </div>
+    <div class="header-right">
+      <div id="sessionStopwatch">00:00</div>
+      <div id="streakDisplay">Streak: 0</div>
+      <button id="clearMemoryButton">Clear Memory</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container" id="main-container">
+    <!-- Content injected via JavaScript -->
+  </div>
+
+  <!-- Modal for Clear Memory -->
+  <div id="clearMemoryModal" class="modal">
+    <div class="modal-content">
+      <h2>Confirm Delete</h2>
+      <p>Are you sure you want to delete streak info?</p>
+      <div class="modal-buttons">
+        <button id="cancelClear">Cancel</button>
+        <button id="confirmClear">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Workout Info -->
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <h2>Workout Details</h2>
+      <div id="workoutInfoContent" style="text-align: left; font-size: 0.9em;"></div>
+      <button id="closeInfo" style="margin-top: 15px;">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // *********************** DATA & CONFIGURATION *************************
+    const workoutPlans = {
+      Monday: {
+        focus: "Upper Body Focus",
+        warmup: { description: "Arm circles, shoulder rolls, light stretching", duration: 300 },
+        exercises: [
+          { name: "Push-ups", description: "Start with knee push-ups if needed", defaultSets: 3, repRange: "8-12" },
+          { name: "Dumbbell Shoulder Press", description: "Work your shoulders", defaultSets: 3, repRange: "10-12" },
+          { name: "Dumbbell Lateral Raises", description: "Lift your arms to the side", defaultSets: 3, repRange: "12" },
+          { name: "Bicep Curls", description: "Curl your arms", defaultSets: 3, repRange: "12" },
+          { name: "Tricep Dips", description: "Using a chair", defaultSets: 3, repRange: "8-12" },
+          { name: "Plank Hold", description: "Hold for 30-45 sec", defaultSets: 3, repRange: "30-45 sec" }
+        ]
+      },
+      Tuesday: {
+        focus: "Lower Body Focus",
+        warmup: { description: "High knees, leg swings, bodyweight squats", duration: 300 },
+        exercises: [
+          { name: "Bodyweight Squats", description: "Perform squats", defaultSets: 3, repRange: "12-15" },
+          { name: "Dumbbell Lunges", description: "Lunge each leg", defaultSets: 3, repRange: "12 per leg" },
+          { name: "Dumbbell Romanian Deadlifts", description: "Work your hamstrings", defaultSets: 3, repRange: "10" },
+          { name: "Calf Raises", description: "Raise your calves", defaultSets: 3, repRange: "15" },
+          { name: "Glute Bridge", description: "Bridge your glutes", defaultSets: 3, repRange: "12" }
+        ]
+      },
+      Wednesday: {
+        focus: "Core & Full Body",
+        warmup: { description: "Torso twists, jumping jacks", duration: 300 },
+        exercises: [
+          { name: "Bicycle Crunches", description: "Crunch per side", defaultSets: 3, repRange: "12 per side" },
+          { name: "Leg Raises", description: "Raise your legs", defaultSets: 3, repRange: "12" },
+          { name: "Russian Twists", description: "With dumbbell", defaultSets: 3, repRange: "12 per side" },
+          { name: "Burpees", description: "Full body workout", defaultSets: 3, repRange: "8-10" },
+          { name: "Plank to Push-up", description: "Transition from plank to push-up", defaultSets: 3, repRange: "8-10" }
+        ]
+      },
+      Thursday: null,
+      Friday: null,
+      Saturday: null,
+      Sunday: {
+        focus: "Rest Day",
+        warmup: { description: "Rest", duration: 0 },
+        exercises: []
+      }
+    };
+    workoutPlans.Thursday = workoutPlans.Monday;
+    workoutPlans.Friday = workoutPlans.Tuesday;
+    workoutPlans.Saturday = workoutPlans.Wednesday;
+
+    const emojis = ["💪", "🏆", "🔥", "👏", "😎", "🙌"];
+
+    // *********************** UTILITY FUNCTIONS *************************
+    function getCurrentDayName() {
+      const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      return days[new Date().getDay()];
+    }
+    function setTheme(focus) {
+      const container = document.getElementById('main-container');
+      if (focus.includes("Upper Body")) {
+        container.className = "container gradient-upper";
+      } else if (focus.includes("Lower Body")) {
+        container.className = "container gradient-lower";
+      } else if (focus.includes("Core & Full Body")) {
+        container.className = "container gradient-core";
+      } else {
+        container.className = "container gradient-break";
+      }
+    }
+    function getStreak() {
+      let streak = localStorage.getItem("streak");
+      return streak ? parseInt(streak) : 0;
+    }
+    function updateStreak() {
+      const today = new Date().toISOString().split("T")[0];
+      if (localStorage.getItem("streakDate") !== today) {
+        let streak = getStreak();
+        streak++;
+        localStorage.setItem("streak", streak);
+        localStorage.setItem("streakDate", today);
+      }
+      document.getElementById("streakDisplay").innerText = "Streak: " + getStreak();
+    }
+    function isWorkoutCompleted() {
+      const today = new Date().toISOString().split("T")[0];
+      return localStorage.getItem("workoutCompleted_" + today);
+    }
+    function markWorkoutCompleted() {
+      const today = new Date().toISOString().split("T")[0];
+      localStorage.setItem("workoutCompleted_" + today, "true");
+    }
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    // *********************** GLOBAL VARIABLES *************************
+    const container = document.getElementById("main-container");
+    const currentDay = getCurrentDayName();
+    const plan = workoutPlans[currentDay];
+    let stopwatchInterval, warmupTimerInterval, sessionStopwatchInterval;
+    let workoutStartTime, elapsedSeconds = 0;
+    let currentExerciseIndex = 0;
+    let exerciseSummary = [];
+    let warmupRemaining = plan ? plan.warmup.duration : 0;
+
+    // *********************** HEADER UPDATES *************************
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("clockTime").innerText = now.toLocaleTimeString();
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    function startSessionStopwatch() {
+      workoutStartTime = Date.now();
+      sessionStopwatchInterval = setInterval(() => {
+        elapsedSeconds = Math.floor((Date.now() - workoutStartTime) / 1000);
+        document.getElementById("sessionStopwatch").innerText = formatTime(elapsedSeconds);
+      }, 1000);
+    }
+
+    // *********************** MODAL HANDLERS *************************
+    const clearMemoryModal = document.getElementById("clearMemoryModal");
+    document.getElementById("clearMemoryButton").addEventListener("click", () => {
+      clearMemoryModal.style.display = "block";
+    });
+    document.getElementById("cancelClear").addEventListener("click", () => {
+      clearMemoryModal.style.display = "none";
+    });
+    document.getElementById("confirmClear").addEventListener("click", () => {
+      localStorage.removeItem("streak");
+      localStorage.removeItem("streakDate");
+      // Also clear today's workout completion if desired
+      const today = new Date().toISOString().split("T")[0];
+      localStorage.removeItem("workoutCompleted_" + today);
+      document.getElementById("streakDisplay").innerText = "Streak: 0";
+      clearMemoryModal.style.display = "none";
+    });
+
+    const infoModal = document.getElementById("infoModal");
+    document.getElementById("closeInfo").addEventListener("click", () => {
+      infoModal.style.display = "none";
+    });
+
+    // *********************** UI SCREENS *************************
+    function showStartScreen() {
+      container.innerHTML = "";
+      setTheme(plan ? plan.focus : "Rest Day");
+      let streak = getStreak();
+      // Build workout info details for the modal
+      let infoHTML = "";
+      if (plan) {
+        infoHTML += `<strong>Focus:</strong> ${plan.focus}<br>`;
+        infoHTML += `<strong>Warm-Up:</strong> ${plan.warmup.description} (${formatTime(plan.warmup.duration)})<br><br>`;
+        if (plan.exercises.length > 0) {
+          infoHTML += `<strong>Exercises:</strong><br>`;
+          plan.exercises.forEach((ex, i) => {
+            infoHTML += `${i+1}. ${ex.name} – ${ex.description} (Recommended: ${ex.repRange} reps, ${ex.defaultSets} sets)<br>`;
+          });
+        } else {
+          infoHTML += `Today is a rest day.`;
+        }
+      }
+      document.getElementById("workoutInfoContent").innerHTML = infoHTML;
+
+      // If workout already done today, show a completion message.
+      if (isWorkoutCompleted()) {
+        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+        container.innerHTML = `<div class="big-text">Well done, come tomorrow! ${emoji}</div>`;
+        return;
+      }
+      container.innerHTML = `
+        <div class="big-text">${currentDay}</div>
+        <div class="big-text">${plan ? plan.focus : "Rest Day"}</div>
+        <div class="display-box">Streak: ${streak}</div>
+        <button id="startButton">START</button>
+        <button id="infoButton" style="margin-top:15px;">More Info</button>
+      `;
+      document.getElementById("startButton").addEventListener("click", startWorkout);
+      document.getElementById("infoButton").addEventListener("click", () => {
+        infoModal.style.display = "block";
+      });
+    }
+
+    function showWarmupScreen() {
+      container.innerHTML = "";
+      // Request full screen
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      }
+      container.innerHTML = `
+        <div class="big-text">Warm-Up</div>
+        <div class="display-box">${plan.warmup.description}</div>
+        <div class="big-text" id="warmupTimer">${formatTime(warmupRemaining)}</div>
+        <button id="skipWarmup">Skip Warm-Up</button>
+      `;
+      document.getElementById("skipWarmup").addEventListener("click", () => {
+        clearInterval(warmupTimerInterval);
+        showExerciseScreen();
+      });
+      warmupTimerInterval = setInterval(() => {
+        warmupRemaining--;
+        document.getElementById("warmupTimer").innerText = formatTime(warmupRemaining);
+        if (warmupRemaining <= 0) {
+          clearInterval(warmupTimerInterval);
+          showExerciseScreen();
+        }
+      }, 1000);
+    }
+
+    function showExerciseScreen() {
+      if (!plan || plan.exercises.length === 0) {
+        container.innerHTML = `<div class="big-text">Rest Day! Enjoy your day.</div>
+        <button id="endRest">OK</button>`;
+        document.getElementById("endRest").addEventListener("click", finishWorkout);
+        return;
+      }
+      if (currentExerciseIndex >= plan.exercises.length) {
+        showFinishScreen();
+        return;
+      }
+      const exercise = plan.exercises[currentExerciseIndex];
+      container.innerHTML = `
+        <div class="big-text">${exercise.name}</div>
+        <div>${exercise.description}</div>
+        <div class="slider-container">
+          <label for="repsSlider">Reps:</label>
+          <input type="range" id="repsSlider" min="0" max="50" value="10">
+          <span id="repsValue">10</span>
+        </div>
+        <div class="slider-container">
+          <button id="addSet">+ Set</button>
+          <div class="display-box">Sets: <span id="setCount">0</span></div>
+        </div>
+        <div class="big-text">Total Reps: <span id="totalReps">0</span></div>
+        <button id="nextExercise">${currentExerciseIndex === plan.exercises.length - 1 ? "Finish" : "Next"}</button>
+      `;
+      const repsSlider = document.getElementById("repsSlider");
+      const repsValue = document.getElementById("repsValue");
+      const setCountEl = document.getElementById("setCount");
+      const totalRepsEl = document.getElementById("totalReps");
+      let sets = 0;
+      let reps = parseInt(repsSlider.value);
+      function updateTotal() {
+        totalRepsEl.innerText = reps * sets;
+      }
+      repsSlider.addEventListener("input", (e) => {
+        reps = parseInt(e.target.value);
+        repsValue.innerText = reps;
+        updateTotal();
+      });
+      document.getElementById("addSet").addEventListener("click", () => {
+        sets++;
+        setCountEl.innerText = sets;
+        updateTotal();
+      });
+      document.getElementById("nextExercise").addEventListener("click", () => {
+        exerciseSummary.push({ name: exercise.name, reps: reps, sets: sets, total: reps * sets });
+        currentExerciseIndex++;
+        showExerciseScreen();
+      });
+    }
+
+    function showFinishScreen() {
+      clearInterval(sessionStopwatchInterval);
+      const totalTime = formatTime(elapsedSeconds);
+      markWorkoutCompleted();
+      updateStreak();
+      let summaryHtml = "<div class='big-text'>Workout Summary</div>";
+      exerciseSummary.forEach(item => {
+        summaryHtml += `<div>${item.name}: ${item.sets} set(s) × ${item.reps} rep(s) = ${item.total} total reps</div>`;
+      });
+      summaryHtml += `<div class="big-text">Total Workout Time: ${totalTime}</div>`;
+      summaryHtml += `<button id="endWorkout">End</button>`;
+      container.innerHTML = summaryHtml;
+      document.getElementById("endWorkout").addEventListener("click", () => {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+        resetWorkout();
+        showStartScreen();
+      });
+    }
+
+    function finishWorkout() {
+      clearInterval(sessionStopwatchInterval);
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+      resetWorkout();
+      showStartScreen();
+    }
+
+    function startWorkout() {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      }
+      elapsedSeconds = 0;
+      startSessionStopwatch();
+      warmupRemaining = plan.warmup.duration;
+      showWarmupScreen();
+    }
+
+    function resetWorkout() {
+      currentExerciseIndex = 0;
+      exerciseSummary = [];
+      warmupRemaining = plan ? plan.warmup.duration : 0;
+      clearInterval(warmupTimerInterval);
+      clearInterval(sessionStopwatchInterval);
+    }
+
+    // *********************** INITIALIZATION *************************
+    updateStreak();
+    showStartScreen();
+  </script>
+</body>
+</html>
