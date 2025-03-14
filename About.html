@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinurag's Self-Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #121212; color: white; padding: 20px; text-align: center; }
+        h1 { margin-bottom: 20px; }
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .card { background: #1e1e1e; padding: 15px; border-radius: 8px; width: 300px; box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1); transition: 0.3s; }
+        .card:hover { box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.3); }
+        .title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin: 5px 0; font-size: 14px; }
+        .expandable { cursor: pointer; background: #333; padding: 10px; border-radius: 5px; margin-top: 10px; display: inline-block; }
+        .expandable:hover { background: #555; }
+        .hidden { display: none; }
+        canvas { max-width: 400px; margin: 20px auto; }
+    </style>
+</head>
+<body>
+
+    <h1>Chinurag's Self-Analysis</h1>
+
+    <!-- Radar Chart -->
+    <canvas id="radarChart"></canvas>
+
+    <div class="container">
+        <div class="card">
+            <div class="title">Things I Like</div>
+            <ul>
+                <li>Cats</li>
+                <li>Making Plans</li>
+                <li>Seeing Others Happy</li>
+                <li>Writing</li>
+                <li>Problem-Solving</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="title">Things I Don't Like</div>
+            <ul>
+                <li>People Who Don’t Think</li>
+                <li>No Self-Improvement</li>
+                <li>Only Love Stories</li>
+                <li>Eating When Sad</li>
+                <li>Overvalued Things</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="title">Things I Love</div>
+            <ul>
+                <li>Family</li>
+                <li>Creating</li>
+                <li>Good Memories</li>
+                <li>Being Noticed</li>
+                <li>Time with Friends</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="title">Things I Hate</div>
+            <ul>
+                <li>Haters</li>
+                <li>Being Stopped</li>
+                <li>Wasting Time</li>
+                <li>Ruined Creative Work</li>
+                <li>False Accusations</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="title">What Annoys Me</div>
+            <ul>
+                <li>Illogical Talk</li>
+                <li>Fake Reactions</li>
+                <li>Wasting Time</li>
+                <li>Testing People</li>
+                <li>Unnecessary Debates</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="title">My Addictions</div>
+            <ul>
+                <li>Chess</li>
+                <li>Thinking</li>
+                <li>Laziness</li>
+                <li>Reels</li>
+                <li>Tea</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="title">Good Habits</div>
+            <ul>
+                <li>Time Management</li>
+                <li>Self-Improvement</li>
+                <li>Skill Enhancement</li>
+                <li>Focus</li>
+                <li>Ignoring Small Issues</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="title">Bad Habits</div>
+            <ul>
+                <li>Ignoring Food</li>
+                <li>Overcorrecting Others</li>
+                <li>Overworking</li>
+                <li>Inconsistency</li>
+                <li>Uncontrollable Anger</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="title">Personality (Good)</div>
+            <ul>
+                <li>Good Smile</li>
+                <li>Confident Speaker</li>
+                <li>Flirting</li>
+                <li>Logical</li>
+                <li>Good Height</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="title">Personality (Bad)</div>
+            <ul>
+                <li>Lack of Eye Contact</li>
+                <li>Self-Bragging</li>
+                <li>Lean Body</li>
+                <li>Awkward Comments</li>
+                <li>Overacting</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Radar Chart for Strengths & Weaknesses
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Confidence', 'Creativity', 'Consistency', 'Social Skills', 'Self-Control'],
+                datasets: [{
+                    label: 'My Strengths & Weaknesses',
+                    data: [8, 9, 5, 7, 6], // Customize scores (1-10 scale)
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { r: { suggestedMin: 0, suggestedMax: 10 } }
+            }
+        });
+    </script>
+
+</body>
+</html>
