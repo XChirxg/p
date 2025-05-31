@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fullscreen Timer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Anton', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            user-select: none;
+        }
+
+        .timer-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20vw;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-align: center;
+            white-space: nowrap;
+            width: 100%;
+            line-height: 0.8;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            z-index: 100;
+        }
+
+        .controls.left {
+            left: 20px;
+        }
+
+        .controls.right {
+            right: 20px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 11px;
+            border-radius: 4px;
+            font-family: 'Anton', sans-serif;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .time-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px;
+            width: 50px;
+            text-align: center;
+            font-size: 11px;
+            border-radius: 4px;
+            font-family: 'Anton', sans-serif;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .label {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .finished {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .timer-display {
+                font-size: 25vw;
+            }
+            
+            .controls {
+                top: 15px;
+                gap: 8px;
+            }
+            
+            .controls.left {
+                left: 15px;
+            }
+            
+            .controls.right {
+                right: 15px;
+            }
+            
+            .btn {
+                padding: 6px 10px;
+                font-size: 10px;
+            }
+            
+            .time-input {
+                width: 45px;
+                padding: 5px;
+                font-size: 10px;
+            }
+            
+            .label {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="timer-display" id="timerDisplay">05:00</div>
+    
+    <div class="controls left">
+        <div class="input-group">
+            <span class="label">MIN</span>
+            <input type="number" class="time-input" id="minutesInput" value="5" min="0" max="99">
+        </div>
+        <div class="input-group">
+            <span class="label">SEC</span>
+            <input type="number" class="time-input" id="secondsInput" value="0" min="0" max="59">
+        </div>
+    </div>
+    
+    <div class="controls right">
+        <button class="btn" id="startBtn">START</button>
+        <button class="btn" id="pauseBtn">PAUSE</button>
+        <button class="btn" id="resetBtn">RESET</button>
+    </div>
+
+    <script>
+        class Timer {
+            constructor() {
+                this.totalSeconds = 300; // 5 minutes default
+                this.remainingSeconds = this.totalSeconds;
+                this.isRunning = false;
+                this.intervalId = null;
+                
+                this.timerDisplay = document.getElementById('timerDisplay');
+                this.minutesInput = document.getElementById('minutesInput');
+                this.secondsInput = document.getElementById('secondsInput');
+                this.startBtn = document.getElementById('startBtn');
+                this.pauseBtn = document.getElementById('pauseBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                
+                this.initializeEventListeners();
+                this.updateDisplay();
+                this.createAlarmSound();
+            }
+            
+            createAlarmSound() {
+                // Create a beep sound using Web Audio API
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            playAlarmSound() {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 1);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 1);
+                
+                // Play multiple beeps
+                setTimeout(() => this.playBeep(), 300);
+                setTimeout(() => this.playBeep(), 600);
+                setTimeout(() => this.playBeep(), 900);
+            }
+            
+            playBeep() {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(1000, this.audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.2);
+            }
+            
+            initializeEventListeners() {
+                this.startBtn.addEventListener('click', () => this.start());
+                this.pauseBtn.addEventListener('click', () => this.pause());
+                this.resetBtn.addEventListener('click', () => this.reset());
+                
+                this.minutesInput.addEventListener('input', () => this.updateTime());
+                this.secondsInput.addEventListener('input', () => this.updateTime());
+                
+                // Prevent inputs from losing focus when clicked
+                this.minutesInput.addEventListener('blur', () => this.updateTime());
+                this.secondsInput.addEventListener('blur', () => this.updateTime());
+            }
+            
+            updateTime() {
+                const minutes = Math.max(0, parseInt(this.minutesInput.value) || 0);
+                const seconds = Math.max(0, Math.min(59, parseInt(this.secondsInput.value) || 0));
+                
+                this.minutesInput.value = minutes;
+                this.secondsInput.value = seconds;
+                
+                this.totalSeconds = minutes * 60 + seconds;
+                
+                if (!this.isRunning) {
+                    this.remainingSeconds = this.totalSeconds;
+                    this.updateDisplay();
+                }
+            }
+            
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            updateDisplay() {
+                this.timerDisplay.textContent = this.formatTime(this.remainingSeconds);
+                
+                if (this.remainingSeconds === 0 && this.isRunning) {
+                    this.timerDisplay.classList.add('finished');
+                } else {
+                    this.timerDisplay.classList.remove('finished');
+                }
+            }
+            
+            async enterFullscreen() {
+                try {
+                    if (document.documentElement.requestFullscreen) {
+                        await document.documentElement.requestFullscreen();
+                    } else if (document.documentElement.webkitRequestFullscreen) {
+                        await document.documentElement.webkitRequestFullscreen();
+                    } else if (document.documentElement.msRequestFullscreen) {
+                        await document.documentElement.msRequestFullscreen();
+                    }
+                } catch (error) {
+                    console.log('Fullscreen not supported or blocked');
+                }
+            }
+            
+            start() {
+                if (this.totalSeconds === 0) return;
+                
+                // Enter fullscreen when starting
+                this.enterFullscreen();
+                
+                if (!this.isRunning) {
+                    this.isRunning = true;
+                    this.intervalId = setInterval(() => {
+                        this.remainingSeconds--;
+                        this.updateDisplay();
+                        
+                        if (this.remainingSeconds <= 0) {
+                            this.playAlarmSound();
+                            this.pause();
+                        }
+                    }, 1000);
+                }
+            }
+            
+            pause() {
+                this.isRunning = false;
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
+                }
+            }
+            
+            reset() {
+                this.pause();
+                this.remainingSeconds = this.totalSeconds;
+                this.updateDisplay();
+            }
+        }
+        
+        // Initialize timer when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new Timer();
+        });
+        
+        // Handle fullscreen change events
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                // Exited fullscreen
+            }
+        });
+    </script>
+</body>
+</html>
