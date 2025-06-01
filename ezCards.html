@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EzCards - Premium Learning System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            max-width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            border-bottom: 1px solid #333;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .developer {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: #666;
+            opacity: 0.7;
+        }
+        
+        .upload-section {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .upload-box {
+            border: 2px dashed #333;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px 0;
+            background: #111;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-box:hover {
+            border-color: #4CAF50;
+            background: #151515;
+        }
+        
+        .upload-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+        }
+        
+        .file-list {
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a1a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: 1px solid #555;
+            color: #aaa;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            opacity: 1;
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .delete-btn:hover {
+            border-color: #f44336;
+            color: #f44336;
+        }
+        
+        .template-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #111;
+            border-radius: 15px;
+            border: 1px solid #333;
+        }
+        
+        .template-title {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .template-content {
+            background: #0a0a0a;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #ccc;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        .flashcard-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .flashcard {
+            width: 80%;
+            max-width: 800px;
+            min-height: 400px;
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .flashcard:hover {
+            transform: scale(1.02);
+        }
+        
+        .card-content {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .card-side {
+            display: none;
+        }
+        
+        .card-side.active {
+            display: block;
+        }
+        
+        .card-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        
+        .card-controls:hover {
+            opacity: 1;
+        }
+        
+        .control-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .hard-btn:hover { background: rgba(244, 67, 54, 0.3); }
+        .good-btn:hover { background: rgba(76, 175, 80, 0.3); }
+        .easy-btn:hover { background: rgba(33, 150, 243, 0.3); }
+        
+        .card-info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 0.8rem;
+            color: #666;
+            opacity: 0.6;
+        }
+        
+        .close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 1px solid #555;
+            color: #aaa;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            opacity: 1;
+            border-color: #f44336;
+            color: #f44336;
+        }
+        
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: #4CAF50;
+            transition: width 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .features-list {
+            background: #111;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #333;
+        }
+        
+        .features-list h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        
+        .features-list ul {
+            list-style: none;
+        }
+        
+        .features-list li {
+            padding: 5px 0;
+            color: #ccc;
+        }
+        
+        .features-list li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="developer">Developed by Chinurag</div>
+    
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <div class="logo">EzCards</div>
+            <div class="subtitle">Premium Flashcard Learning System</div>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-box" onclick="document.getElementById('csvFile').click()">
+                <h3>📁 Upload CSV File</h3>
+                <p>Click here or drag and drop your CSV file</p>
+                <input type="file" id="csvFile" class="upload-input" accept=".csv" />
+                <button class="upload-btn">Choose File</button>
+            </div>
+            
+            <div class="file-list" id="fileList">
+                <h3>📚 Uploaded Files</h3>
+                <div id="filesContainer"></div>
+            </div>
+            
+            <div class="template-section">
+                <div class="template-title">📋 CSV Template & Guidelines</div>
+                <div class="template-content">Question,Answer,Difficulty,Category,Tags
+"What is the capital of France?","Paris","Easy","Geography","europe,capitals"
+"Calculate: x² + 5x + 6 = 0","x = -2 or x = -3 (using quadratic formula: x = (-b ± √(b²-4ac)) / 2a)","Medium","Mathematics","algebra,quadratic"
+"HTML: Create a button","&lt;button onclick='function()'&gt;Click Me&lt;/button&gt;","Easy","Programming","html,web"
+
+📝 FEATURES YOU CAN USE:
+• HTML formatting in both questions and answers (use &lt; &gt; for < >)
+• Mathematical formulas: Use both symbols (±, ², ³, ∑, ∫) and words (plus minus, squared, cubed, sum, integral)
+• Categories and tags for organization
+• Difficulty levels: Easy, Medium, Hard
+• Rich text formatting: **bold**, *italic*, `code`
+• Lists, tables, and structured content
+• Images via HTML img tags
+• LaTeX-style math: Use $ for inline math, $$ for display math
+
+🧠 ADVANCED LEARNING FEATURES:
+• Spaced Repetition Algorithm (Anki-style)
+• Active Recall Testing
+• Interleaved Practice (mixed topics)
+• Confidence-based Learning
+• Retrieval Practice with delayed feedback
+• Elaborative Interrogation (why/how questions)
+• Dual Coding (visual + verbal)
+• Testing Effect optimization
+• Forgetting curve optimization
+
+💡 COPY THIS TEMPLATE TO AI CHAT:
+"Create a CSV file for EzCards flashcard app with the following format:
+Question,Answer,Difficulty,Category,Tags
+
+Requirements:
+- Use HTML entities (&lt; &gt;) for HTML code
+- Math formulas: both symbols (², ³, ±, ∑, ∫) and words
+- Difficulty: Easy/Medium/Hard
+- Categories and tags for organization
+- Support HTML formatting in content
+- Each row should be properly quoted if containing commas"</div>
+            </div>
+            
+            <div class="features-list">
+                <h3>🚀 EzCards Advanced Features</h3>
+                <ul>
+                    <li>Spaced Repetition Algorithm - Cards appear based on your performance</li>
+                    <li>Active Recall - Click to reveal answers, test your memory first</li>
+                    <li>Confidence-Based Learning - Rate your certainty, not just correctness</li>
+                    <li>Interleaved Practice - Mix different topics for better retention</li>
+                    <li>Retrieval Practice - Delayed feedback to strengthen memory</li>
+                    <li>HTML Support - Rich formatting, images, code, and math</li>
+                    <li>Progress Tracking - Visual progress bar and statistics</li>
+                    <li>Distraction-Free Mode - Full-screen black background</li>
+                    <li>File Management - Save, reload, and organize multiple decks</li>
+                    <li>Category Filtering - Study specific topics or mixed review</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="flashcard-section" id="flashcardSection">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="card-info" id="cardInfo">Card 1 of 10 | Geography</div>
+        <button class="close-btn" onclick="exitFlashcards()">✕ Exit</button>
+        
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+            <div class="card-content">
+                <div class="card-side active" id="questionSide">
+                    <div id="questionContent">Click to start...</div>
+                </div>
+                <div class="card-side" id="answerSide">
+                    <div id="answerContent">Answer will appear here...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-controls" id="cardControls" style="display: none;">
+            <button class="control-btn hard-btn" onclick="rateCard('hard')">😓 Hard</button>
+            <button class="control-btn good-btn" onclick="rateCard('good')">👍 Good</button>
+            <button class="control-btn easy-btn" onclick="rateCard('easy')">😊 Easy</button>
+        </div>
+    </div>
+
+    <script>
+        // Data storage (in-memory since localStorage is not supported)
+        let uploadedFiles = [];
+        let currentDeck = [];
+        let currentCardIndex = 0;
+        let showingAnswer = false;
+        let studySession = {
+            cards: [],
+            currentIndex: 0,
+            totalCards: 0,
+            correctCount: 0,
+            startTime: null
+        };
+
+        // Spaced repetition intervals (in days)
+        const spacedRepetitionIntervals = {
+            'hard': 1,
+            'good': 3,
+            'easy': 7
+        };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedFiles();
+            setupFileUpload();
+        });
+
+        function setupFileUpload() {
+            const fileInput = document.getElementById('csvFile');
+            fileInput.addEventListener('change', handleFileUpload);
+            
+            // Drag and drop functionality
+            const uploadBox = document.querySelector('.upload-box');
+            uploadBox.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = '#4CAF50';
+            });
+            
+            uploadBox.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = '#333';
+            });
+            
+            uploadBox.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = '#333';
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileUpload({ target: { files: files } });
+                }
+            });
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file || !file.name.endsWith('.csv')) {
+                alert('Please select a valid CSV file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const cards = parseCSV(csv);
+                    
+                    if (cards.length === 0) {
+                        alert('No valid cards found in the CSV file.');
+                        return;
+                    }
+
+                    const fileData = {
+                        name: file.name,
+                        uploadDate: new Date().toLocaleDateString(),
+                        cards: cards,
+                        lastStudied: null,
+                        totalCards: cards.length
+                    };
+
+                    // Check if file already exists
+                    const existingIndex = uploadedFiles.findIndex(f => f.name === file.name);
+                    if (existingIndex >= 0) {
+                        uploadedFiles[existingIndex] = fileData;
+                    } else {
+                        uploadedFiles.push(fileData);
+                    }
+
+                    updateFileList();
+                    alert(`Successfully loaded ${cards.length} cards from ${file.name}!`);
+                } catch (error) {
+                    alert('Error parsing CSV file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            const cards = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                const values = parseCSVLine(line);
+                if (values.length >= 2) {
+                    const card = {
+                        id: Date.now() + Math.random(),
+                        question: decodeHTML(values[0] || ''),
+                        answer: decodeHTML(values[1] || ''),
+                        difficulty: values[2] || 'Medium',
+                        category: values[3] || 'General',
+                        tags: values[4] || '',
+                        nextReview: new Date(),
+                        interval: 1,
+                        easeFactor: 2.5,
+                        reviewCount: 0
+                    };
+                    cards.push(card);
+                }
+            }
+
+            return cards;
+        }
+
+        function parseCSVLine(line) {
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    values.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            values.push(current.trim());
+            return values.map(v => v.replace(/^"|"$/g, ''));
+        }
+
+        function decodeHTML(html) {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = html;
+            return txt.value;
+        }
+
+        function updateFileList() {
+            const container = document.getElementById('filesContainer');
+            
+            if (uploadedFiles.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center;">No files uploaded yet</p>';
+                return;
+            }
+
+            container.innerHTML = uploadedFiles.map((file, index) => `
+                <div class="file-item fade-in">
+                    <div>
+                        <strong>${file.name}</strong>
+                        <div style="font-size: 0.8rem; color: #888;">
+                            ${file.totalCards} cards | Uploaded: ${file.uploadDate}
+                            ${file.lastStudied ? ` | Last studied: ${file.lastStudied}` : ''}
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="action-btn" onclick="startStudySession(${index})">📚 Study</button>
+                        <button class="action-btn" onclick="startStudySession(${index})">🔄 Relearn</button>
+                        <button class="action-btn delete-btn" onclick="deleteFile(${index})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteFile(index) {
+            if (confirm(`Are you sure you want to delete "${uploadedFiles[index].name}"?`)) {
+                uploadedFiles.splice(index, 1);
+                updateFileList();
+            }
+        }
+
+        function startStudySession(fileIndex) {
+            const file = uploadedFiles[fileIndex];
+            currentDeck = [...file.cards];
+            
+            // Shuffle cards for better learning (interleaved practice)
+            shuffleArray(currentDeck);
+            
+            // Apply spaced repetition filtering
+            const availableCards = currentDeck.filter(card => 
+                new Date() >= new Date(card.nextReview)
+            );
+            
+            if (availableCards.length === 0) {
+                alert('No cards are due for review right now! Come back later.');
+                return;
+            }
+
+            studySession = {
+                cards: availableCards,
+                currentIndex: 0,
+                totalCards: availableCards.length,
+                correctCount: 0,
+                startTime: new Date(),
+                fileName: file.name
+            };
+
+            // Update last studied date
+            uploadedFiles[fileIndex].lastStudied = new Date().toLocaleDateString();
+            updateFileList();
+
+            showFlashcardSection();
+            loadCurrentCard();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function showFlashcardSection() {
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('flashcardSection').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function exitFlashcards() {
+            document.getElementById('flashcardSection').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'flex';
+            document.body.style.overflow = 'auto';
+            
+            // Show session summary
+            if (studySession.startTime) {
+                const duration = Math.round((new Date() - studySession.startTime) / 1000 / 60);
+                const accuracy = Math.round((studySession.correctCount / studySession.currentIndex) * 100) || 0;
+                alert(`Study Session Complete!\nCards reviewed: ${studySession.currentIndex}\nAccuracy: ${accuracy}%\nTime: ${duration} minutes`);
+            }
+        }
+
+        function loadCurrentCard() {
+            if (studySession.currentIndex >= studySession.cards.length) {
+                exitFlashcards();
+                return;
+            }
+
+            const card = studySession.cards[studySession.currentIndex];
+            const progress = ((studySession.currentIndex + 1) / studySession.totalCards) * 100;
+            
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('cardInfo').textContent = 
+                `Card ${studySession.currentIndex + 1} of ${studySession.totalCards} | ${card.category}`;
+            
+            document.getElementById('questionContent').innerHTML = card.question;
+            document.getElementById('answerContent').innerHTML = card.answer;
+            
+            // Reset card state
+            showingAnswer = false;
+            document.getElementById('questionSide').classList.add('active');
+            document.getElementById('answerSide').classList.remove('active');
+            document.getElementById('cardControls').style.display = 'none';
+        }
+
+        function flipCard() {
+            if (!showingAnswer) {
+                // Show answer
+                document.getElementById('questionSide').classList.remove('active');
+                document.getElementById('answerSide').classList.add('active');
+                document.getElementById('cardControls').style.display = 'flex';
+                showingAnswer = true;
+            }
+        }
+
+        function rateCard(rating) {
+            const card = studySession.cards[studySession.currentIndex];
+            
+            // Update spaced repetition data
+            updateCardSchedule(card, rating);
+            
+            if (rating === 'good' || rating === 'easy') {
+                studySession.correctCount++;
+            }
+            
+            studySession.currentIndex++;
+            loadCurrentCard();
+        }
+
+        function updateCardSchedule(card, rating) {
+            card.reviewCount++;
+            
+            // Update interval based on rating
+            if (rating === 'hard') {
+                card.interval = Math.max(1, card.interval * 0.8);
+                card.easeFactor = Math.max(1.3, card.easeFactor - 0.2);
+            } else if (rating === 'good') {
+                card.interval = card.interval * card.easeFactor;
+                card.easeFactor = Math.max(1.3, card.easeFactor - 0.1);
+            } else if (rating === 'easy') {
+                card.interval = card.interval * card.easeFactor * 1.3;
+                card.easeFactor = card.easeFactor + 0.1;
+            }
+            
+            // Set next review date
+            const nextReview = new Date();
+            nextReview.setDate(nextReview.getDate() + Math.round(card.interval));
+            card.nextReview = nextReview;
+        }
+
+        function loadSavedFiles() {
+            // Since we can't use localStorage, files will only persist during the session
+            // In a real environment, you would save to localStorage here
+            updateFileList();
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('flashcardSection').style.display === 'flex') {
+                switch(e.key) {
+                    case ' ':
+                    case 'Enter':
+                        e.preventDefault();
+                        if (!showingAnswer) flipCard();
+                        break;
+                    case '1':
+                        if (showingAnswer) rateCard('hard');
+                        break;
+                    case '2':
+                        if (showingAnswer) rateCard('good');
+                        break;
+                    case '3':
+                        if (showingAnswer) rateCard('easy');
+                        break;
+                    case 'Escape':
+                        exitFlashcards();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
