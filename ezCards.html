@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EzCards - Premium Learning System</title>
+    <title>EzCards - Professional Learning System</title>
     <style>
         * {
             margin: 0;
@@ -160,7 +160,7 @@
             padding: 15px;
             border-radius: 8px;
             font-family: monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #ccc;
             white-space: pre-wrap;
             overflow-x: auto;
@@ -209,6 +209,24 @@
             flex-direction: column;
         }
         
+        .card-content code {
+            font-size: 0.9rem;
+            background: #0a0a0a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #4CAF50;
+        }
+        
+        .card-content strong {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .card-content em {
+            font-style: italic;
+            color: #82b1ff;
+        }
+        
         .card-side {
             display: none;
         }
@@ -219,7 +237,7 @@
         
         .card-controls {
             position: fixed;
-            bottom: 30px;
+            bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -229,6 +247,21 @@
         }
         
         .card-controls:hover {
+            opacity: 1;
+        }
+        
+        .navigation-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        
+        .navigation-controls:hover {
             opacity: 1;
         }
         
@@ -247,6 +280,27 @@
         .control-btn:hover {
             background: rgba(255,255,255,0.2);
             transform: translateY(-2px);
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
         
         .hard-btn:hover { background: rgba(244, 67, 54, 0.3); }
@@ -320,6 +374,27 @@
             font-weight: bold;
         }
         
+        .fullscreen-btn {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: none;
+            border: 1px solid #555;
+            color: #aaa;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .fullscreen-btn:hover {
+            opacity: 1;
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -336,7 +411,7 @@
     <div class="container" id="mainContainer">
         <div class="header">
             <div class="logo">EzCards</div>
-            <div class="subtitle">Premium Flashcard Learning System</div>
+            <div class="subtitle">Professional Flashcard Learning System</div>
         </div>
         
         <div class="upload-section">
@@ -353,59 +428,28 @@
             </div>
             
             <div class="template-section">
-                <div class="template-title">📋 CSV Template & Guidelines</div>
+                <div class="template-title">📋 CSV Template</div>
                 <div class="template-content">Question,Answer,Difficulty,Category,Tags
 "What is the capital of France?","Paris","Easy","Geography","europe,capitals"
-"Calculate: x² + 5x + 6 = 0","x = -2 or x = -3 (using quadratic formula: x = (-b ± √(b²-4ac)) / 2a)","Medium","Mathematics","algebra,quadratic"
+"Calculate: x² + 5x + 6 = 0","x = -2 or x = -3","Medium","Mathematics","algebra,quadratic"
 "HTML: Create a button","&lt;button onclick='function()'&gt;Click Me&lt;/button&gt;","Easy","Programming","html,web"
 
-📝 FEATURES YOU CAN USE:
-• HTML formatting in both questions and answers (use &lt; &gt; for < >)
-• Mathematical formulas: Use both symbols (±, ², ³, ∑, ∫) and words (plus minus, squared, cubed, sum, integral)
+Features:
+• HTML formatting: **bold**, *italic*, `code`
+• Math symbols: ², ³, ±, ∑, ∫
 • Categories and tags for organization
-• Difficulty levels: Easy, Medium, Hard
-• Rich text formatting: **bold**, *italic*, `code`
-• Lists, tables, and structured content
-• Images via HTML img tags
-• LaTeX-style math: Use $ for inline math, $$ for display math
-
-🧠 ADVANCED LEARNING FEATURES:
-• Spaced Repetition Algorithm (Anki-style)
-• Active Recall Testing
-• Interleaved Practice (mixed topics)
-• Confidence-based Learning
-• Retrieval Practice with delayed feedback
-• Elaborative Interrogation (why/how questions)
-• Dual Coding (visual + verbal)
-• Testing Effect optimization
-• Forgetting curve optimization
-
-💡 COPY THIS TEMPLATE TO AI CHAT:
-"Create a CSV file for EzCards flashcard app with the following format:
-Question,Answer,Difficulty,Category,Tags
-
-Requirements:
-- Use HTML entities (&lt; &gt;) for HTML code
-- Math formulas: both symbols (², ³, ±, ∑, ∫) and words
-- Difficulty: Easy/Medium/Hard
-- Categories and tags for organization
-- Support HTML formatting in content
-- Each row should be properly quoted if containing commas"</div>
+• Difficulty: Easy/Medium/Hard</div>
             </div>
             
             <div class="features-list">
-                <h3>🚀 EzCards Advanced Features</h3>
+                <h3>🚀 Key Features</h3>
                 <ul>
-                    <li>Spaced Repetition Algorithm - Cards appear based on your performance</li>
-                    <li>Active Recall - Click to reveal answers, test your memory first</li>
-                    <li>Confidence-Based Learning - Rate your certainty, not just correctness</li>
-                    <li>Interleaved Practice - Mix different topics for better retention</li>
-                    <li>Retrieval Practice - Delayed feedback to strengthen memory</li>
-                    <li>HTML Support - Rich formatting, images, code, and math</li>
-                    <li>Progress Tracking - Visual progress bar and statistics</li>
-                    <li>Distraction-Free Mode - Full-screen black background</li>
-                    <li>File Management - Save, reload, and organize multiple decks</li>
-                    <li>Category Filtering - Study specific topics or mixed review</li>
+                    <li>Spaced Repetition Algorithm</li>
+                    <li>Active Recall Testing</li>
+                    <li>Rich Text Formatting Support</li>
+                    <li>Fullscreen Study Mode</li>
+                    <li>Progress Tracking</li>
+                    <li>Navigation Controls</li>
                 </ul>
             </div>
         </div>
@@ -415,6 +459,7 @@ Requirements:
         <div class="progress-bar" id="progressBar"></div>
         <div class="card-info" id="cardInfo">Card 1 of 10 | Geography</div>
         <button class="close-btn" onclick="exitFlashcards()">✕ Exit</button>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
         
         <div class="flashcard" id="flashcard" onclick="flipCard()">
             <div class="card-content">
@@ -432,10 +477,14 @@ Requirements:
             <button class="control-btn good-btn" onclick="rateCard('good')">👍 Good</button>
             <button class="control-btn easy-btn" onclick="rateCard('easy')">😊 Easy</button>
         </div>
+        
+        <div class="navigation-controls" id="navControls">
+            <button class="nav-btn" id="prevBtn" onclick="previousCard()">← Previous</button>
+            <button class="nav-btn" id="nextBtn" onclick="nextCard()">Next →</button>
+        </div>
     </div>
 
     <script>
-        // Data storage (in-memory since localStorage is not supported)
         let uploadedFiles = [];
         let currentDeck = [];
         let currentCardIndex = 0;
@@ -448,14 +497,12 @@ Requirements:
             startTime: null
         };
 
-        // Spaced repetition intervals (in days)
         const spacedRepetitionIntervals = {
             'hard': 1,
             'good': 3,
             'easy': 7
         };
 
-        // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             loadSavedFiles();
             setupFileUpload();
@@ -465,7 +512,6 @@ Requirements:
             const fileInput = document.getElementById('csvFile');
             fileInput.addEventListener('change', handleFileUpload);
             
-            // Drag and drop functionality
             const uploadBox = document.querySelector('.upload-box');
             uploadBox.addEventListener('dragover', (e) => {
                 e.preventDefault();
@@ -513,7 +559,6 @@ Requirements:
                         totalCards: cards.length
                     };
 
-                    // Check if file already exists
                     const existingIndex = uploadedFiles.findIndex(f => f.name === file.name);
                     if (existingIndex >= 0) {
                         uploadedFiles[existingIndex] = fileData;
@@ -543,8 +588,8 @@ Requirements:
                 if (values.length >= 2) {
                     const card = {
                         id: Date.now() + Math.random(),
-                        question: decodeHTML(values[0] || ''),
-                        answer: decodeHTML(values[1] || ''),
+                        question: processRichText(decodeHTML(values[0] || '')),
+                        answer: processRichText(decodeHTML(values[1] || '')),
                         difficulty: values[2] || 'Medium',
                         category: values[3] || 'General',
                         tags: values[4] || '',
@@ -588,6 +633,14 @@ Requirements:
             return txt.value;
         }
 
+        function processRichText(text) {
+            // Convert markdown-style formatting to HTML
+            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); // **bold**
+            text = text.replace(/\*(.+?)\*/g, '<em>$1</em>'); // *italic*
+            text = text.replace(/`(.+?)`/g, '<code>$1</code>'); // `code`
+            return text;
+        }
+
         function updateFileList() {
             const container = document.getElementById('filesContainer');
             
@@ -607,7 +660,6 @@ Requirements:
                     </div>
                     <div class="file-actions">
                         <button class="action-btn" onclick="startStudySession(${index})">📚 Study</button>
-                        <button class="action-btn" onclick="startStudySession(${index})">🔄 Relearn</button>
                         <button class="action-btn delete-btn" onclick="deleteFile(${index})">🗑️ Delete</button>
                     </div>
                 </div>
@@ -625,10 +677,8 @@ Requirements:
             const file = uploadedFiles[fileIndex];
             currentDeck = [...file.cards];
             
-            // Shuffle cards for better learning (interleaved practice)
             shuffleArray(currentDeck);
             
-            // Apply spaced repetition filtering
             const availableCards = currentDeck.filter(card => 
                 new Date() >= new Date(card.nextReview)
             );
@@ -647,7 +697,6 @@ Requirements:
                 fileName: file.name
             };
 
-            // Update last studied date
             uploadedFiles[fileIndex].lastStudied = new Date().toLocaleDateString();
             updateFileList();
 
@@ -673,7 +722,10 @@ Requirements:
             document.getElementById('mainContainer').style.display = 'flex';
             document.body.style.overflow = 'auto';
             
-            // Show session summary
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+            
             if (studySession.startTime) {
                 const duration = Math.round((new Date() - studySession.startTime) / 1000 / 60);
                 const accuracy = Math.round((studySession.correctCount / studySession.currentIndex) * 100) || 0;
@@ -697,16 +749,24 @@ Requirements:
             document.getElementById('questionContent').innerHTML = card.question;
             document.getElementById('answerContent').innerHTML = card.answer;
             
-            // Reset card state
             showingAnswer = false;
             document.getElementById('questionSide').classList.add('active');
             document.getElementById('answerSide').classList.remove('active');
             document.getElementById('cardControls').style.display = 'none';
+            
+            updateNavigationButtons();
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = studySession.currentIndex === 0;
+            nextBtn.disabled = studySession.currentIndex === studySession.totalCards - 1;
         }
 
         function flipCard() {
             if (!showingAnswer) {
-                // Show answer
                 document.getElementById('questionSide').classList.remove('active');
                 document.getElementById('answerSide').classList.add('active');
                 document.getElementById('cardControls').style.display = 'flex';
@@ -717,7 +777,6 @@ Requirements:
         function rateCard(rating) {
             const card = studySession.cards[studySession.currentIndex];
             
-            // Update spaced repetition data
             updateCardSchedule(card, rating);
             
             if (rating === 'good' || rating === 'easy') {
@@ -728,10 +787,23 @@ Requirements:
             loadCurrentCard();
         }
 
+        function nextCard() {
+            if (studySession.currentIndex < studySession.totalCards - 1) {
+                studySession.currentIndex++;
+                loadCurrentCard();
+            }
+        }
+
+        function previousCard() {
+            if (studySession.currentIndex > 0) {
+                studySession.currentIndex--;
+                loadCurrentCard();
+            }
+        }
+
         function updateCardSchedule(card, rating) {
             card.reviewCount++;
             
-            // Update interval based on rating
             if (rating === 'hard') {
                 card.interval = Math.max(1, card.interval * 0.8);
                 card.easeFactor = Math.max(1.3, card.easeFactor - 0.2);
@@ -743,19 +815,23 @@ Requirements:
                 card.easeFactor = card.easeFactor + 0.1;
             }
             
-            // Set next review date
             const nextReview = new Date();
             nextReview.setDate(nextReview.getDate() + Math.round(card.interval));
             card.nextReview = nextReview;
         }
 
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
         function loadSavedFiles() {
-            // Since we can't use localStorage, files will only persist during the session
-            // In a real environment, you would save to localStorage here
             updateFileList();
         }
 
-        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             if (document.getElementById('flashcardSection').style.display === 'flex') {
                 switch(e.key) {
@@ -773,8 +849,22 @@ Requirements:
                     case '3':
                         if (showingAnswer) rateCard('easy');
                         break;
+                    case 'ArrowLeft':
+                        previousCard();
+                        break;
+                    case 'ArrowRight':
+                        nextCard();
+                        break;
+                    case 'F11':
+                        e.preventDefault();
+                        toggleFullscreen();
+                        break;
                     case 'Escape':
-                        exitFlashcards();
+                        if (document.fullscreenElement) {
+                            document.exitFullscreen();
+                        } else {
+                            exitFlashcards();
+                        }
                         break;
                 }
             }
