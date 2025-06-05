@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Productivity Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d, #0f0f0f, #3a3a3a);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease-in-out infinite;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 50% 100%; }
+            75% { background-position: 50% 0%; }
+        }
+
+        .timer-container {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .controls.visible {
+            opacity: 1;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 12px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .squares-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 8px;
+            padding: 20px;
+            height: calc(100vh - 60px);
+            width: 100vw;
+        }
+
+        .minute-square {
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 1s ease-out;
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        .minute-square.completed {
+            opacity: 0;
+            transform: scale(0.8);
+            background: transparent;
+        }
+
+        .second-progress {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ffffff, #cccccc);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .flash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .flash-overlay.flash {
+            animation: flashEffect 0.5s ease-out;
+        }
+
+        @keyframes flashEffect {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .time-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 48px;
+            font-weight: 300;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .time-display.visible {
+            opacity: 1;
+        }
+
+        @media (orientation: landscape) {
+            .squares-grid {
+                grid-template-columns: repeat(12, 1fr);
+                grid-template-rows: repeat(5, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="timer-container">
+        <div class="controls" id="controls">
+            <button class="btn" onclick="startTimer()">Start</button>
+            <button class="btn" onclick="pauseTimer()">Pause</button>
+            <button class="btn" onclick="resetTimer()">Reset</button>
+            <button class="btn" onclick="toggleFullscreen()">Fullscreen</button>
+        </div>
+
+        <div class="time-display" id="timeDisplay">60:00</div>
+
+        <div class="squares-grid" id="squaresGrid"></div>
+        
+        <div class="second-progress" id="secondProgress"></div>
+        <div class="flash-overlay" id="flashOverlay"></div>
+    </div>
+
+    <script>
+        let timerRunning = false;
+        let totalSeconds = 3600; // 60 minutes
+        let remainingSeconds = totalSeconds;
+        let timerInterval;
+        let secondInterval;
+        let controlsTimeout;
+        let currentSecondInMinute = 0;
+
+        // Create 60 squares (one for each minute)
+        function createSquares() {
+            const grid = document.getElementById('squaresGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 60; i++) {
+                const square = document.createElement('div');
+                square.className = 'minute-square';
+                square.id = `square-${i}`;
+                grid.appendChild(square);
+            }
+        }
+
+        function updateTimeDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            document.getElementById('timeDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateSecondProgress() {
+            const progress = (currentSecondInMinute / 60) * 100;
+            document.getElementById('secondProgress').style.width = progress + '%';
+        }
+
+        function flashScreen() {
+            const flash = document.getElementById('flashOverlay');
+            flash.classList.add('flash');
+            setTimeout(() => flash.classList.remove('flash'), 500);
+        }
+
+        function completeMinute(minuteIndex) {
+            const square = document.getElementById(`square-${minuteIndex}`);
+            if (square) {
+                square.classList.add('completed');
+                flashScreen();
+            }
+        }
+
+        function startTimer() {
+            if (timerRunning) return;
+            
+            timerRunning = true;
+            
+            timerInterval = setInterval(() => {
+                if (remainingSeconds > 0) {
+                    remainingSeconds--;
+                    currentSecondInMinute++;
+                    
+                    updateTimeDisplay();
+                    updateSecondProgress();
+                    
+                    // Complete a minute square every 60 seconds
+                    if (currentSecondInMinute >= 60) {
+                        const completedMinutes = Math.floor((totalSeconds - remainingSeconds) / 60);
+                        if (completedMinutes > 0 && completedMinutes <= 60) {
+                            completeMinute(completedMinutes - 1);
+                        }
+                        currentSecondInMinute = 0;
+                    }
+                } else {
+                    // Timer completed
+                    clearInterval(timerInterval);
+                    timerRunning = false;
+                    flashScreen();
+                    setTimeout(() => alert('Timer Complete!'), 600);
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (!timerRunning) return;
+            
+            clearInterval(timerInterval);
+            timerRunning = false;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            remainingSeconds = totalSeconds;
+            currentSecondInMinute = 0;
+            
+            updateTimeDisplay();
+            document.getElementById('secondProgress').style.width = '0%';
+            createSquares();
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Fullscreen not supported');
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function showControls() {
+            const controls = document.getElementById('controls');
+            const timeDisplay = document.getElementById('timeDisplay');
+            
+            controls.classList.add('visible');
+            timeDisplay.classList.add('visible');
+            
+            clearTimeout(controlsTimeout);
+            controlsTimeout = setTimeout(() => {
+                controls.classList.remove('visible');
+                timeDisplay.classList.remove('visible');
+            }, 5000);
+        }
+
+        // Event listeners
+        document.addEventListener('click', showControls);
+        document.addEventListener('touchstart', showControls);
+        document.addEventListener('mousemove', showControls);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case ' ':
+                    e.preventDefault();
+                    timerRunning ? pauseTimer() : startTimer();
+                    break;
+                case 'r':
+                    resetTimer();
+                    break;
+                case 'F11':
+                case 'f':
+                    toggleFullscreen();
+                    break;
+            }
+            showControls();
+        });
+
+        // Initialize
+        createSquares();
+        updateTimeDisplay();
+        
+        // Show controls initially
+        showControls();
+    </script>
+</body>
+</html>
