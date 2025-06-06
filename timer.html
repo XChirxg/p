@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Water Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .controls.visible {
+            opacity: 1;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            padding: 12px 16px;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        .water-container {
+            width: 80px;
+            height: 120px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            opacity: 0.2;
+            transition: opacity 0.5s ease;
+        }
+
+        .water-container.active {
+            opacity: 1;
+        }
+
+        .water-container.finished {
+            animation: collapse 0.8s ease-in-out forwards;
+        }
+
+        .water-container.danger {
+            background: linear-gradient(180deg, #2d1b1b 0%, #3d1a1a 100%);
+        }
+
+        @keyframes collapse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+        .water {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                #4a90e2 0%, 
+                #357abd 30%, 
+                #2563eb 60%, 
+                #1d4ed8 100%);
+            transition: height 0.3s ease;
+            overflow: hidden;
+        }
+
+        .water.danger {
+            background: linear-gradient(180deg, 
+                #ef4444 0%, 
+                #dc2626 30%, 
+                #b91c1c 60%, 
+                #991b1b 100%);
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: bubble-float 3s infinite ease-in-out;
+        }
+
+        @keyframes bubble-float {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) scale(1.2);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(-40px) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        .wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                transparent 100%);
+            animation: wave 2s infinite ease-in-out;
+        }
+
+        @keyframes wave {
+            0%, 100% {
+                transform: translateX(-100%);
+            }
+            50% {
+                transform: translateX(100%);
+            }
+        }
+
+        .flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.8) 0%, 
+                rgba(255, 255, 255, 0.4) 30%, 
+                transparent 70%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .flash.active {
+            animation: flash-effect 0.5s ease-out;
+        }
+
+        @keyframes flash-effect {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+
+        .fullscreen-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .fullscreen-btn.visible {
+            opacity: 1;
+        }
+
+        .setup-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            gap: 30px;
+        }
+
+        .setup-screen h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        @media (orientation: landscape) {
+            .timer-grid {
+                grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+                gap: 10px;
+            }
+            
+            .water-container {
+                width: 60px;
+                height: 90px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="setup-screen" id="setupScreen">
+            <h1>Premium Timer</h1>
+            <div class="input-group">
+                <input type="number" id="minutesInput" placeholder="Minutes" min="1" max="180" value="25">
+                <button onclick="startTimer()">Start Timer</button>
+            </div>
+        </div>
+
+        <div class="controls" id="controls">
+            <div class="input-group">
+                <input type="number" id="minutesInputRunning" placeholder="Minutes" min="1" max="180">
+                <button onclick="resetTimer()">Reset</button>
+                <button onclick="pauseResumeTimer()" id="pauseBtn">Pause</button>
+            </div>
+        </div>
+
+        <div class="timer-grid" id="timerGrid" style="display: none;"></div>
+        
+        <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()">F11</button>
+    </div>
+
+    <div class="flash" id="flash"></div>
+
+    <script>
+        let timerState = {
+            totalMinutes: 0,
+            currentMinute: 0,
+            intervalId: null,
+            isPaused: false,
+            containers: [],
+            startTime: null,
+            pausedTime: 0
+        };
+
+        let controlsTimeout;
+        let audioContext;
+        let isFirstInteraction = true;
+
+        // Initialize audio context on first user interaction
+        document.addEventListener('click', initializeAudio, { once: true });
+
+        function initializeAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(frequency, duration, type = 'sine') {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        function playWarningSound() {
+            // Warning sound - two quick beeps
+            playSound(800, 0.15);
+            setTimeout(() => playSound(800, 0.15), 200);
+        }
+
+        function playCompletionSound() {
+            // Completion sound - ascending chime
+            playSound(523, 0.2); // C
+            setTimeout(() => playSound(659, 0.2), 100); // E
+            setTimeout(() => playSound(784, 0.3), 200); // G
+        }
+
+        function startTimer() {
+            const minutes = parseInt(document.getElementById('minutesInput').value) || 25;
+            timerState.totalMinutes = minutes;
+            timerState.currentMinute = 0;
+            timerState.startTime = Date.now();
+            timerState.pausedTime = 0;
+            
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('timerGrid').style.display = 'grid';
+            document.getElementById('minutesInputRunning').value = minutes;
+            
+            createWaterContainers();
+            runTimer();
+            
+            // Show controls briefly
+            showControls();
+        }
+
+        function createWaterContainers() {
+            const grid = document.getElementById('timerGrid');
+            grid.innerHTML = '';
+            timerState.containers = [];
+            
+            for (let i = 0; i < timerState.totalMinutes; i++) {
+                const container = document.createElement('div');
+                container.className = 'water-container';
+                
+                const water = document.createElement('div');
+                water.className = 'water';
+                
+                const wave = document.createElement('div');
+                wave.className = 'wave';
+                water.appendChild(wave);
+                
+                // Add random bubbles
+                for (let j = 0; j < Math.random() * 3 + 2; j++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    bubble.style.width = bubble.style.height = (Math.random() * 6 + 4) + 'px';
+                    bubble.style.left = Math.random() * 80 + '%';
+                    bubble.style.animationDelay = Math.random() * 3 + 's';
+                    bubble.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    water.appendChild(bubble);
+                }
+                
+                container.appendChild(water);
+                grid.appendChild(container);
+                timerState.containers.push({ element: container, water: water, progress: 100 });
+            }
+            
+            if (timerState.containers.length > 0) {
+                timerState.containers[0].element.classList.add('active');
+            }
+        }
+
+        function runTimer() {
+            timerState.intervalId = setInterval(() => {
+                if (timerState.isPaused) return;
+                
+                const elapsed = Date.now() - timerState.startTime - timerState.pausedTime;
+                const totalElapsedMinutes = elapsed / (45 * 1000); // 45 seconds = 1 "minute"
+                const currentMinuteIndex = Math.floor(totalElapsedMinutes);
+                
+                if (currentMinuteIndex >= timerState.totalMinutes) {
+                    // Timer completed
+                    clearInterval(timerState.intervalId);
+                    playCompletionSound();
+                    flashScreen();
+                    setTimeout(() => {
+                        resetTimer();
+                    }, 2000);
+                    return;
+                }
+                
+                // Update current minute progress
+                const minuteProgress = (totalElapsedMinutes - currentMinuteIndex) * 100;
+                const container = timerState.containers[currentMinuteIndex];
+                
+                if (container) {
+                    // Update active container
+                    timerState.containers.forEach((c, index) => {
+                        c.element.classList.remove('active', 'danger');
+                        if (index === currentMinuteIndex) {
+                            c.element.classList.add('active');
+                            if (currentMinuteIndex === timerState.totalMinutes - 1) {
+                                c.element.classList.add('danger');
+                                c.water.classList.add('danger');
+                            }
+                        }
+                    });
+                    
+                    container.water.style.height = (100 - minuteProgress) + '%';
+                    
+                    // Check for half-time warning
+                    if (minuteProgress >= 50 && minuteProgress < 55 && !container.warningPlayed) {
+                        playWarningSound();
+                        container.warningPlayed = true;
+                    }
+                }
+                
+                // Complete previous containers
+                if (currentMinuteIndex > timerState.currentMinute) {
+                    for (let i = 0; i < currentMinuteIndex; i++) {
+                        if (!timerState.containers[i].completed) {
+                            timerState.containers[i].element.classList.add('finished');
+                            timerState.containers[i].completed = true;
+                            playCompletionSound();
+                            flashScreen();
+                        }
+                    }
+                    timerState.currentMinute = currentMinuteIndex;
+                }
+                
+            }, 100);
+        }
+
+        function flashScreen() {
+            const flash = document.getElementById('flash');
+            flash.classList.add('active');
+            setTimeout(() => {
+                flash.classList.remove('active');
+            }, 500);
+        }
+
+        function pauseResumeTimer() {
+            if (timerState.isPaused) {
+                timerState.startTime = Date.now() - (timerState.pausedTime + (Date.now() - timerState.pauseStartTime));
+                timerState.isPaused = false;
+                document.getElementById('pauseBtn').textContent = 'Pause';
+            } else {
+                timerState.pauseStartTime = Date.now();
+                timerState.isPaused = true;
+                document.getElementById('pauseBtn').textContent = 'Resume';
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerState.intervalId);
+            timerState = {
+                totalMinutes: 0,
+                currentMinute: 0,
+                intervalId: null,
+                isPaused: false,
+                containers: [],
+                startTime: null,
+                pausedTime: 0
+            };
+            
+            document.getElementById('setupScreen').style.display = 'flex';
+            document.getElementById('timerGrid').style.display = 'none';
+            hideControls();
+        }
+
+        function showControls() {
+            const controls = document.getElementById('controls');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            
+            controls.classList.add('visible');
+            fullscreenBtn.classList.add('visible');
+            
+            clearTimeout(controlsTimeout);
+            controlsTimeout = setTimeout(() => {
+                hideControls();
+            }, 5000);
+        }
+
+        function hideControls() {
+            const controls = document.getElementById('controls');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            
+            controls.classList.remove('visible');
+            fullscreenBtn.classList.remove('visible');
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Show controls on click/touch
+        document.addEventListener('click', () => {
+            if (document.getElementById('timerGrid').style.display !== 'none') {
+                showControls();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                if (timerState.intervalId) {
+                    pauseResumeTimer();
+                }
+            } else if (e.key === 'Escape') {
+                if (timerState.intervalId) {
+                    resetTimer();
+                }
+            }
+        });
+
+        // Prevent context menu
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+    </script>
+</body>
+</html>
