@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Training Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Setup Screen */
+        .setup-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 2rem;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%);
+        }
+
+        .setup-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0;
+        }
+
+        textarea, input[type="number"] {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        textarea::placeholder, input[type="number"]::placeholder {
+            color: #888;
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            min-width: 160px;
+        }
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-button:active {
+            transform: translateY(0);
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.3) 0%, rgba(58, 96, 206, 0.3) 100%);
+            border-color: rgba(74, 144, 226, 0.5);
+            margin-top: 1rem;
+            width: 100%;
+            font-size: 1.3rem;
+            padding: 1.5rem;
+        }
+
+        .start-button:hover {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.4) 0%, rgba(58, 96, 206, 0.4) 100%);
+            border-color: rgba(74, 144, 226, 0.7);
+        }
+
+        /* Interview Screen */
+        .interview-screen {
+            display: none;
+            height: 100vh;
+            position: relative;
+        }
+
+        .camera-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 2rem;
+            z-index: 3;
+        }
+
+        .timer-display {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .timer-display.warning {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.3);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .progress-info {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .question-counter {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-progress {
+            font-size: 1rem;
+            color: #a0a0a0;
+        }
+
+        .bottom-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 70%, transparent 100%);
+            padding: 3rem 2rem 2rem;
+            z-index: 3;
+        }
+
+        .question-display {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .question-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            pointer-events: all;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            z-index: 4;
+        }
+
+        .status-recording {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.3);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .status-reading {
+            color: #4ecdc4;
+            border-color: rgba(78, 205, 196, 0.3);
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .status-complete {
+            color: #45b7d1;
+            border-color: rgba(69, 183, 209, 0.3);
+            background: rgba(69, 183, 209, 0.1);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .setup-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .time-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+                height: auto;
+                padding: 1rem;
+            }
+
+            .timer-display {
+                font-size: 1.5rem;
+                min-width: 140px;
+            }
+
+            .question-text {
+                font-size: 1.4rem;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .setup-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Screen -->
+        <div class="setup-screen" id="setupScreen">
+            <div class="setup-card">
+                <h1>Interview Training Pro</h1>
+                <p class="subtitle">Master your interview skills with AI-powered practice sessions</p>
+                
+                <div class="form-group">
+                    <label for="questionsInput">Interview Questions (comma-separated):</label>
+                    <textarea 
+                        id="questionsInput" 
+                        rows="8" 
+                        placeholder="Tell me about yourself, What are your greatest strengths?, Why do you want to work here?, Describe a challenging situation you faced, Where do you see yourself in 5 years?"
+                    ></textarea>
+                </div>
+
+                <div class="time-inputs">
+                    <div class="form-group">
+                        <label for="answerTime">Answer Time (seconds):</label>
+                        <input type="number" id="answerTime" value="120" min="30" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label for="readingTime">Reading Time (seconds):</label>
+                        <input type="number" id="readingTime" value="10" min="5" max="30">
+                    </div>
+                </div>
+
+                <button class="glass-button start-button" onclick="startInterview()">
+                    Start Interview Session
+                </button>
+            </div>
+        </div>
+
+        <!-- Interview Screen -->
+        <div class="interview-screen" id="interviewScreen">
+            <div class="camera-container">
+                <video id="camera-feed" autoplay muted></video>
+            </div>
+
+            <div class="overlay">
+                <div class="status-indicator" id="statusIndicator">
+                    Preparing...
+                </div>
+
+                <div class="top-bar">
+                    <div class="timer-display" id="timerDisplay">
+                        00:00
+                    </div>
+                    <div class="progress-info">
+                        <div class="question-counter" id="questionCounter">1 / 5</div>
+                        <div class="total-progress" id="totalProgress">Question 1</div>
+                    </div>
+                </div>
+
+                <div class="bottom-bar">
+                    <div class="question-display">
+                        <div class="question-text" id="questionText">
+                            Get ready to start your interview...
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button class="glass-button" onclick="pauseInterview()" id="pauseBtn">
+                            Pause
+                        </button>
+                        <button class="glass-button" onclick="nextQuestion()" id="nextBtn">
+                            Next Question
+                        </button>
+                        <button class="glass-button" onclick="endInterview()" id="endBtn">
+                            End Interview
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let currentQuestion = 0;
+        let answerTime = 120;
+        let readingTime = 10;
+        let timer = null;
+        let timeLeft = 0;
+        let isRecording = false;
+        let isPaused = false;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let stream = null;
+        let phase = 'reading'; // 'reading' or 'answering'
+
+        async function startInterview() {
+            const questionsInput = document.getElementById('questionsInput').value.trim();
+            if (!questionsInput) {
+                alert('Please enter some interview questions first!');
+                return;
+            }
+
+            // Parse questions
+            questions = questionsInput.split(',').map(q => q.trim()).filter(q => q);
+            if (questions.length === 0) {
+                alert('Please enter valid questions!');
+                return;
+            }
+
+            // Get timing settings
+            answerTime = parseInt(document.getElementById('answerTime').value);
+            readingTime = parseInt(document.getElementById('readingTime').value);
+
+            // Request camera and microphone permissions
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 1920 }, 
+                        height: { ideal: 1080 } 
+                    }, 
+                    audio: true 
+                });
+                
+                document.getElementById('camera-feed').srcObject = stream;
+                
+                // Enter fullscreen
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                }
+                
+                // Switch to interview screen
+                document.getElementById('setupScreen').style.display = 'none';
+                document.getElementById('interviewScreen').style.display = 'block';
+                
+                // Initialize interview
+                currentQuestion = 0;
+                startQuestionCycle();
+                
+            } catch (error) {
+                alert('Camera and microphone access is required for the interview. Please allow access and try again.');
+                console.error('Error accessing media devices:', error);
+            }
+        }
+
+        function startQuestionCycle() {
+            if (currentQuestion >= questions.length) {
+                completeInterview();
+                return;
+            }
+
+            updateQuestionDisplay();
+            startReadingPhase();
+        }
+
+        function startReadingPhase() {
+            phase = 'reading';
+            timeLeft = readingTime;
+            updateStatus('Reading Time', 'status-reading');
+            updateTimerDisplay();
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    startAnsweringPhase();
+                }
+            }, 1000);
+        }
+
+        function startAnsweringPhase() {
+            phase = 'answering';
+            timeLeft = answerTime;
+            updateStatus('Recording Answer', 'status-recording');
+            updateTimerDisplay();
+            
+            // Start recording
+            startRecording();
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    stopRecording();
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function startRecording() {
+            if (stream) {
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.start();
+                isRecording = true;
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+            }
+        }
+
+        function updateQuestionDisplay() {
+            document.getElementById('questionText').textContent = questions[currentQuestion];
+            document.getElementById('questionCounter').textContent = `${currentQuestion + 1} / ${questions.length}`;
+            document.getElementById('totalProgress').textContent = `Question ${currentQuestion + 1}`;
+        }
+
+        function updateStatus(text, className) {
+            const statusEl = document.getElementById('statusIndicator');
+            statusEl.textContent = text;
+            statusEl.className = 'status-indicator ' + className;
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const timerEl = document.getElementById('timerDisplay');
+            timerEl.textContent = display;
+            
+            // Add warning class for last 30 seconds
+            if (timeLeft <= 30 && phase === 'answering') {
+                timerEl.classList.add('warning');
+            } else {
+                timerEl.classList.remove('warning');
+            }
+        }
+
+        function pauseInterview() {
+            if (isPaused) {
+                resumeInterview();
+            } else {
+                isPaused = true;
+                clearInterval(timer);
+                document.getElementById('pauseBtn').textContent = 'Resume';
+                updateStatus('Paused', 'status-indicator');
+                
+                if (isRecording) {
+                    mediaRecorder.pause();
+                }
+            }
+        }
+
+        function resumeInterview() {
+            isPaused = false;
+            document.getElementById('pauseBtn').textContent = 'Pause';
+            
+            if (phase === 'reading') {
+                startReadingPhase();
+            } else {
+                startAnsweringPhase();
+            }
+            
+            if (mediaRecorder && mediaRecorder.state === 'paused') {
+                mediaRecorder.resume();
+            }
+        }
+
+        function nextQuestion() {
+            clearInterval(timer);
+            stopRecording();
+            
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                setTimeout(() => {
+                    startQuestionCycle();
+                }, 1000);
+            } else {
+                completeInterview();
+            }
+        }
+
+        function endInterview() {
+            if (confirm('Are you sure you want to end the interview?')) {
+                clearInterval(timer);
+                stopRecording();
+                completeInterview();
+            }
+        }
+
+        function completeInterview() {
+            updateStatus('Interview Complete!', 'status-complete');
+            document.getElementById('questionText').textContent = 'Congratulations! You have completed your interview practice session.';
+            
+            // Hide controls
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('endBtn').textContent = 'Return to Setup';
+            document.getElementById('endBtn').onclick = returnToSetup;
+            
+            // Stop camera
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        function returnToSetup() {
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+            
+            // Reset UI
+            document.getElementById('interviewScreen').style.display = 'none';
+            document.getElementById('setupScreen').style.display = 'flex';
+            
+            // Reset controls
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('endBtn').textContent = 'End Interview';
+            document.getElementById('endBtn').onclick = endInterview;
+            document.getElementById('pauseBtn').textContent = 'Pause';
+            
+            // Reset variables
+            currentQuestion = 0;
+            isPaused = false;
+            isRecording = false;
+            phase = 'reading';
+            
+            // Clear camera feed
+            document.getElementById('camera-feed').srcObject = null;
+        }
+
+        // Handle fullscreen change
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement && document.getElementById('interviewScreen').style.display === 'block') {
+                // User exited fullscreen during interview
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                }
+            }
+        });
+
+        // Prevent accidental page refresh during interview
+        window.addEventListener('beforeunload', function(e) {
+            if (document.getElementById('interviewScreen').style.display === 'block') {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    </script>
+</body>
+</html>
