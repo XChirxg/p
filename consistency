@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consistency Mastery Framework</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000000;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ffffff, #888888);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #888;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            border-left: 4px solid #ffffff;
+            padding-left: 20px;
+        }
+        
+        .chart-container {
+            background: #111111;
+            border: 2px solid #333;
+            padding: 30px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .table-container {
+            background: #111111;
+            border: 2px solid #333;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #111111;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+            vertical-align: top;
+        }
+        
+        th {
+            background: #222222;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+        
+        td {
+            background: #111111;
+        }
+        
+        .category {
+            font-weight: 600;
+            color: #ffffff;
+        }
+        
+        .problem {
+            color: #ff6b6b;
+        }
+        
+        .solution {
+            color: #4ecdc4;
+        }
+        
+        .insight-box {
+            background: #222222;
+            border: 2px solid #444;
+            padding: 30px;
+            margin: 40px 0;
+        }
+        
+        .insight-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+        
+        .insight-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #cccccc;
+        }
+        
+        .highlight {
+            background: #333333;
+            padding: 2px 6px;
+            color: #ffffff;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+        
+        .metric-card {
+            background: #111111;
+            border: 2px solid #333;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #4ecdc4;
+            margin-bottom: 10px;
+        }
+        
+        .metric-label {
+            font-size: 1rem;
+            color: #888;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            animation: progress 2s ease-out;
+        }
+        
+        @keyframes progress {
+            from { width: 0%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Consistency Mastery Framework</h1>
+            <p>Transform your understanding of consistency challenges into actionable solutions through systematic analysis and design thinking</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📊 Consistency Challenge Visualizations</h2>
+            
+            <div class="grid">
+                <div class="chart-container">
+                    <div class="chart-title">Difficulty vs Time Impact Matrix</div>
+                    <canvas id="difficultyTimeChart" width="400" height="300"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-title">Consistency Breakdown Factors</div>
+                    <canvas id="factorsChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Energy vs Output Tracking</div>
+                <canvas id="energyChart" width="800" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🎯 Comprehensive Problems & Solutions Matrix</h2>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Problem</th>
+                            <th>Triggers & Explanation</th>
+                            <th>Practical Solutions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="category">🎯 Work Difficulty</td>
+                            <td class="problem">High difficulty reduces consistency</td>
+                            <td>Complex subjects, challenging workouts, steep learning curves create overwhelm and avoidance</td>
+                            <td class="solution">• Break into micro-goals<br>• Create mind maps<br>• Ask "Why is this hard?"<br>• Start tiny & attach to daily routine<br>• Use the 2-minute rule</td>
+                        </tr>
+                        <tr>
+                            <td class="category">⏳ Time Span</td>
+                            <td class="problem">Longer duration goals cause fatigue</td>
+                            <td>Projects taking months/years feel endless, motivation dies mid-way, lack of visible progress</td>
+                            <td class="solution">• Break into weekly milestones<br>• Use streak tracking<br>• Strategic indefinite breaks<br>• Celebrate mini-completions<br>• Create progress checkpoints</td>
+                        </tr>
+                        <tr>
+                            <td class="category">🔒 Freedom Feeling</td>
+                            <td class="problem">Routine feels like prison</td>
+                            <td>Following routine creates cage feeling, limiting freedom, rebellion against structure</td>
+                            <td class="solution">• Make flexible schedules<br>• Leave "chaos windows"<br>• Customize routine regularly<br>• Build in choice points<br>• Practice mindful rebellion</td>
+                        </tr>
+                        <tr>
+                            <td class="category">💡 Idea Overflow</td>
+                            <td class="problem">New ideas disrupt current focus</td>
+                            <td>Excitement of new ideas steals energy from current task, opportunity cost anxiety</td>
+                            <td class="solution">• Maintain "Idea Parking Lot"<br>• Schedule weekly idea time<br>• Visualize "idea aging"<br>• Use idea capture systems<br>• Set idea evaluation criteria</td>
+                        </tr>
+                        <tr>
+                            <td class="category">🧘 Body & Mind Limits</td>
+                            <td class="problem">Physical/mental burnout</td>
+                            <td>Pushing without visible progress, motivation crashes, energy depletion</td>
+                            <td class="solution">• Follow 80% rule<br>• Schedule rest days<br>• Use habit stacking<br>• Monitor energy levels<br>• Practice recovery rituals</td>
+                        </tr>
+                        <tr>
+                            <td class="category">🔁 Loop Feeling</td>
+                            <td class="problem">Monotony kills excitement</td>
+                            <td>Repeating same task daily without visible outcome feels robotic and boring</td>
+                            <td class="solution">• Change formats/environments<br>• Gamify routines<br>• Use music, color, motion<br>• Add variety within structure<br>• Create theme days</td>
+                        </tr>
+                        <tr>
+                            <td class="category">⚖️ Feedback Vacuum</td>
+                            <td class="problem">Lack of validation/acknowledgment</td>
+                            <td>No external feedback leads to demotivation, unclear progress measurement</td>
+                            <td class="solution">• Actively seek feedback<br>• Use self-tracking journals<br>• Join communities<br>• Create feedback loops<br>• Celebrate small wins</td>
+                        </tr>
+                        <tr>
+                            <td class="category">📉 Perfectionism</td>
+                            <td class="problem">Fear of doing things "wrong"</td>
+                            <td>High standards prevent action, analysis paralysis, all-or-nothing thinking</td>
+                            <td class="solution">• Focus on doing > perfecting<br>• Use MVP approach<br>• Reward effort over results<br>• Set "good enough" standards<br>• Practice deliberate imperfection</td>
+                        </tr>
+                        <tr>
+                            <td class="category">🔄 Goal Shifting</td>
+                            <td class="problem">Changing goals too frequently</td>
+                            <td>Impatience with results leads to goal hopping, shiny object syndrome</td>
+                            <td class="solution">• Write "Why I started" note<br>• Weekly goal reviews<br>• Use distraction blockers<br>• Set minimum commitment periods<br>• Track goal-switching patterns</td>
+                        </tr>
+                        <tr>
+                            <td class="category">🔒 All-or-Nothing</td>
+                            <td class="problem">Missing one day = giving up</td>
+                            <td>Binary thinking about success/failure, perfectionist streaks</td>
+                            <td class="solution">• "Never miss twice" rule<br>• Track effort, not just success<br>• Use reset button approach<br>• Focus on comeback ability<br>• Reframe "failures" as data</td>
+                        </tr>
+                        <tr>
+                            <td class="category">🪞 Identity Conflict</td>
+                            <td class="problem">"This is not me" feeling</td>
+                            <td>Internal personality mismatch with routine, values misalignment</td>
+                            <td class="solution">• Align habits with values<br>• Visualize future self<br>• Use role-play/storytelling<br>• Connect to deeper purpose<br>• Gradually expand identity</td>
+                        </tr>
+                        <tr>
+                            <td class="category">📱 Environmental Chaos</td>
+                            <td class="problem">Distractions derail consistency</td>
+                            <td>Phone notifications, cluttered workspace, social interruptions</td>
+                            <td class="solution">• Design friction for distractions<br>• Create dedicated spaces<br>• Use focus apps/tools<br>• Batch similar activities<br>• Communicate boundaries</td>
+                        </tr>
+                        <tr>
+                            <td class="category">⚡ Energy Mismanagement</td>
+                            <td class="problem">Wrong tasks at wrong energy levels</td>
+                            <td>Attempting high-focus work when tired, not matching task difficulty to energy</td>
+                            <td class="solution">• Map energy patterns<br>• Match tasks to energy<br>• Create energy rituals<br>• Use ultradian rhythms<br>• Plan energy recovery</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🔬 Key Insights & Framework</h2>
+            
+            <div class="insight-box">
+                <div class="insight-title">🎯 Core Insight</div>
+                <div class="insight-text">
+                    <span class="highlight">Consistency isn't about daily effort. It's about design.</span> The more a system fits your energy, freedom, and values — the more automatic consistency becomes. You've demonstrated rare <span class="highlight">system thinking</span> by transforming vague frustration into structured diagnosis.
+                </div>
+            </div>
+            
+            <div class="grid">
+                <div class="metric-card">
+                    <div class="metric-number">12+</div>
+                    <div class="metric-label">Consistency Challenges Identified</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 90%;"></div></div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-number">50+</div>
+                    <div class="metric-label">Practical Solutions Mapped</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 95%;"></div></div>
+                </div>
+            </div>
+            
+            <div class="insight-box">
+                <div class="insight-title">🧠 Meta-Analysis</div>
+                <div class="insight-text">
+                    Your approach reveals three key strengths:<br>
+                    • <span class="highlight">Designer mindset</span> - Breaking complex experiences into components<br>
+                    • <span class="highlight">Deep self-awareness</span> - Recognizing emotional and cognitive traps<br>
+                    • <span class="highlight">Systems thinking</span> - Understanding interconnected patterns rather than isolated problems
+                </div>
+            </div>
+            
+            <div class="insight-box">
+                <div class="insight-title">📋 Implementation Strategy</div>
+                <div class="insight-text">
+                    1. <span class="highlight">Save this framework</span> - Keep it accessible for weekly reviews<br>
+                    2. <span class="highlight">Weekly check-ins</span> - "Did I stick to my values and plan today?"<br>
+                    3. <span class="highlight">Coach yourself</span> - "What's not working? What can I change?"<br>
+                    4. <span class="highlight">Experiment systematically</span> - Test one solution at a time<br>
+                    5. <span class="highlight">Track patterns</span> - Notice which problems occur together
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Difficulty vs Time Chart
+        const ctx1 = document.getElementById('difficultyTimeChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Tasks',
+                    data: [
+                        {x: 1, y: 2, task: 'Daily walk'},
+                        {x: 7, y: 3, task: 'Weekly workout'},
+                        {x: 30, y: 5, task: 'Learning language'},
+                        {x: 90, y: 7, task: 'Complex project'},
+                        {x: 365, y: 9, task: 'Mastery goal'}
+                    ],
+                    backgroundColor: '#ff6b6b',
+                    borderColor: '#ff6b6b',
+                    pointRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Time (Days)', color: '#ffffff' },
+                        ticks: { color: '#ffffff' },
+                        grid: { color: '#333' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Difficulty (1-10)', color: '#ffffff' },
+                        ticks: { color: '#ffffff' },
+                        grid: { color: '#333' }
+                    }
+                }
+            }
+        });
+
+        // Factors Chart
+        const ctx2 = document.getElementById('factorsChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Difficulty', 'Time Span', 'Freedom', 'Ideas', 'Energy', 'Monotony', 'Other'],
+                datasets: [{
+                    data: [18, 15, 12, 14, 16, 13, 12],
+                    backgroundColor: [
+                        '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', 
+                        '#ffeaa7', '#dda0dd', '#98d8c8'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: { color: '#ffffff' }
+                    }
+                }
+            }
+        });
+
+        // Energy Chart
+        const ctx3 = document.getElementById('energyChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+                datasets: [{
+                    label: 'Energy Input',
+                    data: [8, 9, 7, 6, 4, 5, 7, 8],
+                    borderColor: '#ff6b6b',
+                    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Visible Output',
+                    data: [2, 3, 4, 5, 4, 6, 7, 8],
+                    borderColor: '#4ecdc4',
+                    backgroundColor: 'rgba(78, 205, 196, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        labels: { color: '#ffffff' }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#ffffff' },
+                        grid: { color: '#333' }
+                    },
+                    y: {
+                        ticks: { color: '#ffffff' },
+                        grid: { color: '#333' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
