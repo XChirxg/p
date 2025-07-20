@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internet Security - Chirag Sharma</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            cursor: none;
+        }
+        
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .slide.active {
+            opacity: 1;
+        }
+        
+        .dark-theme {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+        }
+        
+        .light-theme {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #212529;
+        }
+        
+        .gold-accent {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+            color: #ffd700;
+        }
+        
+        .violet-accent {
+            background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 50%, #4a148c 100%);
+            color: #ffffff;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        p {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+            max-width: 900px;
+        }
+        
+        .bullet-point {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            text-align: left;
+            max-width: 800px;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin: 30px 0;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 0;
+            text-align: center;
+            min-width: 200px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .controls.hidden {
+            opacity: 0;
+        }
+        
+        .control-btn {
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .slide-counter {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 0;
+            font-size: 1rem;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .slide-counter.hidden {
+            opacity: 0;
+        }
+        
+        .citation {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        .light-theme .citation {
+            color: rgba(0, 0, 0, 0.6);
+        }
+        
+        .threat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            max-width: 800px;
+            margin: 20px 0;
+        }
+        
+        .threat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 0;
+            border-left: 4px solid #ffd700;
+        }
+        
+        .tips-list {
+            max-width: 700px;
+            text-align: left;
+        }
+        
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        
+        .tip-number {
+            background: #ffd700;
+            color: #000;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .conclusion-text {
+            font-size: 1.6rem;
+            line-height: 1.7;
+            text-align: center;
+            max-width: 1000px;
+            margin-bottom: 30px;
+        }
+        
+        .author-credit {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffd700;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active dark-theme">
+            <h1>INTERNET SECURITY</h1>
+            <p style="font-size: 1.6rem; margin-top: 30px;">Staying Safe in the Digital World</p>
+            <p style="font-size: 1.3rem; margin-top: 40px; color: #ffd700;">Presented by: Chirag Sharma</p>
+            <p style="font-size: 1.1rem; margin-top: 20px;">For Students of GSSS Mahori, Shimla HP</p>
+        </div>
+
+        <!-- Slide 2: What is Internet Security -->
+        <div class="slide light-theme">
+            <h2>What is Internet Security?</h2>
+            <p>Internet Security means protecting yourself, your data, and your devices when you use the internet. Just like you lock your house to keep thieves out, we need to protect our digital lives too.</p>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number">4.9B</div>
+                    <p>Internet Users Worldwide</p>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">₹3.25L Cr</div>
+                    <p>Annual Cybercrime Cost in India</p>
+                </div>
+            </div>
+            <p class="citation">Source: ITU Global Cybersecurity Index 2023</p>
+        </div>
+
+        <!-- Slide 3: Why Should You Care -->
+        <div class="slide gold-accent">
+            <h2>Why Should You Care?</h2>
+            <div class="bullet-point">You share personal information online every day - photos, messages, location</div>
+            <div class="bullet-point">Your phone contains bank details, family contacts, and private conversations</div>
+            <div class="bullet-point">One mistake can cost you money, embarrassment, or worse</div>
+            <div class="bullet-point">Cybercriminals target young people because they think you won't notice</div>
+            <p style="margin-top: 30px; font-size: 1.5rem;">Being smart online is as important as being smart in real life</p>
+        </div>
+
+        <!-- Slide 4: Common Threats - Phishing -->
+        <div class="slide dark-theme">
+            <h2>Threat #1: Phishing</h2>
+            <p>Fake messages that trick you into giving personal information</p>
+            <div class="threat-grid">
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Email Phishing</h3>
+                    <p style="font-size: 1.1rem;">Fake emails from "banks" asking for passwords</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">SMS Phishing</h3>
+                    <p style="font-size: 1.1rem;">Text messages claiming you won a prize</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Social Media</h3>
+                    <p style="font-size: 1.1rem;">Fake accounts asking for personal details</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Voice Calls</h3>
+                    <p style="font-size: 1.1rem;">Calls claiming your account is blocked</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Malware -->
+        <div class="slide violet-accent">
+            <h2>Threat #2: Malware</h2>
+            <p>Harmful software that can damage your device or steal information</p>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">1</div>
+                    <div><strong>Viruses:</strong> Corrupt your files and slow down your phone</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">2</div>
+                    <div><strong>Spyware:</strong> Secretly watches what you do online</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">3</div>
+                    <div><strong>Ransomware:</strong> Locks your files until you pay money</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">4</div>
+                    <div><strong>Adware:</strong> Shows unwanted ads everywhere</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Identity Theft -->
+        <div class="slide light-theme">
+            <h2>Threat #3: Identity Theft</h2>
+            <p>When criminals use your personal information to pretend to be you</p>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number">₹1.25L</div>
+                    <p>Average Loss per Victim in India</p>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">50,000+</div>
+                    <p>Identity Theft Cases in India (2023)</p>
+                </div>
+            </div>
+            <p>They can open bank accounts, take loans, or commit crimes in your name</p>
+            <p class="citation">Source: National Crime Records Bureau 2023</p>
+        </div>
+
+        <!-- Slide 7: Cyberbullying -->
+        <div class="slide dark-theme">
+            <h2>Threat #4: Cyberbullying</h2>
+            <p>Using technology to harass, threaten, or embarrass someone</p>
+            <div class="threat-grid">
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Online Harassment</h3>
+                    <p style="font-size: 1.1rem;">Mean comments, threats, spreading rumors</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Exclusion</h3>
+                    <p style="font-size: 1.1rem;">Deliberately leaving someone out of groups</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Impersonation</h3>
+                    <p style="font-size: 1.1rem;">Creating fake profiles to hurt someone</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Doxxing</h3>
+                    <p style="font-size: 1.1rem;">Sharing private information publicly</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Why Do Hackers Attack -->
+        <div class="slide gold-accent">
+            <h2>Why Do Hackers Attack?</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">₹</div>
+                    <div><strong>Money:</strong> Steal bank details, sell personal data, ransomware</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📊</div>
+                    <div><strong>Data:</strong> Your photos, contacts, passwords are valuable</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">⚡</div>
+                    <div><strong>Disruption:</strong> Crash websites, delete important files</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">👁</div>
+                    <div><strong>Espionage:</strong> Spy on individuals or organizations</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🎯</div>
+                    <div><strong>Personal:</strong> Revenge, jealousy, or just for fun</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Password Security -->
+        <div class="slide violet-accent">
+            <h2>Password Security</h2>
+            <p>Your first line of defense</p>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">1</div>
+                    <div>Use at least 12 characters with numbers, symbols, and letters</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">2</div>
+                    <div>Never use the same password for multiple accounts</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">3</div>
+                    <div>Avoid personal information like birthdays or names</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">4</div>
+                    <div>Use password managers like Google Password Manager</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">5</div>
+                    <div>Change passwords if you suspect they're compromised</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Two-Factor Authentication -->
+        <div class="slide light-theme">
+            <h2>Two-Factor Authentication (2FA)</h2>
+            <p>Add an extra layer of security to your accounts</p>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number">99.9%</div>
+                    <p>Reduction in Account Takeovers</p>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">2 Steps</div>
+                    <p>Password + Phone/App Code</p>
+                </div>
+            </div>
+            <p>Enable 2FA on Instagram, WhatsApp, Gmail, and banking apps</p>
+            <p>Even if someone gets your password, they can't access your account</p>
+        </div>
+
+        <!-- Slide 11: Safe Browsing -->
+        <div class="slide dark-theme">
+            <h2>Safe Browsing Habits</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">🔒</div>
+                    <div>Look for HTTPS (lock icon) before entering sensitive information</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🚫</div>
+                    <div>Don't click on suspicious links or pop-up ads</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📱</div>
+                    <div>Only download apps from Google Play Store or App Store</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🔄</div>
+                    <div>Keep your browser and apps updated</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">👥</div>
+                    <div>Be careful what you share on public computers</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Social Media Safety -->
+        <div class="slide gold-accent">
+            <h2>Social Media Safety</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">🔐</div>
+                    <div>Set your profiles to private, not public</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🏠</div>
+                    <div>Don't share your location, address, or school details</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📸</div>
+                    <div>Think twice before posting photos - they stay forever</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">👤</div>
+                    <div>Don't accept friend requests from strangers</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">💬</div>
+                    <div>Report and block users who make you uncomfortable</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Email Security -->
+        <div class="slide violet-accent">
+            <h2>Email Security</h2>
+            <p>How to spot and avoid dangerous emails</p>
+            <div class="threat-grid">
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Red Flags</h3>
+                    <p style="font-size: 1.1rem;">Urgent action required, spelling mistakes, unknown senders</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Never Click</h3>
+                    <p style="font-size: 1.1rem;">Suspicious links, unexpected attachments</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Verify First</h3>
+                    <p style="font-size: 1.1rem;">Contact the company directly if unsure</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Use Spam Filter</h3>
+                    <p style="font-size: 1.1rem;">Enable Gmail's built-in protection</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Mobile Security -->
+        <div class="slide light-theme">
+            <h2>Mobile Security</h2>
+            <p>Your phone needs protection too</p>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">🔢</div>
+                    <div>Use screen lock - PIN, pattern, fingerprint, or face unlock</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🔄</div>
+                    <div>Install security updates immediately</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📱</div>
+                    <div>Review app permissions - why does a flashlight need your contacts?</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📶</div>
+                    <div>Avoid public WiFi for banking or personal stuff</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">💾</div>
+                    <div>Backup your photos and important data regularly</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Public WiFi Risks -->
+        <div class="slide dark-theme">
+            <h2>Public WiFi Dangers</h2>
+            <p>Free WiFi can be expensive for your privacy</p>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number">68%</div>
+                    <p>of Public WiFi is Unsecured</p>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">₹45,000</div>
+                    <p>Average Loss from WiFi Attacks</p>
+                </div>
+            </div>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">⚠</div>
+                    <div>Hackers can see everything you do on unsecured networks</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📱</div>
+                    <div>Use your mobile data instead when possible</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Online Shopping Safety -->
+        <div class="slide gold-accent">
+            <h2>Safe Online Shopping</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">🏪</div>
+                    <div>Shop only on trusted sites - Amazon, Flipkart, official brand websites</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🔒</div>
+                    <div>Look for HTTPS and security badges before payment</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">💳</div>
+                    <div>Use credit cards or UPI instead of debit cards</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📱</div>
+                    <div>Never save payment information on websites</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🔍</div>
+                    <div>Check seller reviews and return policies</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Banking Security -->
+        <div class="slide violet-accent">
+            <h2>Online Banking Safety</h2>
+            <p>Protect your money with these practices</p>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">🏦</div>
+                    <div>Always type your bank's URL directly, never click links</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📱</div>
+                    <div>Use your bank's official mobile app</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">⏰</div>
+                    <div>Set up SMS alerts for all transactions</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🚫</div>
+                    <div>Never share OTP, PIN, or passwords with anyone</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📊</div>
+                    <div>Check your statements regularly</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Recognizing Scams -->
+        <div class="slide light-theme">
+            <h2>Common Scam Warning Signs</h2>
+            <div class="threat-grid">
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Too Good to Be True</h3>
+                    <p style="font-size: 1.1rem;">"Win ₹10 lakh instantly!" or "Work from home, earn ₹50,000/month"</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Urgent Action</h3>
+                    <p style="font-size: 1.1rem;">"Your account will be closed in 24 hours"</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Ask for Money</h3>
+                    <p style="font-size: 1.1rem;">Pay fees to claim prizes or jobs</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Personal Info</h3>
+                    <p style="font-size: 1.1rem;">Asking for passwords, OTP, or bank details</p>
+                </div>
+            </div>
+            <p style="margin-top: 30px; font-size: 1.4rem; font-weight: 600;">Remember: Banks never ask for passwords over phone or email</p>
+        </div>
+
+        <!-- Slide 19: What to Do if Attacked -->
+        <div class="slide dark-theme">
+            <h2>If You're Attacked</h2>
+            <p>Quick action can minimize damage</p>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">1</div>
+                    <div><strong>Don't Panic:</strong> Stay calm and think clearly</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">2</div>
+                    <div><strong>Disconnect:</strong> Turn off WiFi or mobile data immediately</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">3</div>
+                    <div><strong>Change Passwords:</strong> Start with email and banking apps</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">4</div>
+                    <div><strong>Contact Bank:</strong> Report any suspicious transactions</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">5</div>
+                    <div><strong>Report:</strong> File complaint at cybercrime.gov.in</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Digital Footprint -->
+        <div class="slide gold-accent">
+            <h2>Your Digital Footprint</h2>
+            <p>Everything you do online leaves traces</p>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number">2.5 GB</div>
+                    <p>Data Created Per Person Daily</p>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">Forever</div>
+                    <p>How Long Internet Remembers</p>
+                </div>
+            </div>
+            <div class="bullet-point">Search engines, social media, and websites track your activity</div>
+            <div class="bullet-point">Future employers and colleges check your online presence</div>
+            <div class="bullet-point">Think before you post - would you want your grandmother to see it?</div>
+        </div>
+
+        <!-- Slide 21: Privacy Settings -->
+        <div class="slide violet-accent">
+            <h2>Privacy Settings Matter</h2>
+            <p>Take control of what others can see about you</p>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">📱</div>
+                    <div><strong>Instagram:</strong> Switch to private account, limit story visibility</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📘</div>
+                    <div><strong>Facebook:</strong> Limit who can see your posts and friend list</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">💬</div>
+                    <div><strong>WhatsApp:</strong> Hide last seen, profile photo from strangers</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🔍</div>
+                    <div><strong>Google:</strong> Turn off location tracking and ad personalization</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📺</div>
+                    <div><strong>YouTube:</strong> Make your liked videos and subscriptions private</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Backup Your Data -->
+        <div class="slide light-theme">
+            <h2>Backup Your Important Data</h2>
+            <p>Don't lose years of memories and work</p>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number">30%</div>
+                    <p>of People Never Backup</p>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">60%</div>
+                    <p>of Small Businesses Close After Data Loss</p>
+                </div>
+            </div>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">☁</div>
+                    <div>Use Google Drive, iCloud, or OneDrive for automatic backup</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📱</div>
+                    <div>Enable automatic photo backup on your phone</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📚</div>
+                    <div>Keep important documents in multiple places</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Building Good Habits -->
+        <div class="slide dark-theme">
+            <h2>Building Good Cyber Habits</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <div class="tip-number">🔄</div>
+                    <div><strong>Weekly:</strong> Check privacy settings and review recent activity</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📱</div>
+                    <div><strong>Monthly:</strong> Update apps, clear browser data, review permissions</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🔐</div>
+                    <div><strong>Quarterly:</strong> Change important passwords, clean up old accounts</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">🧠</div>
+                    <div><strong>Always:</strong> Think twice before clicking, sharing, or downloading</div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">📖</div>
+                    <div><strong>Stay Updated:</strong> Follow reliable tech news sources</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Resources for Help -->
+        <div class="slide gold-accent">
+            <h2>Where to Get Help</h2>
+            <div class="threat-grid">
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Cyber Crime Helpline</h3>
+                    <p style="font-size: 1.1rem;">1930 (National Helpline)</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Online Reporting</h3>
+                    <p style="font-size: 1.1rem;">cybercrime.gov.in</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Banking Fraud</h3>
+                    <p style="font-size: 1.1rem;">Contact your bank immediately</p>
+                </div>
+                <div class="threat-item">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Cyberbullying</h3>
+                    <p style="font-size: 1.1rem;">Talk to parents, teachers, or counselors</p>
+                </div>
+            </div>
+            <p style="margin-top: 30px; font-size: 1.4rem;">Remember: It's better to ask for help than suffer in silence</p>
+        </div>
+
+        <!-- Slide 25: Conclusion -->
+        <div class="slide violet-accent">
+            <h2>Remember This</h2>
+            <div class="conclusion-text">
+                This presentation is just to make you aware - do not fear the internet. The benefits of the internet are 100 times more than these risks. You don't stop walking on the road just because a car might hit you. You learn to adapt and protect yourself from possible dangers.
+            </div>
+            <div class="conclusion-text">
+                Be smart, be safe, and enjoy all the amazing things the internet has to offer. Knowledge is your best defense against cyber threats.
+            </div>
+            <div class="conclusion-text">
+                Stay curious, stay protected, and keep learning!
+            </div>
+            <div class="author-credit">Thank You<br>- Chirag Sharma</div>
+        </div>
+    </div>
+
+    <div class="slide-counter" id="slideCounter">1 / 25</div>
+
+    <div class="controls" id="controls">
+        <button class="control-btn" id="prevBtn">◀ Prev</button>
+        <button class="control-btn" id="nextBtn">Next ▶</button>
+        <button class="control-btn" id="fullscreenBtn">Fullscreen</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let hideTimeout;
+        let controlsVisible = true;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err.message);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function hideControls() {
+            const controls = document.getElementById('controls');
+            const counter = document.getElementById('slideCounter');
+            controls.classList.add('hidden');
+            counter.classList.add('hidden');
+            controlsVisible = false;
+        }
+
+        function showControls() {
+            const controls = document.getElementById('controls');
+            const counter = document.getElementById('slideCounter');
+            controls.classList.remove('hidden');
+            counter.classList.remove('hidden');
+            controlsVisible = true;
+            
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(hideControls, 2000);
+        }
+
+        // Event listeners
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+                case 'F11':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case 'Escape':
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                    }
+                    break;
+            }
+            showControls();
+        });
+
+        // Mouse movement detection
+        document.addEventListener('mousemove', showControls);
+        document.addEventListener('click', showControls);
+
+        // Touch support for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            showControls();
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (!touchStartX || !touchStartY) return;
+
+            let touchEndX = e.changedTouches[0].clientX;
+            let touchEndY = e.changedTouches[0].clientY;
+
+            let diffX = touchStartX - touchEndX;
+            let diffY = touchStartY - touchEndY;
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 50) {
+                    nextSlide();
+                } else if (diffX < -50) {
+                    prevSlide();
+                }
+            }
+
+            touchStartX = 0;
+            touchStartY = 0;
+        });
+
+        // Initialize
+        showControls();
+    </script>
+</body>
+</html>
