@@ -166,6 +166,25 @@
             z-index: 1000;
         }
         
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #000;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .fullscreen-btn:hover {
+            background: #333;
+        }
+        
         .title-slide {
             background: #000;
             color: #fff;
@@ -208,6 +227,8 @@
     </style>
 </head>
 <body>
+    <button class="fullscreen-btn" id="fullscreenBtn">Fullscreen (F11)</button>
+    
     <div class="quiz-container">
         <!-- Title Slide -->
         <div class="question-slide active title-slide">
@@ -347,6 +368,7 @@
             <div class="question-text">Quiz Complete!</div>
             <div class="subtitle">Knowledge is your best defense</div>
             <div class="subtitle">Stay safe online</div>
+            <div class="author">Presentation by Chirag Sharma</div>
             <div class="author">Thank you for participating</div>
         </div>
     </div>
@@ -447,6 +469,16 @@
             updateButtonStates();
         }
 
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
         function nextSlide() {
             if (currentSlide < totalSlides - 1) {
                 showSlide(currentSlide + 1);
@@ -463,6 +495,7 @@
         document.getElementById('nextBtn').addEventListener('click', nextSlide);
         document.getElementById('prevBtn').addEventListener('click', prevSlide);
         document.getElementById('showAnswerBtn').addEventListener('click', showAnswer);
+        document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
 
         // Option click handlers
         document.querySelectorAll('.option').forEach(option => {
@@ -490,6 +523,10 @@
                     if (currentSlide > 0 && currentSlide < totalSlides - 1) {
                         showAnswer();
                     }
+                    break;
+                case 'F11':
+                    e.preventDefault();
+                    toggleFullscreen();
                     break;
             }
         });
