@@ -6,7 +6,8 @@
     <title>Prastuti - A Completely Free AI PPT Making Tool</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Source+Sans+Pro:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Changed title font to Pacifico (cursive) - you can change this font by modifying the Google Fonts link and updating --logo-font variable -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playfair+Display:wght@400;500;600;700;800&family=Source+Sans+Pro:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -26,8 +27,8 @@
             --button-text: #ffffff;
             --circle-color: rgba(102, 126, 234, 0.1);
             
-            /* Font families */
-            --logo-font: 'Dancing Script', cursive;
+            /* Font families - Change 'Pacifico' here to change the title font */
+            --logo-font: 'Pacifico', cursive;
             --heading-font: 'Playfair Display', serif;
             --body-font: 'Source Sans Pro', sans-serif;
             --ui-font: 'Poppins', sans-serif;
@@ -56,7 +57,7 @@
             position: relative;
         }
 
-        /* Animated Background Circles */
+        /* Animated Background Circles - Decreased speed by 2x */
         .background-animation {
             position: fixed;
             top: 0;
@@ -72,7 +73,7 @@
             position: absolute;
             border-radius: 50%;
             background: var(--circle-color);
-            animation: float-around 20s infinite linear;
+            animation: float-around 40s infinite linear; /* Changed from 20s to 40s */
             opacity: 0.6;
         }
 
@@ -81,11 +82,11 @@
         }
 
         .floating-circle:nth-child(3n) {
-            animation-duration: 25s;
+            animation-duration: 50s; /* Changed from 25s to 50s */
         }
 
         .floating-circle:nth-child(4n) {
-            animation-duration: 30s;
+            animation-duration: 60s; /* Changed from 30s to 60s */
         }
 
         @keyframes float-around {
@@ -128,7 +129,7 @@
         .logo {
             font-family: var(--logo-font);
             font-size: 32px;
-            font-weight: 700;
+            font-weight: 400;
             color: var(--accent-color);
             letter-spacing: 1px;
         }
@@ -179,6 +180,27 @@
             color: var(--secondary-text);
             margin-bottom: 40px;
             font-weight: 400;
+        }
+
+        /* Greeting message styling */
+        .greeting-message {
+            font-family: var(--ui-font);
+            font-size: 24px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            font-weight: 500;
+            animation: fadeInSlide 0.8s ease-out;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .action-buttons {
@@ -344,6 +366,11 @@
             display: none !important;
         }
 
+        /* Ensure background animation is visible in presentation mode */
+        .presentation-view .background-animation {
+            z-index: 0;
+        }
+
         .slide {
             display: none;
             padding: 60px;
@@ -404,18 +431,21 @@
             border-collapse: collapse;
             margin: 20px 0;
             font-family: var(--body-font);
+            font-size: 18px; /* Increased table font size */
         }
 
         .slide th, .slide td {
             border: 1px solid var(--border-color);
-            padding: 12px;
+            padding: 16px; /* Increased padding */
             text-align: left;
+            font-size: 18px; /* Explicit font size for table cells */
         }
 
         .slide th {
             background: var(--hover-color);
             font-weight: 600;
             font-family: var(--ui-font);
+            font-size: 18px; /* Explicit font size for table headers */
         }
 
         .controls {
@@ -554,6 +584,141 @@
             50% { transform: translateY(-50%) scale(1.2); }
         }
 
+        /* Copy Success Modal */
+        .copy-success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .copy-success-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .copy-success-content h3 {
+            font-family: var(--heading-font);
+            font-size: 24px;
+            margin-bottom: 16px;
+            color: #4caf50;
+        }
+
+        .copy-success-content p {
+            font-family: var(--body-font);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .copy-success-content .close-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: var(--ui-font);
+            font-weight: 500;
+            border-radius: 6px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-success-content .close-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Navigation Instructions Modal */
+        .nav-instructions-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .nav-instructions-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-instructions-content h3 {
+            font-family: var(--heading-font);
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .nav-instructions-list {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .nav-instructions-list li {
+            font-family: var(--body-font);
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-instructions-list i {
+            color: var(--accent-color);
+            font-size: 18px;
+            width: 20px;
+        }
+
+        .nav-skip-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: var(--ui-font);
+            font-weight: 500;
+            border-radius: 6px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-skip-btn:hover {
+            opacity: 0.9;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 42px;
@@ -574,6 +739,34 @@
 
             .logo {
                 font-size: 28px;
+            }
+
+            /* Mobile responsive controls */
+            .controls {
+                padding: 8px 16px;
+                gap: 8px;
+                max-width: 90%;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .control-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            /* Make table text larger on mobile */
+            .slide table {
+                font-size: 16px;
+            }
+
+            .slide th, .slide td {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .greeting-message {
+                font-size: 20px;
             }
         }
 
@@ -632,6 +825,7 @@
     <main class="main-content" id="mainContent">
         <div class="container">
             <div class="hero" id="heroSection">
+                <div id="greetingMessage" class="greeting-message" style="display: none;"></div>
                 <h1>AI-Powered Presentation Generator</h1>
                 <p>A Completely Free AI PPT Making Tool</p>
                 <div class="action-buttons">
@@ -704,6 +898,7 @@
     </main>
 
     <div class="presentation-view" id="presentationView">
+        <div class="background-animation" id="presentationBackgroundAnimation"></div>
         <div class="progress-bar" id="progressBar"></div>
         <div class="swipe-indicator left" id="swipeLeft">
             <i class="fas fa-chevron-left"></i>
@@ -759,7 +954,43 @@
         </div>
     </div>
 
-    <input type="file" id="fileInput" class="file-input" accept=".xml,.json" onchange="loadUploadedFile()">
+    <!-- Copy Success Modal -->
+    <div class="copy-success-modal" id="copySuccessModal">
+        <div class="copy-success-content">
+            <h3><i class="fas fa-check-circle"></i> Code Copied!</h3>
+            <p><strong>Next Steps:</strong></p>
+            <p>1. Open your preferred AI tool (ChatGPT, Claude, Gemini, etc.)</p>
+            <p>2. Paste the copied template and press Enter</p>
+            <p>3. Copy the AI-generated XML response</p>
+            <p>4. Come back here and paste it in the XML input field</p>
+            <p>5. Click "Create Presentation" to start your slideshow</p>
+            <button class="close-btn" onclick="closeCopySuccessModal()">
+                <i class="fas fa-times"></i>
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Instructions Modal -->
+    <div class="nav-instructions-modal" id="navInstructionsModal">
+        <div class="nav-instructions-content">
+            <h3><i class="fas fa-info-circle"></i> Navigation Guide</h3>
+            <p>Here's how to navigate through your presentation:</p>
+            <ul class="nav-instructions-list">
+                <li><i class="fas fa-hand-pointer"></i>Double tap anywhere on screen to show/hide controls</li>
+                <li><i class="fas fa-swatchbook"></i>Swipe left or right to navigate between slides</li>
+                <li><i class="fas fa-keyboard"></i>Use arrow keys or spacebar (desktop)</li>
+                <li><i class="fas fa-expand"></i>Use fullscreen mode for better experience</li>
+                <li><i class="fas fa-moon"></i>Toggle dark/light theme anytime</li>
+            </ul>
+            <button class="nav-skip-btn" onclick="closeNavInstructions()">
+                <i class="fas fa-play"></i>
+                Got it, Start Presentation
+            </button>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" class="file-input" accept=".xml,.json,.txt" onchange="loadUploadedFile()">
 
     <script>
         let currentSlide = 0;
@@ -770,10 +1001,39 @@
         let currentAuthor = '';
         let touchStartX = 0;
         let touchEndX = 0;
+        let lastTap = 0;
+        let doubleTapDelay = 300;
+
+        // State management keys
+        const STATE_KEYS = {
+            USER_NAME: 'prastuti_user_name',
+            CURRENT_STATE: 'prastuti_current_state',
+            PRESENTATION_DATA: 'prastuti_presentation_data',
+            CURRENT_SLIDE: 'prastuti_current_slide',
+            TOPIC: 'prastuti_topic',
+            AUTHOR: 'prastuti_author',
+            XML_INPUT: 'prastuti_xml_input',
+            TEMPLATE_VISIBLE: 'prastuti_template_visible',
+            THEME: 'prastuti_theme',
+            SEEN_INSTRUCTIONS: 'prastuti_seen_instructions'
+        };
+
+        // Application states
+        const APP_STATES = {
+            HOME: 'home',
+            CREATE_NEW: 'create_new',
+            TEMPLATE_GENERATED: 'template_generated',
+            PRESENTATION: 'presentation'
+        };
 
         // Initialize animated background
-        function createFloatingCircles() {
-            const container = document.getElementById('backgroundAnimation');
+        function createFloatingCircles(containerId = 'backgroundAnimation') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            // Clear existing circles
+            container.innerHTML = '';
+            
             const circleCount = 15;
             
             for (let i = 0; i < circleCount; i++) {
@@ -790,15 +1050,136 @@
                 circle.style.top = Math.random() * window.innerHeight + 'px';
                 
                 // Random animation delay
-                circle.style.animationDelay = Math.random() * 20 + 's';
+                circle.style.animationDelay = Math.random() * 40 + 's'; // Updated for slower animation
                 
                 container.appendChild(circle);
             }
         }
 
+        // Save current application state
+        function saveState(state) {
+            localStorage.setItem(STATE_KEYS.CURRENT_STATE, state);
+        }
+
+        // Load and restore application state
+        function loadState() {
+            const savedState = localStorage.getItem(STATE_KEYS.CURRENT_STATE);
+            const savedName = localStorage.getItem(STATE_KEYS.USER_NAME);
+            
+            // Load saved user name if available
+            if (savedName) {
+                document.getElementById('authorName').value = savedName;
+                showGreeting(savedName);
+            }
+            
+            // Restore previous state if not on home
+            if (savedState && savedState !== APP_STATES.HOME) {
+                switch (savedState) {
+                    case APP_STATES.CREATE_NEW:
+                        restoreCreateNewState();
+                        break;
+                    case APP_STATES.TEMPLATE_GENERATED:
+                        restoreTemplateGeneratedState();
+                        break;
+                    case APP_STATES.PRESENTATION:
+                        restorePresentationState();
+                        break;
+                }
+            }
+        }
+
+        // Show personalized greeting
+        function showGreeting(name) {
+            const greetingElement = document.getElementById('greetingMessage');
+            const greetings = [
+                `Welcome back, ${name}! 👋`,
+                `Hello ${name}! Ready to create? ✨`,
+                `Good to see you again, ${name}! 🎉`,
+                `Hey ${name}! Let's make something amazing! 🚀`
+            ];
+            
+            const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+            greetingElement.textContent = randomGreeting;
+            greetingElement.style.display = 'block';
+        }
+
+        // Restore create new state
+        function restoreCreateNewState() {
+            document.getElementById('inputSection').style.display = 'block';
+            document.getElementById('heroSection').style.display = 'none';
+            
+            // Restore form data
+            const savedTopic = localStorage.getItem(STATE_KEYS.TOPIC);
+            const savedAuthor = localStorage.getItem(STATE_KEYS.AUTHOR);
+            
+            if (savedTopic) document.getElementById('topicName').value = savedTopic;
+            if (savedAuthor) document.getElementById('authorName').value = savedAuthor;
+        }
+
+        // Restore template generated state
+        function restoreTemplateGeneratedState() {
+            restoreCreateNewState();
+            
+            const templateVisible = localStorage.getItem(STATE_KEYS.TEMPLATE_VISIBLE);
+            const savedXmlInput = localStorage.getItem(STATE_KEYS.XML_INPUT);
+            
+            if (templateVisible === 'true') {
+                document.getElementById('templateSection').style.display = 'block';
+                
+                // Regenerate template if topic exists
+                const savedTopic = localStorage.getItem(STATE_KEYS.TOPIC);
+                const savedAuthor = localStorage.getItem(STATE_KEYS.AUTHOR);
+                if (savedTopic) {
+                    currentTopic = savedTopic;
+                    currentAuthor = savedAuthor || '';
+                    generateTemplateContent();
+                }
+            }
+            
+            if (savedXmlInput) {
+                document.getElementById('xmlInput').value = savedXmlInput;
+            }
+        }
+
+        // Restore presentation state
+        function restorePresentationState() {
+            const savedPresentationData = localStorage.getItem(STATE_KEYS.PRESENTATION_DATA);
+            const savedCurrentSlide = localStorage.getItem(STATE_KEYS.CURRENT_SLIDE);
+            
+            if (savedPresentationData) {
+                try {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(savedPresentationData, 'text/xml');
+                    const slideElements = xmlDoc.querySelectorAll('slide');
+                    
+                    if (slideElements.length > 0) {
+                        slides = Array.from(slideElements).map(slide => slide.innerHTML);
+                        presentationData = savedPresentationData;
+                        currentSlide = parseInt(savedCurrentSlide) || 0;
+                        
+                        // Extract topic and author
+                        const topicElement = xmlDoc.querySelector('topic');
+                        const authorElement = xmlDoc.querySelector('author');
+                        
+                        if (topicElement) currentTopic = topicElement.textContent;
+                        if (authorElement) currentAuthor = authorElement.textContent;
+                        
+                        startPresentation();
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error restoring presentation:', error);
+                }
+            }
+            
+            // If restoration fails, go to create new state
+            saveState(APP_STATES.CREATE_NEW);
+            restoreCreateNewState();
+        }
+
         function toggleTheme() {
             document.body.classList.toggle('dark-theme');
-            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+            localStorage.setItem(STATE_KEYS.THEME, document.body.classList.contains('dark-theme') ? 'dark' : 'light');
             
             // Update theme toggle icon
             const themeIcons = document.querySelectorAll('.theme-toggle i');
@@ -812,7 +1193,7 @@
         }
 
         function loadTheme() {
-            const savedTheme = localStorage.getItem('theme');
+            const savedTheme = localStorage.getItem(STATE_KEYS.THEME);
             if (savedTheme === 'dark') {
                 document.body.classList.add('dark-theme');
                 document.querySelectorAll('.theme-toggle i').forEach(icon => {
@@ -824,6 +1205,7 @@
         function showCreateNew() {
             document.getElementById('inputSection').style.display = 'block';
             document.getElementById('heroSection').style.display = 'none';
+            saveState(APP_STATES.CREATE_NEW);
         }
 
         function uploadPPT() {
@@ -838,8 +1220,12 @@
                     try {
                         const content = e.target.result;
                         document.getElementById('xmlInput').value = content;
+                        localStorage.setItem(STATE_KEYS.XML_INPUT, content);
+                        
                         showCreateNew();
                         document.getElementById('templateSection').style.display = 'block';
+                        localStorage.setItem(STATE_KEYS.TEMPLATE_VISIBLE, 'true');
+                        saveState(APP_STATES.TEMPLATE_GENERATED);
                         
                         // Try to extract topic and author from uploaded file
                         const parser = new DOMParser();
@@ -849,15 +1235,25 @@
                         
                         if (topicElement) {
                             document.getElementById('topicName').value = topicElement.textContent;
+                            localStorage.setItem(STATE_KEYS.TOPIC, topicElement.textContent);
                         }
                         if (authorElement) {
                             document.getElementById('authorName').value = authorElement.textContent;
+                            localStorage.setItem(STATE_KEYS.AUTHOR, authorElement.textContent);
+                            saveUserName(authorElement.textContent);
                         }
                     } catch (error) {
                         alert('Error loading file. Please make sure it\'s a valid XML file.');
                     }
                 };
                 reader.readAsText(file);
+            }
+        }
+
+        // Save user name to localStorage
+        function saveUserName(name) {
+            if (name && name.trim()) {
+                localStorage.setItem(STATE_KEYS.USER_NAME, name.trim());
             }
         }
 
@@ -872,14 +1268,26 @@
 
             currentTopic = topic;
             currentAuthor = author;
+            
+            // Save form data
+            localStorage.setItem(STATE_KEYS.TOPIC, topic);
+            localStorage.setItem(STATE_KEYS.AUTHOR, author);
+            saveUserName(author);
 
-            const template = `Create a comprehensive presentation on "${topic}" in XML format. Follow this exact structure and guidelines:
+            generateTemplateContent();
+            document.getElementById('templateSection').style.display = 'block';
+            localStorage.setItem(STATE_KEYS.TEMPLATE_VISIBLE, 'true');
+            saveState(APP_STATES.TEMPLATE_GENERATED);
+        }
+
+        function generateTemplateContent() {
+            const template = `Create a comprehensive presentation on "${currentTopic}" in XML format. Follow this exact structure and guidelines:
 
 **IMPORTANT XML STRUCTURE REQUIREMENTS:**
 - Start with <?xml version="1.0" encoding="UTF-8"?>
 - Use <presentation> as root element
-- Include <topic>${topic}</topic>
-- Include <author>${author || 'Anonymous'}</author>
+- Include <topic>${currentTopic}</topic>
+- Include <author>${currentAuthor || 'Anonymous'}</author>
 - Each slide must be wrapped in <slide> tags
 - Create as many slides as needed (no limit)
 
@@ -902,6 +1310,7 @@
 - Highlight key information using color classes
 - Make content engaging and well-structured
 - Use professional language appropriate for presentations
+- Make 2 Mcq slides in end one for question from the ppt and other explaing the correct answer
 
 **SPECIAL CHARACTERS:**
 - Use &amp; for &
@@ -928,19 +1337,21 @@
 Please create a complete, professional presentation following these guidelines.`;
 
             document.getElementById('templateDisplay').textContent = template;
-            document.getElementById('templateSection').style.display = 'block';
         }
 
         function copyTemplate() {
             const template = document.getElementById('templateDisplay').textContent;
             navigator.clipboard.writeText(template).then(() => {
-                const btn = event.target;
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                }, 2000);
+                showCopySuccessModal();
             });
+        }
+
+        function showCopySuccessModal() {
+            document.getElementById('copySuccessModal').style.display = 'block';
+        }
+
+        function closeCopySuccessModal() {
+            document.getElementById('copySuccessModal').style.display = 'none';
         }
 
         function createPresentation() {
@@ -971,10 +1382,17 @@ Please create a complete, professional presentation following these guidelines.`
                 const authorElement = xmlDoc.querySelector('author');
                 
                 if (topicElement) currentTopic = topicElement.textContent;
-                if (authorElement) currentAuthor = authorElement.textContent;
+                if (authorElement) {
+                    currentAuthor = authorElement.textContent;
+                    saveUserName(currentAuthor);
+                }
 
                 slides = Array.from(slideElements).map(slide => slide.innerHTML);
                 presentationData = xmlContent;
+                
+                // Save presentation data
+                localStorage.setItem(STATE_KEYS.PRESENTATION_DATA, xmlContent);
+                localStorage.setItem(STATE_KEYS.CURRENT_SLIDE, '0');
                 
                 startPresentation();
             } catch (error) {
@@ -983,9 +1401,15 @@ Please create a complete, professional presentation following these guidelines.`
         }
 
         function startPresentation() {
+            // Check if it's first time presentation for this user
+            const hasSeenInstructions = localStorage.getItem(STATE_KEYS.SEEN_INSTRUCTIONS);
+            
             document.getElementById('mainContent').style.display = 'none';
             document.getElementById('mainHeader').style.display = 'none';
             document.getElementById('presentationView').style.display = 'block';
+            
+            // Create background animation for presentation
+            createFloatingCircles('presentationBackgroundAnimation');
             
             const slidesContainer = document.getElementById('slidesContainer');
             slidesContainer.innerHTML = '';
@@ -994,18 +1418,58 @@ Please create a complete, professional presentation following these guidelines.`
                 const slideDiv = document.createElement('div');
                 slideDiv.className = 'slide';
                 slideDiv.innerHTML = slideContent;
-                if (index === 0) slideDiv.classList.add('active');
+                if (index === currentSlide) slideDiv.classList.add('active');
                 slidesContainer.appendChild(slideDiv);
             });
             
-            currentSlide = 0;
             updateProgressBar();
-            showControls();
             setupSwipeGestures();
+            setupDoubleTap();
+            saveState(APP_STATES.PRESENTATION);
             
-            // Add click event to show/hide controls
-            document.addEventListener('click', showControls);
-            document.addEventListener('mousemove', showControls);
+            // Show navigation instructions if first time
+            if (!hasSeenInstructions) {
+                showNavInstructions();
+            }
+        }
+
+        function showNavInstructions() {
+            document.getElementById('navInstructionsModal').style.display = 'block';
+        }
+
+        function closeNavInstructions() {
+            document.getElementById('navInstructionsModal').style.display = 'none';
+            localStorage.setItem(STATE_KEYS.SEEN_INSTRUCTIONS, 'true');
+        }
+
+        function setupDoubleTap() {
+            const presentationView = document.getElementById('presentationView');
+            
+            presentationView.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                
+                if (tapLength < doubleTapDelay && tapLength > 0) {
+                    e.preventDefault();
+                    toggleControls();
+                }
+                lastTap = currentTime;
+            });
+
+            // Double click support for desktop
+            presentationView.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                toggleControls();
+            });
+        }
+
+        function toggleControls() {
+            const controls = document.getElementById('controls');
+            if (controls.classList.contains('visible')) {
+                hideControls();
+            } else {
+                showControls();
+            }
         }
 
         function setupSwipeGestures() {
@@ -1087,11 +1551,12 @@ Please create a complete, professional presentation following these guidelines.`
             clearTimeout(controlsTimeout);
             controlsTimeout = setTimeout(() => {
                 controls.classList.remove('visible');
-            }, 1000); // Reduced from 3000ms to 1000ms
+            }, 3000);
         }
 
         function hideControls() {
             document.getElementById('controls').classList.remove('visible');
+            clearTimeout(controlsTimeout);
         }
 
         function previousSlide() {
@@ -1100,7 +1565,7 @@ Please create a complete, professional presentation following these guidelines.`
                 currentSlide--;
                 document.querySelectorAll('.slide')[currentSlide].classList.add('active');
                 updateProgressBar();
-                showControls();
+                localStorage.setItem(STATE_KEYS.CURRENT_SLIDE, currentSlide.toString());
             }
         }
 
@@ -1110,7 +1575,7 @@ Please create a complete, professional presentation following these guidelines.`
                 currentSlide++;
                 document.querySelectorAll('.slide')[currentSlide].classList.add('active');
                 updateProgressBar();
-                showControls();
+                localStorage.setItem(STATE_KEYS.CURRENT_SLIDE, currentSlide.toString());
             } else {
                 showEndOptions();
             }
@@ -1137,6 +1602,11 @@ Please create a complete, professional presentation following these guidelines.`
             document.getElementById('inputSection').style.display = 'none';
             hideEndOptions();
             
+            // Clear presentation state and return to home
+            saveState(APP_STATES.HOME);
+            localStorage.removeItem(STATE_KEYS.PRESENTATION_DATA);
+            localStorage.removeItem(STATE_KEYS.CURRENT_SLIDE);
+            
             if (document.fullscreenElement) {
                 document.exitFullscreen();
             }
@@ -1157,8 +1627,8 @@ Please create a complete, professional presentation following these guidelines.`
                 if (index === 0) slide.classList.add('active');
             });
             updateProgressBar();
+            localStorage.setItem(STATE_KEYS.CURRENT_SLIDE, '0');
             hideEndOptions();
-            showControls();
         }
 
         function downloadPresentation() {
@@ -1179,18 +1649,37 @@ Please create a complete, professional presentation following these guidelines.`
         }
 
         function sharePresentation() {
-            if (navigator.share && presentationData) {
-                const file = new File([presentationData], `${currentTopic}_presentation.xml`, { type: 'application/xml' });
+            const shareText = `🎯 Check out Prastuti - A Completely Free AI PPT Making Tool! 
+
+🚀 Create professional presentations in minutes with AI assistance
+✨ No registration required, completely free
+🎨 Beautiful themes and animations
+📱 Works on all devices
+
+Try it now: https://xchirxg.github.io/p/prastuti
+
+${currentTopic ? `I just created an amazing presentation on "${currentTopic}" using Prastuti!` : 'Perfect for students, professionals, and educators!'}
+
+#Prastuti #AI #Presentations #Free #Education`;
+
+            if (navigator.share) {
                 navigator.share({
-                    title: `Presentation: ${currentTopic}`,
-                    text: `Check out this presentation on ${currentTopic}`,
-                    files: [file]
+                    title: 'Prastuti - Free AI PPT Making Tool',
+                    text: shareText,
+                    url: 'https://xchirxg.github.io/p/prastuti'
+                }).catch(err => {
+                    // Fallback to clipboard
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        alert('Prastuti link and promotion copied to clipboard! Share it with others to help them discover this amazing tool! 🎉');
+                    });
                 });
             } else {
-                // Fallback: copy presentation link or data
-                const shareText = `Presentation: ${currentTopic}\nCreated with Prastuti - A Completely Free AI PPT Making Tool\n\nView more from Chinurag: https://www.google.com/search?q=chinurag`;
+                // Fallback: copy to clipboard
                 navigator.clipboard.writeText(shareText).then(() => {
-                    alert('Presentation info copied to clipboard!');
+                    alert('Prastuti link and promotion copied to clipboard! Share it with others to help them discover this amazing tool! 🎉');
+                }).catch(() => {
+                    // Final fallback
+                    prompt('Copy this text to share Prastuti:', shareText);
                 });
             }
         }
@@ -1199,9 +1688,42 @@ Please create a complete, professional presentation following these guidelines.`
             hideEndOptions();
             exitPresentation();
             document.getElementById('topicName').value = '';
-            document.getElementById('authorName').value = '';
+            // Keep user name but clear other fields
             document.getElementById('xmlInput').value = '';
             document.getElementById('templateSection').style.display = 'none';
+            
+            // Clear saved state except user name
+            localStorage.removeItem(STATE_KEYS.TOPIC);
+            localStorage.removeItem(STATE_KEYS.XML_INPUT);
+            localStorage.removeItem(STATE_KEYS.TEMPLATE_VISIBLE);
+            localStorage.removeItem(STATE_KEYS.PRESENTATION_DATA);
+            localStorage.removeItem(STATE_KEYS.CURRENT_SLIDE);
+            
+            saveState(APP_STATES.HOME);
+        }
+
+        // Auto-save functionality with state management
+        let autoSaveTimeout;
+        function setupAutoSave() {
+            document.getElementById('xmlInput').addEventListener('input', (e) => {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const content = e.target.value;
+                    if (content.trim()) {
+                        localStorage.setItem(STATE_KEYS.XML_INPUT, content);
+                    }
+                }, 2000);
+            });
+
+            // Save form data on input
+            document.getElementById('topicName').addEventListener('input', (e) => {
+                localStorage.setItem(STATE_KEYS.TOPIC, e.target.value);
+            });
+
+            document.getElementById('authorName').addEventListener('input', (e) => {
+                localStorage.setItem(STATE_KEYS.AUTHOR, e.target.value);
+                saveUserName(e.target.value);
+            });
         }
 
         // Keyboard navigation
@@ -1240,13 +1762,17 @@ Please create a complete, professional presentation following these guidelines.`
         document.addEventListener('DOMContentLoaded', () => {
             loadTheme();
             createFloatingCircles();
+            setupAutoSave();
+            loadState(); // Load saved state and restore user experience
         });
 
         // Resize handler for responsive circles
         window.addEventListener('resize', () => {
-            const container = document.getElementById('backgroundAnimation');
-            container.innerHTML = '';
             createFloatingCircles();
+            // Also recreate circles in presentation if active
+            if (document.getElementById('presentationView').style.display === 'block') {
+                createFloatingCircles('presentationBackgroundAnimation');
+            }
         });
 
         // Enhanced form validation
@@ -1259,26 +1785,27 @@ Please create a complete, professional presentation following these guidelines.`
             }
         });
 
-        // Auto-save functionality
-        let autoSaveTimeout;
-        document.getElementById('xmlInput').addEventListener('input', () => {
-            clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = setTimeout(() => {
-                const content = document.getElementById('xmlInput').value;
-                if (content.trim()) {
-                    localStorage.setItem('prastuti_draft', content);
-                }
-            }, 2000);
+        // Close modals when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('copy-success-modal')) {
+                closeCopySuccessModal();
+            }
+            if (e.target.classList.contains('nav-instructions-modal')) {
+                closeNavInstructions();
+            }
         });
 
-        // Load draft on page load
-        window.addEventListener('load', () => {
-            const draft = localStorage.getItem('prastuti_draft');
-            if (draft && !document.getElementById('xmlInput').value) {
-                const loadDraft = confirm('Found a saved draft. Would you like to load it?');
-                if (loadDraft) {
-                    document.getElementById('xmlInput').value = draft;
-                }
+        // Handle page refresh/reload
+        window.addEventListener('beforeunload', () => {
+            // Save current state before page unload
+            if (document.getElementById('presentationView').style.display === 'block') {
+                localStorage.setItem(STATE_KEYS.CURRENT_STATE, APP_STATES.PRESENTATION);
+            } else if (document.getElementById('templateSection').style.display === 'block') {
+                localStorage.setItem(STATE_KEYS.CURRENT_STATE, APP_STATES.TEMPLATE_GENERATED);
+            } else if (document.getElementById('inputSection').style.display === 'block') {
+                localStorage.setItem(STATE_KEYS.CURRENT_STATE, APP_STATES.CREATE_NEW);
+            } else {
+                localStorage.setItem(STATE_KEYS.CURRENT_STATE, APP_STATES.HOME);
             }
         });
     </script>
