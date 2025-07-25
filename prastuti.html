@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prastuti - A Completely Free AI PPT Making Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&family=Source+Sans+Pro:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --secondary-text: #666666;
+            --border-color: #cccccc;
+            --accent-color: #0066cc;
+            --hover-color: #f5f5f5;
+            --button-bg: #000000;
+            --button-text: #ffffff;
+            --circle-color: rgba(102, 126, 234, 0.1);
+            
+            /* Font families */
+            --logo-font: 'Dancing Script', cursive;
+            --heading-font: 'Playfair Display', serif;
+            --body-font: 'Source Sans Pro', sans-serif;
+            --ui-font: 'Poppins', sans-serif;
+            --mono-font: 'Roboto Mono', monospace;
+        }
+
+        .dark-theme {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --secondary-text: #999999;
+            --border-color: #333333;
+            --accent-color: #4da6ff;
+            --hover-color: #1a1a1a;
+            --button-bg: #ffffff;
+            --button-text: #000000;
+            --circle-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: var(--body-font);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Circles */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--circle-color);
+            animation: float-around 20s infinite linear;
+            opacity: 0.6;
+        }
+
+        .floating-circle:nth-child(odd) {
+            animation-direction: reverse;
+        }
+
+        .floating-circle:nth-child(3n) {
+            animation-duration: 25s;
+        }
+
+        .floating-circle:nth-child(4n) {
+            animation-duration: 30s;
+        }
+
+        @keyframes float-around {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(200px, -150px) rotate(90deg);
+            }
+            50% {
+                transform: translate(-100px, -300px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-300px, -100px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--logo-font);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+        }
+
+        .theme-toggle {
+            background: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            padding: 10px 18px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: var(--ui-font);
+            font-weight: 500;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        .main-content {
+            padding: 60px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-family: var(--heading-font);
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-family: var(--body-font);
+            font-size: 20px;
+            color: var(--secondary-text);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: var(--ui-font);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .btn-primary {
+            background: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Credit Section */
+        .credit-section {
+            margin-top: 60px;
+            text-align: center;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .credit-section:hover {
+            opacity: 1;
+        }
+
+        .credit-link {
+            color: var(--secondary-text);
+            text-decoration: none;
+            font-size: 12px;
+            font-family: var(--ui-font);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.3s ease;
+        }
+
+        .credit-link:hover {
+            color: var(--accent-color);
+        }
+
+        .credit-link i {
+            color: #e91e63;
+            font-size: 14px;
+        }
+
+        .input-section {
+            max-width: 600px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-family: var(--ui-font);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 16px;
+            font-family: var(--body-font);
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .form-group textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .template-display {
+            background: var(--hover-color);
+            padding: 24px;
+            margin: 20px 0;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-family: var(--mono-font);
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: var(--ui-font);
+            font-weight: 500;
+            border-radius: 6px;
+            margin-top: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .presentation-view {
+            display: none;
+            position: relative;
+            height: 100vh;
+            background: var(--bg-color);
+            touch-action: pan-y;
+        }
+
+        .presentation-view header {
+            display: none !important;
+        }
+
+        .slide {
+            display: none;
+            padding: 60px;
+            height: 100vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide h1 {
+            font-family: var(--heading-font);
+            font-size: 48px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .slide h2 {
+            font-family: var(--heading-font);
+            font-size: 36px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .slide h3 {
+            font-family: var(--heading-font);
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .slide p {
+            font-family: var(--body-font);
+            font-size: 20px;
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .slide ul, .slide ol {
+            margin-left: 40px;
+            margin-bottom: 20px;
+        }
+
+        .slide li {
+            font-family: var(--body-font);
+            font-size: 18px;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .slide table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-family: var(--body-font);
+        }
+
+        .slide th, .slide td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        .slide th {
+            background: var(--hover-color);
+            font-weight: 600;
+            font-family: var(--ui-font);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 12px 24px;
+            border-radius: 50px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .controls.visible {
+            opacity: 1;
+        }
+
+        .control-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: var(--ui-font);
+            font-weight: 500;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), #4da6ff);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .end-options {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            z-index: 1001;
+        }
+
+        .end-options h2 {
+            font-family: var(--heading-font);
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .end-options p {
+            font-family: var(--body-font);
+            font-size: 16px;
+            color: var(--secondary-text);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .highlight {
+            background: #ffeb3b;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .important {
+            color: #f44336;
+            font-weight: 700;
+        }
+
+        .success {
+            color: #4caf50;
+            font-weight: 700;
+        }
+
+        .info {
+            color: #2196f3;
+            font-weight: 700;
+        }
+
+        /* Swipe indicators */
+        .swipe-indicator {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .swipe-indicator.left {
+            left: 20px;
+        }
+
+        .swipe-indicator.right {
+            right: 20px;
+        }
+
+        .swipe-indicator.show {
+            opacity: 1;
+            animation: swipe-hint 0.5s ease;
+        }
+
+        @keyframes swipe-hint {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.2); }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 42px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .slide {
+                padding: 30px 20px;
+            }
+            
+            .slide h1 {
+                font-size: 36px;
+            }
+
+            .logo {
+                font-size: 28px;
+            }
+        }
+
+        /* Additional premium styling */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-color);
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .template-display {
+            background: linear-gradient(135deg, var(--hover-color) 0%, rgba(102, 126, 234, 0.05) 100%);
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background-animation" id="backgroundAnimation"></div>
+
+    <header id="mainHeader">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">Prastuti</div>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                    Theme
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content" id="mainContent">
+        <div class="container">
+            <div class="hero" id="heroSection">
+                <h1>AI-Powered Presentation Generator</h1>
+                <p>A Completely Free AI PPT Making Tool</p>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showCreateNew()">
+                        <i class="fas fa-plus-circle"></i>
+                        Create New PPT
+                    </button>
+                    <button class="btn btn-secondary" onclick="uploadPPT()">
+                        <i class="fas fa-upload"></i>
+                        Upload Existing PPT
+                    </button>
+                </div>
+                
+                <!-- Credit Section -->
+                <div class="credit-section">
+                    <a href="https://www.google.com/search?q=chinurag&oq=chinurag&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgYIARBFGEAyDAgCEC4YDRixAxiABDIJCAMQABgNGIAEMgkIBBAAGA0YgAQyCQgFEAAYDRiABDIJCAYQABgNGIAEMgYIBxBFGD3SAQgyMDQ4ajBqN6gCCLACAfEFyPfDwlHGhGc&sourceid=chrome&ie=UTF-8" 
+                       target="_blank" 
+                       class="credit-link">
+                        <i class="fas fa-heart"></i>
+                        View more from Chinurag
+                    </a>
+                </div>
+            </div>
+
+            <div class="input-section" id="inputSection">
+                <div class="form-group">
+                    <label for="topicName">
+                        <i class="fas fa-lightbulb"></i>
+                        Presentation Topic:
+                    </label>
+                    <input type="text" id="topicName" placeholder="Enter your presentation topic">
+                </div>
+                
+                <div class="form-group">
+                    <label for="authorName">
+                        <i class="fas fa-user"></i>
+                        Your Name (Optional):
+                    </label>
+                    <input type="text" id="authorName" placeholder="Enter your name">
+                </div>
+
+                <button class="btn btn-primary" onclick="generateTemplate()">
+                    <i class="fas fa-magic"></i>
+                    Generate AI Template
+                </button>
+
+                <div id="templateSection" style="display: none;">
+                    <h3 style="font-family: var(--heading-font); font-size: 24px; margin: 30px 0 20px 0;">Copy this template and paste it to your AI tool:</h3>
+                    <div class="template-display" id="templateDisplay"></div>
+                    <button class="copy-btn" onclick="copyTemplate()">
+                        <i class="fas fa-copy"></i>
+                        Copy Template
+                    </button>
+                    
+                    <div class="form-group" style="margin-top: 30px;">
+                        <label for="xmlInput">
+                            <i class="fas fa-code"></i>
+                            Paste the AI-generated XML here:
+                        </label>
+                        <textarea id="xmlInput" placeholder="Paste your AI-generated XML presentation here..."></textarea>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="createPresentation()">
+                        <i class="fas fa-play"></i>
+                        Create Presentation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="presentation-view" id="presentationView">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="swipe-indicator left" id="swipeLeft">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="swipe-indicator right" id="swipeRight">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+        <div id="slidesContainer"></div>
+        <div class="controls" id="controls">
+            <button class="control-btn" onclick="previousSlide()">
+                <i class="fas fa-chevron-left"></i>
+                Previous
+            </button>
+            <button class="control-btn" onclick="nextSlide()">
+                Next
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="control-btn" onclick="toggleFullscreen()">
+                <i class="fas fa-expand"></i>
+                Fullscreen
+            </button>
+            <button class="control-btn" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+                Theme
+            </button>
+            <button class="control-btn" onclick="exitPresentation()">
+                <i class="fas fa-times"></i>
+                Exit
+            </button>
+        </div>
+    </div>
+
+    <div class="end-options" id="endOptions">
+        <h2>Presentation Complete!</h2>
+        <p style="margin: 20px 0;">What would you like to do next?</p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="restartPresentation()">
+                <i class="fas fa-redo"></i>
+                Restart
+            </button>
+            <button class="btn btn-secondary" onclick="downloadPresentation()">
+                <i class="fas fa-save"></i>
+                Download
+            </button>
+            <button class="btn btn-secondary" onclick="sharePresentation()">
+                <i class="fas fa-share"></i>
+                Share
+            </button>
+            <button class="btn btn-secondary" onclick="createNewPresentation()">
+                <i class="fas fa-plus"></i>
+                Create New
+            </button>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" class="file-input" accept=".xml,.json" onchange="loadUploadedFile()">
+
+    <script>
+        let currentSlide = 0;
+        let slides = [];
+        let presentationData = null;
+        let controlsTimeout;
+        let currentTopic = '';
+        let currentAuthor = '';
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // Initialize animated background
+        function createFloatingCircles() {
+            const container = document.getElementById('backgroundAnimation');
+            const circleCount = 15;
+            
+            for (let i = 0; i < circleCount; i++) {
+                const circle = document.createElement('div');
+                circle.className = 'floating-circle';
+                
+                // Random size between 20px and 150px
+                const size = Math.random() * 130 + 20;
+                circle.style.width = size + 'px';
+                circle.style.height = size + 'px';
+                
+                // Random starting position
+                circle.style.left = Math.random() * window.innerWidth + 'px';
+                circle.style.top = Math.random() * window.innerHeight + 'px';
+                
+                // Random animation delay
+                circle.style.animationDelay = Math.random() * 20 + 's';
+                
+                container.appendChild(circle);
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+            
+            // Update theme toggle icon
+            const themeIcons = document.querySelectorAll('.theme-toggle i');
+            themeIcons.forEach(icon => {
+                if (document.body.classList.contains('dark-theme')) {
+                    icon.className = 'fas fa-sun';
+                } else {
+                    icon.className = 'fas fa-moon';
+                }
+            });
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.querySelectorAll('.theme-toggle i').forEach(icon => {
+                    icon.className = 'fas fa-sun';
+                });
+            }
+        }
+
+        function showCreateNew() {
+            document.getElementById('inputSection').style.display = 'block';
+            document.getElementById('heroSection').style.display = 'none';
+        }
+
+        function uploadPPT() {
+            document.getElementById('fileInput').click();
+        }
+
+        function loadUploadedFile() {
+            const file = document.getElementById('fileInput').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const content = e.target.result;
+                        document.getElementById('xmlInput').value = content;
+                        showCreateNew();
+                        document.getElementById('templateSection').style.display = 'block';
+                        
+                        // Try to extract topic and author from uploaded file
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(content, 'text/xml');
+                        const topicElement = xmlDoc.querySelector('topic');
+                        const authorElement = xmlDoc.querySelector('author');
+                        
+                        if (topicElement) {
+                            document.getElementById('topicName').value = topicElement.textContent;
+                        }
+                        if (authorElement) {
+                            document.getElementById('authorName').value = authorElement.textContent;
+                        }
+                    } catch (error) {
+                        alert('Error loading file. Please make sure it\'s a valid XML file.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function generateTemplate() {
+            const topic = document.getElementById('topicName').value.trim();
+            const author = document.getElementById('authorName').value.trim();
+            
+            if (!topic) {
+                alert('Please enter a presentation topic');
+                return;
+            }
+
+            currentTopic = topic;
+            currentAuthor = author;
+
+            const template = `Create a comprehensive presentation on "${topic}" in XML format. Follow this exact structure and guidelines:
+
+**IMPORTANT XML STRUCTURE REQUIREMENTS:**
+- Start with <?xml version="1.0" encoding="UTF-8"?>
+- Use <presentation> as root element
+- Include <topic>${topic}</topic>
+- Include <author>${author || 'Anonymous'}</author>
+- Each slide must be wrapped in <slide> tags
+- Create as many slides as needed (no limit)
+
+**FORMATTING FEATURES AVAILABLE:**
+- Headings: <h1>, <h2>, <h3>
+- Paragraphs: <p>
+- Bullet points: <ul><li></li></ul>
+- Numbered lists: <ol><li></li></ol>
+- Tables: <table><tr><th></th></tr><tr><td></td></tr></table>
+- Text highlighting: <span class="highlight">important text</span>
+- Important text: <span class="important">critical info</span>
+- Success text: <span class="success">positive info</span>
+- Info text: <span class="info">additional info</span>
+
+**CONTENT GUIDELINES:**
+- Create a title slide with topic and author
+- Include introduction, main content slides, and conclusion
+- Use bullet points and lists effectively
+- Add tables when data presentation is helpful
+- Highlight key information using color classes
+- Make content engaging and well-structured
+- Use professional language appropriate for presentations
+
+**SPECIAL CHARACTERS:**
+- Use &amp; for &
+- Use &lt; for <
+- Use &gt; for >
+- Use &quot; for "
+- Use &#39; for '
+
+**EXAMPLE SLIDE STRUCTURE:**
+<slide>
+    <h1>Slide Title</h1>
+    <p>Introduction paragraph</p>
+    <ul>
+        <li>Bullet point 1</li>
+        <li><span class="important">Important bullet point</span></li>
+        <li>Bullet point 3</li>
+    </ul>
+    <table>
+        <tr><th>Header 1</th><th>Header 2</th></tr>
+        <tr><td>Data 1</td><td>Data 2</td></tr>
+    </table>
+</slide>
+
+Please create a complete, professional presentation following these guidelines.`;
+
+            document.getElementById('templateDisplay').textContent = template;
+            document.getElementById('templateSection').style.display = 'block';
+        }
+
+        function copyTemplate() {
+            const template = document.getElementById('templateDisplay').textContent;
+            navigator.clipboard.writeText(template).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        function createPresentation() {
+            const xmlContent = document.getElementById('xmlInput').value.trim();
+            
+            if (!xmlContent) {
+                alert('Please paste the AI-generated XML content');
+                return;
+            }
+
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+                
+                // Check for parsing errors
+                const parserError = xmlDoc.querySelector('parsererror');
+                if (parserError) {
+                    throw new Error('Invalid XML format');
+                }
+
+                const slideElements = xmlDoc.querySelectorAll('slide');
+                if (slideElements.length === 0) {
+                    throw new Error('No slides found in XML');
+                }
+
+                // Extract topic and author
+                const topicElement = xmlDoc.querySelector('topic');
+                const authorElement = xmlDoc.querySelector('author');
+                
+                if (topicElement) currentTopic = topicElement.textContent;
+                if (authorElement) currentAuthor = authorElement.textContent;
+
+                slides = Array.from(slideElements).map(slide => slide.innerHTML);
+                presentationData = xmlContent;
+                
+                startPresentation();
+            } catch (error) {
+                alert('Error parsing XML: ' + error.message + '\n\nPlease check your XML format and try again.');
+            }
+        }
+
+        function startPresentation() {
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('mainHeader').style.display = 'none';
+            document.getElementById('presentationView').style.display = 'block';
+            
+            const slidesContainer = document.getElementById('slidesContainer');
+            slidesContainer.innerHTML = '';
+            
+            slides.forEach((slideContent, index) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'slide';
+                slideDiv.innerHTML = slideContent;
+                if (index === 0) slideDiv.classList.add('active');
+                slidesContainer.appendChild(slideDiv);
+            });
+            
+            currentSlide = 0;
+            updateProgressBar();
+            showControls();
+            setupSwipeGestures();
+            
+            // Add click event to show/hide controls
+            document.addEventListener('click', showControls);
+            document.addEventListener('mousemove', showControls);
+        }
+
+        function setupSwipeGestures() {
+            const presentationView = document.getElementById('presentationView');
+            
+            presentationView.addEventListener('touchstart', handleTouchStart, { passive: true });
+            presentationView.addEventListener('touchend', handleTouchEnd, { passive: true });
+            
+            // Mouse drag support for desktop
+            let mouseDown = false;
+            let startX = 0;
+            
+            presentationView.addEventListener('mousedown', (e) => {
+                mouseDown = true;
+                startX = e.clientX;
+                e.preventDefault();
+            });
+            
+            presentationView.addEventListener('mousemove', (e) => {
+                if (!mouseDown) return;
+                e.preventDefault();
+            });
+            
+            presentationView.addEventListener('mouseup', (e) => {
+                if (!mouseDown) return;
+                mouseDown = false;
+                
+                const endX = e.clientX;
+                const diff = startX - endX;
+                
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) {
+                        nextSlide();
+                        showSwipeIndicator('right');
+                    } else {
+                        previousSlide();
+                        showSwipeIndicator('left');
+                    }
+                }
+            });
+        }
+
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }
+
+        function handleTouchEnd(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSlide();
+                    showSwipeIndicator('right');
+                } else {
+                    previousSlide();
+                    showSwipeIndicator('left');
+                }
+            }
+        }
+
+        function showSwipeIndicator(direction) {
+            const indicator = document.getElementById('swipe' + (direction === 'left' ? 'Left' : 'Right'));
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 500);
+        }
+
+        function showControls() {
+            const controls = document.getElementById('controls');
+            controls.classList.add('visible');
+            
+            clearTimeout(controlsTimeout);
+            controlsTimeout = setTimeout(() => {
+                controls.classList.remove('visible');
+            }, 1000); // Reduced from 3000ms to 1000ms
+        }
+
+        function hideControls() {
+            document.getElementById('controls').classList.remove('visible');
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                document.querySelectorAll('.slide')[currentSlide].classList.remove('active');
+                currentSlide--;
+                document.querySelectorAll('.slide')[currentSlide].classList.add('active');
+                updateProgressBar();
+                showControls();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                document.querySelectorAll('.slide')[currentSlide].classList.remove('active');
+                currentSlide++;
+                document.querySelectorAll('.slide')[currentSlide].classList.add('active');
+                updateProgressBar();
+                showControls();
+            } else {
+                showEndOptions();
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentSlide + 1) / slides.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function exitPresentation() {
+            document.getElementById('presentationView').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('mainHeader').style.display = 'block';
+            document.getElementById('heroSection').style.display = 'block';
+            document.getElementById('inputSection').style.display = 'none';
+            hideEndOptions();
+            
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        }
+
+        function showEndOptions() {
+            document.getElementById('endOptions').style.display = 'block';
+        }
+
+        function hideEndOptions() {
+            document.getElementById('endOptions').style.display = 'none';
+        }
+
+        function restartPresentation() {
+            currentSlide = 0;
+            document.querySelectorAll('.slide').forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === 0) slide.classList.add('active');
+            });
+            updateProgressBar();
+            hideEndOptions();
+            showControls();
+        }
+
+        function downloadPresentation() {
+            if (!presentationData) {
+                alert('No presentation data available');
+                return;
+            }
+            
+            const blob = new Blob([presentationData], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentTopic.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_presentation.xml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function sharePresentation() {
+            if (navigator.share && presentationData) {
+                const file = new File([presentationData], `${currentTopic}_presentation.xml`, { type: 'application/xml' });
+                navigator.share({
+                    title: `Presentation: ${currentTopic}`,
+                    text: `Check out this presentation on ${currentTopic}`,
+                    files: [file]
+                });
+            } else {
+                // Fallback: copy presentation link or data
+                const shareText = `Presentation: ${currentTopic}\nCreated with Prastuti - A Completely Free AI PPT Making Tool\n\nView more from Chinurag: https://www.google.com/search?q=chinurag`;
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('Presentation info copied to clipboard!');
+                });
+            }
+        }
+
+        function createNewPresentation() {
+            hideEndOptions();
+            exitPresentation();
+            document.getElementById('topicName').value = '';
+            document.getElementById('authorName').value = '';
+            document.getElementById('xmlInput').value = '';
+            document.getElementById('templateSection').style.display = 'none';
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('presentationView').style.display === 'block') {
+                switch(e.key) {
+                    case 'ArrowRight':
+                    case ' ':
+                        e.preventDefault();
+                        nextSlide();
+                        showSwipeIndicator('right');
+                        break;
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        previousSlide();
+                        showSwipeIndicator('left');
+                        break;
+                    case 'F11':
+                        e.preventDefault();
+                        toggleFullscreen();
+                        break;
+                    case 'Escape':
+                        if (document.fullscreenElement) {
+                            document.exitFullscreen();
+                        } else if (document.getElementById('endOptions').style.display === 'block') {
+                            hideEndOptions();
+                        } else {
+                            exitPresentation();
+                        }
+                        break;
+                }
+            }
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+            createFloatingCircles();
+        });
+
+        // Resize handler for responsive circles
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('backgroundAnimation');
+            container.innerHTML = '';
+            createFloatingCircles();
+        });
+
+        // Enhanced form validation
+        document.getElementById('topicName').addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (value.length > 100) {
+                e.target.style.borderColor = '#f44336';
+            } else {
+                e.target.style.borderColor = 'var(--border-color)';
+            }
+        });
+
+        // Auto-save functionality
+        let autoSaveTimeout;
+        document.getElementById('xmlInput').addEventListener('input', () => {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                const content = document.getElementById('xmlInput').value;
+                if (content.trim()) {
+                    localStorage.setItem('prastuti_draft', content);
+                }
+            }, 2000);
+        });
+
+        // Load draft on page load
+        window.addEventListener('load', () => {
+            const draft = localStorage.getItem('prastuti_draft');
+            if (draft && !document.getElementById('xmlInput').value) {
+                const loadDraft = confirm('Found a saved draft. Would you like to load it?');
+                if (loadDraft) {
+                    document.getElementById('xmlInput').value = draft;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
