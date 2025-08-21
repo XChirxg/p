@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PhysioMatters - Professional Physiotherapy Services</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@iconify/iconify@3.1.1/dist/iconify.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
         * {
             margin: 0;
             padding: 0;
@@ -12,27 +15,30 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #1a1a1a;
+            background: #fafafa;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 2rem;
         }
 
         /* Header */
         header {
-            background: linear-gradient(135deg, #2c5aa0 0%, #1e3d72 100%);
-            color: white;
-            padding: 1rem 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem 0;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
         nav {
@@ -43,42 +49,1045 @@
 
         .logo {
             font-size: 1.8rem;
-            font-weight: bold;
+            font-weight: 700;
+            color: #0052cc;
+            letter-spacing: -0.02em;
         }
 
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 2rem;
+            gap: 2.5rem;
         }
 
         .nav-links a {
-            color: white;
+            color: #333;
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .nav-links a:hover {
-            color: #87ceeb;
+            color: #0052cc;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #0052cc, #0066ff);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
         }
 
         .mobile-menu {
             display: none;
             background: none;
             border: none;
-            color: white;
+            color: #333;
             font-size: 1.5rem;
             cursor: pointer;
         }
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(44, 90, 160, 0.8), rgba(30, 61, 114, 0.8)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23f0f8ff" width="1200" height="600"/><circle fill="%23e6f3ff" cx="200" cy="150" r="80"/><circle fill="%23d1e9ff" cx="800" cy="300" r="120"/><circle fill="%23bce0ff" cx="1000" cy="100" r="60"/></svg>');
+            background: linear-gradient(135deg, #0052cc 0%, #0066ff 50%, #004499 100%);
             height: 100vh;
             display: flex;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="%23ffffff10" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: left;
+            color: white;
+            max-width: 700px;
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-content .subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+            font-weight: 400;
+            line-height: 1.6;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #0052cc;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 16px 32px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Sections */
+        section {
+            padding: 7rem 0;
+        }
+
+        .section-title {
             text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+
+        /* Services */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .service-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0052cc, #0066ff);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 82, 204, 0.15);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: #0052cc;
+            font-size: 1.5rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .service-card p {
+            color: #666;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* About Section */
+        .about-section {
+            background: white;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+        }
+
+        .about-image {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+            height: 500px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #0052cc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-image::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .about-image::after {
+            content: '';
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: #f8f9fa;
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .contact-info {
+            background: white;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .contact-info h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: #0052cc;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .contact-details strong {
+            display: block;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+
+        .contact-details a {
+            color: #0052cc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-details a:hover {
+            color: #004499;
+        }
+
+        .contact-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .contact-form h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e8eaed;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0052cc;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 82, 204, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: #ccc;
+            text-align: center;
+            padding: 3rem 0;
+            font-size: 0.9rem;
+        }
+
+        /* Quick Info Bar */
+        .quick-info {
+            background: linear-gradient(90deg, #0052cc, #0066ff);
+            color: white;
+            text-align: center;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .quick-info-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Floating WhatsApp Button */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #25D366 0%, #1ebe57 100%);
+            color: white;
+            border-radius: 60px;
+            padding: 18px 24px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .whatsapp-float:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(37, 211, 102, 0.5);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 1.5rem;
+                border-top: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                justify-content: center;
+            }
+
+            .contact-content,
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-card {
+                padding: 2rem;
+            }
+
+            .quick-info-content {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .whatsapp-float {
+                bottom: 20px;
+                right: 20px;
+                padding: 16px 20px;
+            }
+
+            section {
+                padding: 4rem 0;
+            }
+        }
+
+        /* Premium touches */
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Scroll animations */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Quick Info Bar -->
+    <div class="quick-info">
+        <div class="quick-info-content">
+            <div class="quick-info-item">
+                <iconify-icon icon="ph:phone-fill"></iconify-icon>
+                <span>Call: 7807082926</span>
+            </div>
+            <div class="quick-info-item">
+                <iconify-icon icon="ph:envelope-fill"></iconify-icon>
+                <span>physiomattersofficial@gmail.com</span>
+            </div>
+            <div class="quick-info-item">
+                <iconify-icon icon="ph:clock-fill"></iconify-icon>
+                <span>Mon-Sat: 9AM-7PM</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo">PhysioMatters</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="mobile-menu" onclick="toggleMenu()">
+                <iconify-icon icon="ph:list"></iconify-icon>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Premium Physiotherapy Excellence</h1>
+                <p class="subtitle">Transform your health with personalized rehabilitation and wellness solutions. Experience professional care that gets you back to your best life, faster.</p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="btn-primary">
+                        <iconify-icon icon="ph:calendar-plus"></iconify-icon>
+                        Book Consultation
+                    </a>
+                    <a href="tel:7807082926" class="btn-secondary">
+                        <iconify-icon icon="ph:phone"></iconify-icon>
+                        Call Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Excellence in Physiotherapy Care</h2>
+            <p class="section-subtitle scroll-reveal">Delivering world-class rehabilitation services with a personalized approach to your recovery and wellness journey.</p>
+            <div class="about-content">
+                <div class="about-text scroll-reveal">
+                    <p>At PhysioMatters, we represent the pinnacle of physiotherapy excellence in Solan. Our practice combines cutting-edge treatment methodologies with personalized care to deliver exceptional outcomes for every patient.</p>
+                    
+                    <p>We specialize in comprehensive rehabilitation services, from acute injury recovery to chronic pain management. Our evidence-based approach ensures that every treatment plan is tailored to your specific needs, lifestyle, and recovery goals.</p>
+                    
+                    <p>Our commitment extends beyond immediate treatment. We empower our patients with the knowledge and tools necessary for long-term health maintenance, injury prevention, and optimal physical performance.</p>
+                </div>
+                <div class="about-image scroll-reveal">
+                    <iconify-icon icon="ph:heart-beat"></iconify-icon>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Comprehensive Treatment Solutions</h2>
+            <p class="section-subtitle scroll-reveal">Our specialized services address a complete spectrum of musculoskeletal conditions with precision and expertise.</p>
+            <div class="services-grid">
+                <div class="service-card scroll-reveal">
+                    <div class="service-icon">
+                        <iconify-icon icon="ph:running"></iconify-icon>
+                    </div>
+                    <h3>Sports Medicine & Recovery</h3>
+                    <p>Advanced rehabilitation protocols for athletes and active individuals. Accelerated recovery programs designed to restore peak performance and prevent re-injury through comprehensive biomechanical analysis.</p>
+                </div>
+                <div class="service-card scroll-reveal">
+                    <div class="service-icon">
+                        <iconify-icon icon="ph:spine"></iconify-icon>
+                    </div>
+                    <h3>Spinal Rehabilitation</h3>
+                    <p>Specialized treatment for cervical and lumbar spine conditions. Expert management of disc disorders, chronic pain, and postural dysfunction using innovative therapeutic techniques.</p>
+                </div>
+                <div class="service-card scroll-reveal">
+                    <div class="service-icon">
+                        <iconify-icon icon="ph:bone"></iconify-icon>
+                    </div>
+                    <h3>Orthopedic Recovery</h3>
+                    <p>Comprehensive joint rehabilitation for knee, shoulder, hip, and ankle conditions. Post-surgical recovery programs and conservative management of arthritis and degenerative conditions.</p>
+                </div>
+                <div class="service-card scroll-reveal">
+                    <div class="service-icon">
+                        <iconify-icon icon="ph:lightning"></iconify-icon>
+                    </div>
+                    <h3>Advanced Pain Management</h3>
+                    <p>Multi-modal pain relief strategies combining manual therapy, therapeutic modalities, and progressive exercise protocols for sustainable long-term outcomes.</p>
+                </div>
+                <div class="service-card scroll-reveal">
+                    <div class="service-icon">
+                        <iconify-icon icon="ph:house-line"></iconify-icon>
+                    </div>
+                    <h3>Concierge Home Care</h3>
+                    <p>Premium in-home physiotherapy services for patients requiring specialized care in the comfort of their environment. Ideal for elderly patients and mobility-limited individuals.</p>
+                </div>
+                <div class="service-card scroll-reveal">
+                    <div class="service-icon">
+                        <iconify-icon icon="ph:shield-check"></iconify-icon>
+                    </div>
+                    <h3>Preventive Wellness</h3>
+                    <p>Proactive health optimization through movement screening, ergonomic assessment, and personalized fitness programs designed to prevent injury and enhance quality of life.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2 class="section-title scroll-reveal">Connect With Excellence</h2>
+            <p class="section-subtitle scroll-reveal">Begin your journey to optimal health. Our team is ready to provide personalized consultation and treatment planning.</p>
+            <div class="contact-content">
+                <div class="contact-info scroll-reveal">
+                    <h3>Practice Information</h3>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <iconify-icon icon="ph:phone-fill"></iconify-icon>
+                        </div>
+                        <div class="contact-details">
+                            <strong>Direct Line</strong>
+                            <a href="tel:7807082926">+91 78070 82926</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <iconify-icon icon="ph:envelope-fill"></iconify-icon>
+                        </div>
+                        <div class="contact-details">
+                            <strong>Email Consultation</strong>
+                            <a href="mailto:physiomattersofficial@gmail.com">physiomattersofficial@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <iconify-icon icon="ph:map-pin-fill"></iconify-icon>
+                        </div>
+                        <div class="contact-details">
+                            <strong>Clinic Location</strong>
+                            Sharma Niwas Hospital Road<br>
+                            Kotla Nala, Solan<br>
+                            Himachal Pradesh 173212
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <iconify-icon icon="ph:clock-fill"></iconify-icon>
+                        </div>
+                        <div class="contact-details">
+                            <strong>Operating Hours</strong>
+                            Monday - Saturday: 9:00 AM - 7:00 PM<br>
+                            Sunday: Closed
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form scroll-reveal">
+                    <h3>Request Consultation</h3>
+                    <form onsubmit="sendEmail(event)">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" required placeholder="Enter your complete name">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Contact Number *</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="+91 XXXXX XXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="your.email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="problem">Primary Concern *</label>
+                            <select id="problem" name="problem" required>
+                                <option value="">Select your primary concern</option>
+                                <option value="back-pain">Chronic Back Pain</option>
+                                <option value="neck-pain">Cervical/Neck Issues</option>
+                                <option value="knee-pain">Knee Joint Problems</option>
+                                <option value="shoulder-pain">Shoulder Dysfunction</option>
+                                <option value="sports-injury">Sports-Related Injury</option>
+                                <option value="post-surgery">Post-Surgical Rehabilitation</option>
+                                <option value="arthritis">Arthritis Management</option>
+                                <option value="muscle-strain">Muscle Strain/Spasm</option>
+                                <option value="headaches">Chronic Headaches</option>
+                                <option value="posture">Postural Disorders</option>
+                                <option value="workplace-injury">Workplace Injury</option>
+                                <option value="other">Other Condition</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Condition Details</label>
+                            <textarea id="message" name="message" rows="4" placeholder="Please describe your symptoms, duration, previous treatments, and any specific concerns..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="preferred-time">Preferred Appointment Window</label>
+                            <select id="preferred-time" name="preferred-time">
+                                <option value="">Select your preference</option>
+                                <option value="morning">Morning Session (9:00 AM - 12:00 PM)</option>
+                                <option value="afternoon">Afternoon Session (12:00 PM - 4:00 PM)</option>
+                                <option value="evening">Evening Session (4:00 PM - 7:00 PM)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <iconify-icon icon="ph:paper-plane-tilt"></iconify-icon>
+                            Submit Consultation Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 PhysioMatters. All rights reserved. | Premium Physiotherapy Services in Solan, Himachal Pradesh</p>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/917807082926?text=Hello%20PhysioMatters!%20I%20would%20like%20to%20schedule%20a%20consultation%20appointment." class="whatsapp-float" target="_blank">
+        <iconify-icon icon="ph:whatsapp-logo"></iconify-icon>
+        WhatsApp
+    </a>
+
+    <!-- Iconify Script -->
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                // Close mobile menu if open
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // Form submission
+        function sendEmail(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const name = formData.get('name');
+            const phone = formData.get('phone');
+            const email = formData.get('email');
+            const problem = formData.get('problem');
+            const message = formData.get('message');
+            const preferredTime = formData.get('preferred-time');
+            
+            // Create email subject and body
+            const subject = `Consultation Request - ${problem.replace('-', ' ').toUpperCase()}`;
+            const emailBody = `
+CONSULTATION REQUEST - PhysioMatters Website
+
+Patient Information:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Name: ${name}
+Phone: ${phone}
+Email: ${email || 'Not provided'}
+
+Medical Information:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Primary Concern: ${problem.replace('-', ' ').toUpperCase()}
+Preferred Time: ${preferredTime.replace('-', ' ') || 'No preference'}
+
+Patient Description:
+${message || 'No additional information provided'}
+
+Action Required:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Please contact this patient within 24 hours to schedule their consultation appointment.
+
+This request was submitted via the PhysioMatters website contact form.
+            `;
+            
+            // Create mailto link
+            const mailtoLink = `mailto:physiomattersofficial@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+            
+            // Open email client
+            window.location.href = mailtoLink;
+            
+            // Show confirmation
+            showConfirmation();
+            
+            // Reset form
+            event.target.reset();
+        }
+
+        // Show confirmation message
+        function showConfirmation() {
+            const originalBtn = document.querySelector('.submit-btn');
+            const originalContent = originalBtn.innerHTML;
+            
+            originalBtn.innerHTML = '<iconify-icon icon="ph:check-circle"></iconify-icon> Request Sent Successfully!';
+            originalBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            originalBtn.disabled = true;
+            
+            setTimeout(() => {
+                originalBtn.innerHTML = originalContent;
+                originalBtn.style.background = 'linear-gradient(135deg, #0052cc 0%, #0066ff 100%)';
+                originalBtn.disabled = false;
+            }, 3000);
+            
+            // Show alert
+            alert('Thank you for your consultation request! Your default email client will open with a pre-filled message. Please send the email to complete your request. We will contact you within 24 hours to schedule your appointment.');
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+                header.style.boxShadow = '0 8px 40px rgba(0, 0, 0, 0.12)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.08)';
+            }
+        });
+
+        // Scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, observerOptions);
+
+        // Initialize scroll reveal
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.scroll-reveal').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Add staggered animation delay for service cards
+            document.querySelectorAll('.service-card.scroll-reveal').forEach((card, index) => {
+                card.style.transitionDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Smooth page loading
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+        });
+
+        // Enhanced mobile experience
+        if ('ontouchstart' in window) {
+            document.body.classList.add('touch-device');
+        }
+
+        // Keyboard navigation enhancement
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('navLinks').classList.remove('active');
+            }
+        });
+
+        // Focus management for accessibility
+        const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+        
+        function trapFocus(element) {
+            const focusableContent = element.querySelectorAll(focusableElements);
+            const firstFocusableElement = focusableContent[0];
+            const lastFocusableElement = focusableContent[focusableContent.length - 1];
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusableElement) {
+                            lastFocusableElement.focus();
+                            e.preventDefault();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusableElement) {
+                            firstFocusableElement.focus();
+                            e.preventDefault();
+                        }
+                    }
+                }
+            });
+        }
+
+        // Performance optimization
+        let ticking = false;
+        function updateOnScroll() {
+            // Scroll-based animations and effects
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    // Your scroll handlers here
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', updateOnScroll);
+        
+        // Preload critical resources
+        const preloadLink = document.createElement('link');
+        preloadLink.rel = 'preload';
+        preloadLink.href = 'https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js';
+        preloadLink.as = 'script';
+        document.head.appendChild(preloadLink);
+    </script>
+</body>
+</html>            text-align: center;
             color: white;
             background-size: cover;
             background-position: center;
