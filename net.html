@@ -434,21 +434,28 @@
             }
         }
 
-        function startTimer() {
-            studyTimer = setInterval(() => {
-                if (!isOnBreak) {
-                    sessionEarnings += EARNINGS_PER_SECOND;
-                    pomodoroTimer++;
-                    
-                    // Check for Pomodoro break
-                    if (pomodoroTimer >= POMODORO_STUDY_TIME) {
-                        startBreak();
-                    }
-                }
-                
-                updateDisplay();
-            }, 1000);
+function startTimer() {
+    let lastUpdate = Date.now(); // remember the last tick time
+
+    studyTimer = setInterval(() => {
+        const now = Date.now();
+        const elapsed = (now - lastUpdate) / 1000; // how many seconds passed
+        lastUpdate = now;
+
+        if (!isOnBreak) {
+            sessionEarnings += EARNINGS_PER_SECOND * elapsed;
+            pomodoroTimer += elapsed;
+
+            // Check for Pomodoro break
+            if (pomodoroTimer >= POMODORO_STUDY_TIME) {
+                startBreak();
+            }
         }
+
+        updateDisplay();
+    }, 1000);
+}
+
 
         function startBreak() {
             isOnBreak = true;
