@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounting Journal Entries Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f0f;
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .home-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .home-content {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .home-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .home-subtitle {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            margin-bottom: 3rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .option-card:hover::before {
+            left: 100%;
+        }
+
+        .option-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .option-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .option-desc {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .custom-test-area {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .json-input {
+            width: 100%;
+            min-height: 200px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 1rem;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+
+        .json-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #555;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .game-screen {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #b0b0b0;
+            font-size: 1.1rem;
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .question-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-section h3 {
+            color: #fff;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .question-section p {
+            font-size: 1.1rem;
+            color: #e0e0e0;
+        }
+
+        /* Desktop layout */
+        .accounts-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 3rem;
+            align-items: start;
+            margin: 2rem 0;
+        }
+
+        .debit-side, .credit-side {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 2rem;
+            min-height: 400px;
+        }
+
+        .side-title {
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .account-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .account-row.credit-row {
+            flex-direction: row-reverse;
+        }
+
+        .account-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .personal { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .real { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .nominal { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+
+        .account-dropdown {
+            flex: 1;
+            padding: 12px 16px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .account-dropdown:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #333;
+        }
+
+        .account-dropdown:disabled {
+            background: #1a1a1a;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .arrow-container {
+            width: 50px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arrow {
+            font-size: 2rem;
+            color: #667eea;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .company-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            align-self: center;
+            border: 3px solid #333;
+        }
+
+        .mobile-company-icon {
+            display: none;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .journal-entry {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .journal-entry h4 {
+            color: #fff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .entry-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 20px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+        }
+
+        .entry-line.debit {
+            background: #2a2a2a;
+            border-left: 4px solid #667eea;
+        }
+
+        .entry-line.credit {
+            background: #2a2a2a;
+            border-left: 4px solid #667eea;
+            text-align: right;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .feedback {
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .feedback.correct {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+
+        .feedback.incorrect {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .arrow.correct {
+            color: #27ae60;
+            text-shadow: 0 0 10px #27ae60;
+        }
+
+        .arrow.incorrect {
+            color: #e74c3c;
+            text-shadow: 0 0 10px #e74c3c;
+        }
+
+        .special-fact {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid #667eea;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            color: #e0e0e0;
+        }
+
+        .special-fact h5 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #333;
+            border: 1px solid #555;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: #555;
+            transform: translateY(-2px);
+        }
+
+        .template-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .template-section h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .template-code {
+            background: #0f0f0f;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #e0e0e0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .home-title {
+                font-size: 2.2rem;
+            }
+
+            .home-subtitle {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .option-card {
+                padding: 1.5rem;
+            }
+
+            .option-icon {
+                font-size: 2rem;
+            }
+
+            .option-title {
+                font-size: 1.2rem;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .game-container {
+                padding: 1rem;
+            }
+
+            .question-section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .question-section h3 {
+                font-size: 1.1rem;
+            }
+
+            .question-section p {
+                font-size: 1rem;
+            }
+            
+            /* Mobile grid layout - single column with debit/credit side by side */
+            .accounts-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .debit-side, .credit-side {
+                padding: 1rem;
+                min-height: auto;
+            }
+
+            .side-title {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+
+            /* Hide desktop company icon on mobile */
+            .company-icon {
+                display: none;
+            }
+
+            /* Show mobile company icons */
+            .mobile-company-icon {
+                display: flex;
+            }
+
+            /* Mobile account row layout */
+            .account-row {
+                margin-bottom: 1rem;
+                gap: 0.5rem;
+                flex-wrap: nowrap;
+            }
+
+            .account-row.credit-row {
+                flex-direction: row;
+            }
+
+            .account-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .account-dropdown {
+                font-size: 0.85rem;
+                padding: 10px 12px;
+                min-width: 0;
+            }
+
+            .arrow-container {
+                width: 35px;
+                height: 35px;
+            }
+
+            .arrow {
+                font-size: 1.5rem;
+            }
+
+            .journal-entry {
+                padding: 1.5rem;
+                margin: 1.5rem 0;
+            }
+
+            .journal-entry h4 {
+                font-size: 1.1rem;
+            }
+
+            .entry-line {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                flex-direction: column;
+                text-align: left;
+                gap: 0.2rem;
+            }
+
+            .entry-line.credit {
+                text-align: left;
+            }
+
+            .buttons {
+                gap: 0.8rem;
+                margin: 1.5rem 0;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+
+            .feedback {
+                padding: 1rem;
+                font-size: 1rem;
+                margin: 1rem 0;
+            }
+
+            .special-fact {
+                padding: 1rem;
+                margin-top: 1rem;
+            }
+
+            .special-fact h5 {
+                font-size: 1rem;
+            }
+
+            .back-btn {
+                top: 15px;
+                left: 15px;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+
+            .template-section {
+                padding: 1rem;
+            }
+
+            .template-code {
+                font-size: 0.7rem;
+                padding: 0.8rem;
+            }
+
+            .json-input {
+                min-height: 150px;
+                font-size: 0.8rem;
+                padding: 0.8rem;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .home-title {
+                font-size: 1.8rem;
+            }
+
+            .game-container {
+                padding: 0.5rem;
+            }
+
+            .question-section {
+                padding: 1rem;
+            }
+
+            .debit-side, .credit-side {
+                padding: 0.8rem;
+            }
+
+            .account-dropdown {
+                font-size: 0.8rem;
+                padding: 8px 10px;
+            }
+
+            .entry-line {
+                font-size: 0.8rem;
+                padding: 6px 8px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Screen -->
+    <div class="home-screen" id="homeScreen">
+        <div class="home-content">
+            <h1 class="home-title">Accounting Mastery</h1>
+            <p class="home-subtitle">Master Double Entry System with Interactive Learning</p>
+            
+            <div class="options-grid">
+                <div class="option-card" onclick="startQuickTest()">
+                    <div class="option-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="option-title">Quick Test</h3>
+                    <p class="option-desc">Start with pre-loaded accounting scenarios to practice journal entries instantly</p>
+                </div>
+                
+                <div class="option-card" onclick="toggleCustomTest()">
+                    <div class="option-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="option-title">Custom Test</h3>
+                    <p class="option-desc">Load your own questions using AI-generated JSON format for personalized learning</p>
+                </div>
+            </div>
+            
+            <div class="custom-test-area" id="customTestArea">
+                <div class="template-section">
+                    <h4><i class="fas fa-lightbulb"></i> Template for AI</h4>
+                    <p style="color: #b0b0b0; margin-bottom: 1rem;">Copy this template and ask any AI to generate custom accounting questions:</p>
+                    <div class="template-code" id="templateCode">Generate accounting journal entry questions in this exact JSON format:
+
+{
+  "questions": [
+    {
+      "question": "Transaction description here",
+      "correctAnswer": {
+        "debit": { "type": "real", "account": "cash-ac" },
+        "credit": { "type": "nominal", "account": "sales-ac" }
+      },
+      "amount": 5000,
+      "specialFact": "Optional: Special accounting principle or note about this transaction"
+    }
+  ],
+  "categories": {
+    "personal": [
+      { "value": "sundry-debtors-ac", "label": "Sundry Debtors A/c", "icon": "fas fa-user-tie" }
+    ],
+    "real": [
+      { "value": "cash-ac", "label": "Cash A/c", "icon": "fas fa-money-bill-wave" }
+    ],
+    "nominal": [
+      { "value": "sales-ac", "label": "Sales A/c", "icon": "fas fa-cash-register" }
+    ]
+  }
+}
+
+Use proper account names ending with "A/c" or "-ac". Account types: "personal" (persons/entities), "real" (tangible assets), "nominal" (income/expenses)
+Generate 5-10 questions with diverse accounting scenarios.</div>
+                </div>
+                
+                <textarea 
+                    class="json-input" 
+                    id="jsonInput" 
+                    placeholder="Paste your AI-generated JSON here..."
+                ></textarea>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="loadCustomTest()">
+                        <i class="fas fa-upload"></i> Load Test
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleCustomTest()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="game-screen" id="gameScreen">
+        <button class="back-btn" onclick="goHome()">
+            <i class="fas fa-arrow-left"></i> Back
+        </button>
+
+        <div class="header">
+            <h1>Journal Entries Practice</h1>
+            <p>Apply Golden Rules of Accounting</p>
+        </div>
+
+        <div class="game-container">
+            <div class="question-section">
+                <h3><i class="fas fa-question-circle"></i> Transaction:</h3>
+                <p id="questionText">Loading question...</p>
+            </div>
+
+            <div class="accounts-grid">
+                <div class="debit-side">
+                    <div class="side-title">DEBIT</div>
+                    <div class="account-row debit-row">
+                        <div class="account-icon personal">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <select class="account-dropdown" id="debit-personal">
+                            <option value="">Personal: Debit the Receiver</option>
+                        </select>
+                        <div class="arrow-container">
+                            <div class="arrow" id="debit-personal-arrow">←</div>
+                        </div>
+                        <div class="mobile-company-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                    <div class="account-row debit-row">
+                        <div class="account-icon real">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <select class="account-dropdown" id="debit-real">
+                            <option value="">Real: Debit what comes in</option>
+                        </select>
+                        <div class="arrow-container">
+                            <div class="arrow" id="debit-real-arrow">→</div>
+                        </div>
+                        <div class="mobile-company-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                    <div class="account-row debit-row">
+                        <div class="account-icon nominal">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <select class="account-dropdown" id="debit-nominal">
+                            <option value="">Nominal: Debit Expenses & Losses</option>
+                        </select>
+                        <div class="arrow-container">
+                            <div class="arrow" id="debit-nominal-arrow">←</div>
+                        </div>
+                        <div class="mobile-company-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="company-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+
+                <div class="credit-side">
+                    <div class="side-title">CREDIT</div>
+                    <div class="account-row credit-row">
+                        <div class="mobile-company-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="arrow-container">
+                            <div class="arrow" id="credit-personal-arrow">←</div>
+                        </div>
+                        <select class="account-dropdown" id="credit-personal" disabled>
+                            <option value="">Personal: Credit the Giver</option>
+                        </select>
+                        <div class="account-icon personal">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div class="account-row credit-row">
+                        <div class="mobile-company-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="arrow-container">
+                            <div class="arrow" id="credit-real-arrow">→</div>
+                        </div>
+                        <select class="account-dropdown" id="credit-real" disabled>
+                            <option value="">Real: Credit what goes out</option>
+                        </select>
+                        <div class="account-icon real">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                    <div class="account-row credit-row">
+                        <div class="mobile-company-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="arrow-container">
+                            <div class="arrow" id="credit-nominal-arrow">←</div>
+                        </div>
+                        <select class="account-dropdown" id="credit-nominal" disabled>
+                            <option value="">Nominal: Credit Income & Gains</option>
+                        </select>
+                        <div class="account-icon nominal">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="journal-entry">
+                <h4><i class="fas fa-book"></i> Journal Entry</h4>
+                <div id="journalContent">
+                    <p style="text-align: center; color: #666; font-style: italic;">Make your selections to create journal entries</p>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button class="btn btn-primary" id="checkAnswer">
+                    <i class="fas fa-check"></i> Check Answer
+                </button>
+                <button class="btn btn-secondary" id="showCorrect" disabled>
+                    <i class="fas fa-lightbulb"></i> Show Correct Answer
+                </button>
+                <button class="btn btn-primary" id="nextQuestion">
+                    <i class="fas fa-forward"></i> Next Question
+                </button>
+            </div>
+
+            <div id="feedback" class="feedback" style="display: none;"></div>
+            <div id="specialFact" class="special-fact" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Corrected questions with proper accounting principles
+        const defaultQuestions = [
+            {
+                question: "Purchased goods for cash ₹15,000",
+                correctAnswer: {
+                    debit: { type: "nominal", account: "purchases-ac" },
+                    credit: { type: "real", account: "cash-ac" }
+                },
+                amount: 15000,
+                specialFact: "Purchase A/c is debited as it's an expense. Cash A/c is credited as cash goes out of the business."
+            },
+            {
+                question: "Sold goods to Rajesh for credit ₹25,000",
+                correctAnswer: {
+                    debit: { type: "personal", account: "sundry-debtors-ac" },
+                    credit: { type: "nominal", account: "sales-ac" }
+                },
+                amount: 25000,
+                specialFact: "Sundry Debtors A/c is debited (debit the receiver). Sales A/c is credited as it's income."
+            },
+            {
+                question: "Paid salary to employees ₹18,000 in cash",
+                correctAnswer: {
+                    debit: { type: "nominal", account: "salary-ac" },
+                    credit: { type: "real", account: "cash-ac" }
+                },
+                amount: 18000,
+                specialFact: "Salary A/c is an expense (debit nominal). Cash A/c is credited as money is paid out."
+            },
+            {
+                question: "Received cash from Priya (debtor) ₹12,000",
+                correctAnswer: {
+                    debit: { type: "real", account: "cash-ac" },
+                    credit: { type: "personal", account: "sundry-debtors-ac" }
+                },
+                amount: 12000,
+                specialFact: "Cash A/c is debited as cash comes in. Sundry Debtors A/c is credited (credit the giver)."
+            },
+            {
+                question: "Owner invested cash in business ₹100,000",
+                correctAnswer: {
+                    debit: { type: "real", account: "cash-ac" },
+                    credit: { type: "personal", account: "capital-ac" }
+                },
+                amount: 100000,
+                specialFact: "Cash A/c is debited as cash comes in. Capital A/c is credited (credit the giver - owner)."
+            },
+            {
+                question: "Purchased machinery from Gupta & Co. on credit ₹80,000",
+                correctAnswer: {
+                    debit: { type: "real", account: "machinery-ac" },
+                    credit: { type: "personal", account: "sundry-creditors-ac" }
+                },
+                amount: 80000,
+                specialFact: "Machinery A/c is debited (asset comes in). Sundry Creditors A/c is credited (credit the giver)."
+            },
+            {
+                question: "Paid office rent ₹8,000 by cash",
+                correctAnswer: {
+                    debit: { type: "nominal", account: "rent-ac" },
+                    credit: { type: "real", account: "cash-ac" }
+                },
+                amount: 8000,
+                specialFact: "Rent A/c is an expense (debit nominal). Cash A/c is credited as money goes out."
+            },
+            {
+                question: "Received commission income ₹5,000 in cash",
+                correctAnswer: {
+                    debit: { type: "real", account: "cash-ac" },
+                    credit: { type: "nominal", account: "commission-received-ac" }
+                },
+                amount: 5000,
+                specialFact: "Cash A/c is debited as cash comes in. Commission Received A/c is income (credit nominal)."
+            },
+            {
+                question: "Paid cash to Sharma & Co. (creditor) ₹20,000",
+                correctAnswer: {
+                    debit: { type: "personal", account: "sundry-creditors-ac" },
+                    credit: { type: "real", account: "cash-ac" }
+                },
+                amount: 20000,
+                specialFact: "Sundry Creditors A/c is debited (debit the receiver). Cash A/c is credited as money goes out."
+            },
+            {
+                question: "Withdrew cash for personal use ₹10,000",
+                correctAnswer: {
+                    debit: { type: "personal", account: "drawings-ac" },
+                    credit: { type: "real", account: "cash-ac" }
+                },
+                amount: 10000,
+                specialFact: "Drawings A/c is debited (debit the receiver - owner takes). Cash A/c is credited as money goes out."
+            }
+        ];
+
+        // Corrected categories with proper account names
+        const defaultCategories = {
+            personal: [
+                { value: "capital-ac", label: "Capital A/c", icon: "fas fa-crown" },
+                { value: "drawings-ac", label: "Drawings A/c", icon: "fas fa-hand-holding-usd" },
+                { value: "sundry-debtors-ac", label: "Sundry Debtors A/c", icon: "fas fa-user-tie" },
+                { value: "sundry-creditors-ac", label: "Sundry Creditors A/c", icon: "fas fa-handshake" },
+                { value: "bank-loan-ac", label: "Bank Loan A/c", icon: "fas fa-university" },
+                { value: "advance-from-customers-ac", label: "Advance from Customers A/c", icon: "fas fa-users" },
+                { value: "outstanding-salary-ac", label: "Outstanding Salary A/c", icon: "fas fa-user-hard-hat" },
+                { value: "loan-from-directors-ac", label: "Loan from Directors A/c", icon: "fas fa-user-friends" }
+            ],
+            real: [
+                { value: "cash-ac", label: "Cash A/c", icon: "fas fa-money-bill-wave" },
+                { value: "bank-ac", label: "Bank A/c", icon: "fas fa-piggy-bank" },
+                { value: "stock-ac", label: "Stock A/c", icon: "fas fa-boxes" },
+                { value: "machinery-ac", label: "Machinery A/c", icon: "fas fa-cogs" },
+                { value: "building-ac", label: "Building A/c", icon: "fas fa-building" },
+                { value: "furniture-ac", label: "Furniture A/c", icon: "fas fa-couch" },
+                { value: "motor-vehicles-ac", label: "Motor Vehicles A/c", icon: "fas fa-car" },
+                { value: "land-ac", label: "Land A/c", icon: "fas fa-mountain" },
+                { value: "plant-machinery-ac", label: "Plant & Machinery A/c", icon: "fas fa-industry" },
+                { value: "investment-ac", label: "Investment A/c", icon: "fas fa-chart-pie" },
+                { value: "raw-material-ac", label: "Raw Material A/c", icon: "fas fa-warehouse" },
+                { value: "goodwill-ac", label: "Goodwill A/c", icon: "fas fa-star" }
+            ],
+            nominal: [
+                { value: "purchases-ac", label: "Purchases A/c", icon: "fas fa-shopping-cart" },
+                { value: "sales-ac", label: "Sales A/c", icon: "fas fa-cash-register" },
+                { value: "salary-ac", label: "Salary A/c", icon: "fas fa-money-check-alt" },
+                { value: "wages-ac", label: "Wages A/c", icon: "fas fa-hard-hat" },
+                { value: "rent-ac", label: "Rent A/c", icon: "fas fa-home" },
+                { value: "electricity-ac", label: "Electricity A/c", icon: "fas fa-bolt" },
+                { value: "telephone-ac", label: "Telephone A/c", icon: "fas fa-phone" },
+                { value: "stationery-ac", label: "Stationery A/c", icon: "fas fa-pencil-alt" },
+                { value: "freight-inward-ac", label: "Freight Inward A/c", icon: "fas fa-truck" },
+                { value: "insurance-ac", label: "Insurance A/c", icon: "fas fa-shield-alt" },
+                { value: "bad-debts-ac", label: "Bad Debts A/c", icon: "fas fa-exclamation-triangle" },
+                { value: "depreciation-ac", label: "Depreciation A/c", icon: "fas fa-chart-line-down" },
+                { value: "interest-expense-ac", label: "Interest Expense A/c", icon: "fas fa-percentage" },
+                { value: "advertisement-ac", label: "Advertisement A/c", icon: "fas fa-ad" },
+                { value: "commission-received-ac", label: "Commission Received A/c", icon: "fas fa-trophy" },
+                { value: "rent-received-ac", label: "Rent Received A/c", icon: "fas fa-key" },
+                { value: "interest-received-ac", label: "Interest Received A/c", icon: "fas fa-coins" },
+                { value: "discount-received-ac", label: "Discount Received A/c", icon: "fas fa-tags" },
+                { value: "discount-allowed-ac", label: "Discount Allowed A/c", icon: "fas fa-cut" },
+                { value: "travel-ac", label: "Travel A/c", icon: "fas fa-suitcase" },
+                { value: "repairs-ac", label: "Repairs & Maintenance A/c", icon: "fas fa-wrench" }
+            ]
+        };
+
+        let currentQuestions = defaultQuestions;
+        let currentCategories = defaultCategories;
+        let currentQuestion = 0;
+        let gameState = {
+            debitSelection: null,
+            creditSelection: null,
+            answered: false
+        };
+
+        // Home screen functions
+        function startQuickTest() {
+            currentQuestions = defaultQuestions;
+            currentCategories = defaultCategories;
+            showGameScreen();
+        }
+
+        function toggleCustomTest() {
+            const area = document.getElementById('customTestArea');
+            area.style.display = area.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function loadCustomTest() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+            
+            if (!jsonInput) {
+                alert('Please paste the JSON data first!');
+                return;
+            }
+            
+            try {
+                const data = JSON.parse(jsonInput);
+                
+                if (!data.questions || !Array.isArray(data.questions)) {
+                    throw new Error('Invalid JSON structure: questions array is required');
+                }
+                
+                currentQuestions = data.questions;
+                currentCategories = data.categories || defaultCategories;
+                
+                showGameScreen();
+            } catch (error) {
+                alert('Invalid JSON format! Please check your input.\nError: ' + error.message);
+            }
+        }
+
+        function showGameScreen() {
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            currentQuestion = 0;
+            populateDropdowns();
+            loadQuestion();
+        }
+
+        function goHome() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('homeScreen').style.display = 'flex';
+            document.getElementById('customTestArea').style.display = 'none';
+        }
+
+        // Populate dropdowns with current categories
+        function populateDropdowns() {
+            Object.keys(currentCategories).forEach(type => {
+                const debitDropdown = document.getElementById(`debit-${type}`);
+                const creditDropdown = document.getElementById(`credit-${type}`);
+                
+                // Clear existing options except the first one
+                debitDropdown.innerHTML = debitDropdown.options[0].outerHTML;
+                creditDropdown.innerHTML = creditDropdown.options[0].outerHTML;
+                
+                // Add new options
+                currentCategories[type].forEach(account => {
+                    const debitOption = new Option(account.label, account.value);
+                    const creditOption = new Option(account.label, account.value);
+                    
+                    debitDropdown.add(debitOption);
+                    creditDropdown.add(creditOption);
+                });
+                
+                // Update icons if provided
+                if (currentCategories[type][0]?.icon) {
+                    const debitIcon = document.querySelector(`.debit-side .account-row .${type} i`);
+                    const creditIcon = document.querySelector(`.credit-side .account-row .${type} i`);
+                    if (debitIcon && creditIcon) {
+                        debitIcon.className = currentCategories[type][0].icon;
+                        creditIcon.className = currentCategories[type][0].icon;
+                    }
+                }
+            });
+        }
+
+        function loadQuestion() {
+            const question = currentQuestions[currentQuestion];
+            document.getElementById('questionText').textContent = question.question;
+            
+            // Reset all dropdowns
+            document.querySelectorAll('.account-dropdown').forEach(dropdown => {
+                dropdown.value = '';
+            });
+            
+            // Reset dropdown states - enable debit side, disable credit side
+            document.querySelectorAll('.debit-side .account-dropdown').forEach(dropdown => {
+                dropdown.disabled = false;
+            });
+            document.querySelectorAll('.credit-side .account-dropdown').forEach(dropdown => {
+                dropdown.disabled = true;
+            });
+            
+            // Reset all arrows
+            document.querySelectorAll('.arrow').forEach(arrow => {
+                arrow.className = 'arrow';
+            });
+            
+            // Reset game state
+            gameState = {
+                debitSelection: null,
+                creditSelection: null,
+                answered: false
+            };
+            
+            // Reset buttons
+            document.getElementById('checkAnswer').disabled = false;
+            document.getElementById('showCorrect').disabled = true;
+            
+            // Clear feedback and special fact
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('specialFact').style.display = 'none';
+            
+            // Clear journal entry
+            document.getElementById('journalContent').innerHTML = 
+                '<p style="text-align: center; color: #666; font-style: italic;">Select debit account first, then credit account</p>';
+        }
+
+        function updateJournalEntry() {
+            const content = document.getElementById('journalContent');
+            const question = currentQuestions[currentQuestion];
+            
+            if (!gameState.debitSelection && !gameState.creditSelection) {
+                content.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">Select debit account first, then credit account</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            if (gameState.debitSelection) {
+                const accountLabel = getAccountLabel(gameState.debitSelection.type, gameState.debitSelection.account);
+                html += `<div class="entry-line debit">
+                    <span>${accountLabel}</span>
+                    <span>Dr. ₹${question.amount.toLocaleString()}</span>
+                </div>`;
+            }
+            
+            if (gameState.creditSelection) {
+                const accountLabel = getAccountLabel(gameState.creditSelection.type, gameState.creditSelection.account);
+                html += `<div class="entry-line credit">
+                    <span>To ${accountLabel}</span>
+                    <span>₹${question.amount.toLocaleString()}</span>
+                </div>`;
+            }
+            
+            content.innerHTML = html;
+        }
+
+        function getAccountLabel(type, value) {
+            const account = currentCategories[type]?.find(acc => acc.value === value);
+            return account ? account.label : value.charAt(0).toUpperCase() + value.slice(1);
+        }
+
+        function highlightArrows(isCorrect) {
+            // Reset all arrows first
+            document.querySelectorAll('.arrow').forEach(arrow => {
+                arrow.className = 'arrow';
+            });
+            
+            if (gameState.debitSelection) {
+                const debitArrow = document.getElementById(`debit-${gameState.debitSelection.type}-arrow`);
+                debitArrow.className = isCorrect ? 'arrow correct' : 'arrow incorrect';
+            }
+            
+            if (gameState.creditSelection) {
+                const creditArrow = document.getElementById(`credit-${gameState.creditSelection.type}-arrow`);
+                creditArrow.className = isCorrect ? 'arrow correct' : 'arrow incorrect';
+            }
+        }
+
+        function checkAnswer() {
+            const correct = currentQuestions[currentQuestion].correctAnswer;
+            const feedback = document.getElementById('feedback');
+            
+            if (!gameState.debitSelection || !gameState.creditSelection) {
+                feedback.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Please make selections for both debit and credit sides.';
+                feedback.className = 'feedback incorrect';
+                feedback.style.display = 'block';
+                return;
+            }
+            
+            const isCorrect = 
+                gameState.debitSelection.type === correct.debit.type &&
+                gameState.debitSelection.account === correct.debit.account &&
+                gameState.creditSelection.type === correct.credit.type &&
+                gameState.creditSelection.account === correct.credit.account;
+            
+            if (isCorrect) {
+                feedback.innerHTML = '<i class="fas fa-check-circle"></i> Excellent! Your journal entry is correct!';
+                feedback.className = 'feedback correct';
+                highlightArrows(true);
+                
+                // Show special fact if available
+                const question = currentQuestions[currentQuestion];
+                if (question.specialFact) {
+                    const specialFact = document.getElementById('specialFact');
+                    specialFact.innerHTML = `
+                        <h5><i class="fas fa-lightbulb"></i> Accounting Insight</h5>
+                        <p>${question.specialFact}</p>
+                    `;
+                    specialFact.style.display = 'block';
+                }
+            } else {
+                feedback.innerHTML = '<i class="fas fa-times-circle"></i> Not quite right. Review the golden rules and try again, or see the correct answer.';
+                feedback.className = 'feedback incorrect';
+                document.getElementById('showCorrect').disabled = false;
+                highlightArrows(false);
+            }
+            
+            feedback.style.display = 'block';
+            document.getElementById('checkAnswer').disabled = true;
+            gameState.answered = true;
+        }
+
+        function showCorrectAnswer() {
+            const correct = currentQuestions[currentQuestion].correctAnswer;
+            
+            // Reset all dropdowns first
+            document.querySelectorAll('.account-dropdown').forEach(dropdown => {
+                dropdown.value = '';
+                dropdown.disabled = false;
+            });
+            
+            // Set correct values in dropdowns
+            document.getElementById(`debit-${correct.debit.type}`).value = correct.debit.account;
+            document.getElementById(`credit-${correct.credit.type}`).value = correct.credit.account;
+            
+            // Disable non-selected dropdowns
+            ['personal', 'real', 'nominal'].forEach(type => {
+                if (type !== correct.debit.type) {
+                    document.getElementById(`debit-${type}`).disabled = true;
+                    document.getElementById(`debit-${type}`).value = '';
+                }
+                if (type !== correct.credit.type) {
+                    document.getElementById(`credit-${type}`).disabled = true;
+                    document.getElementById(`credit-${type}`).value = '';
+                }
+            });
+            
+            // Update game state
+            gameState.debitSelection = correct.debit;
+            gameState.creditSelection = correct.credit;
+            
+            // Update journal entry
+            updateJournalEntry();
+            
+            // Highlight correct arrows
+            highlightArrows(true);
+            
+            // Update feedback
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = '<i class="fas fa-lightbulb"></i> Here is the correct journal entry!';
+            feedback.className = 'feedback correct';
+            feedback.style.display = 'block';
+            
+            // Show special fact if available
+            const question = currentQuestions[currentQuestion];
+            if (question.specialFact) {
+                const specialFact = document.getElementById('specialFact');
+                specialFact.innerHTML = `
+                    <h5><i class="fas fa-lightbulb"></i> Accounting Insight</h5>
+                    <p>${question.specialFact}</p>
+                `;
+                specialFact.style.display = 'block';
+            }
+            
+            document.getElementById('showCorrect').disabled = true;
+        }
+
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % currentQuestions.length;
+            loadQuestion();
+        }
+
+        // Event listeners
+        document.getElementById('checkAnswer').addEventListener('click', checkAnswer);
+        document.getElementById('showCorrect').addEventListener('click', showCorrectAnswer);
+        document.getElementById('nextQuestion').addEventListener('click', nextQuestion);
+
+        // Dropdown change handlers
+        document.querySelectorAll('.account-dropdown').forEach(dropdown => {
+            dropdown.addEventListener('change', function() {
+                const [side, type] = this.id.split('-');
+                
+                if (this.value) {
+                    const selection = { type, account: this.value };
+                    
+                    if (side === 'debit') {
+                        gameState.debitSelection = selection;
+                        
+                        // Disable other debit dropdowns
+                        document.querySelectorAll('.debit-side .account-dropdown').forEach(dd => {
+                            if (dd !== this) {
+                                dd.value = '';
+                                dd.disabled = true;
+                            }
+                        });
+                        
+                        // Enable credit side dropdowns
+                        document.querySelectorAll('.credit-side .account-dropdown').forEach(dd => {
+                            dd.disabled = false;
+                        });
+                        
+                    } else {
+                        gameState.creditSelection = selection;
+                        
+                        // Disable other credit dropdowns
+                        document.querySelectorAll('.credit-side .account-dropdown').forEach(dd => {
+                            if (dd !== this) {
+                                dd.value = '';
+                                dd.disabled = true;
+                            }
+                        });
+                    }
+                } else {
+                    // Handle deselection
+                    if (side === 'debit') {
+                        gameState.debitSelection = null;
+                        
+                        // Re-enable all debit dropdowns
+                        document.querySelectorAll('.debit-side .account-dropdown').forEach(dd => {
+                            dd.disabled = false;
+                        });
+                        
+                        // Disable and clear credit side
+                        document.querySelectorAll('.credit-side .account-dropdown').forEach(dd => {
+                            dd.disabled = true;
+                            dd.value = '';
+                        });
+                        gameState.creditSelection = null;
+                        
+                    } else {
+                        gameState.creditSelection = null;
+                        
+                        // Re-enable all credit dropdowns
+                        document.querySelectorAll('.credit-side .account-dropdown').forEach(dd => {
+                            dd.disabled = false;
+                        });
+                    }
+                }
+                
+                updateJournalEntry();
+                
+                // Reset answer state if user changes selection
+                if (gameState.answered) {
+                    document.getElementById('checkAnswer').disabled = false;
+                    document.getElementById('feedback').style.display = 'none';
+                    document.getElementById('specialFact').style.display = 'none';
+                    gameState.answered = false;
+                    // Reset arrow colors
+                    document.querySelectorAll('.arrow').forEach(arrow => {
+                        arrow.className = 'arrow';
+                    });
+                }
+            });
+        });
+
+        // Copy template function
+        document.getElementById('templateCode').addEventListener('click', function() {
+            navigator.clipboard.writeText(this.textContent).then(() => {
+                // Show temporary success message
+                const originalText = this.textContent;
+                this.textContent = 'Template copied to clipboard!';
+                this.style.color = '#27ae60';
+                setTimeout(() => {
+                    this.textContent = originalText;
+                    this.style.color = '#e0e0e0';
+                }, 2000);
+            }).catch(() => {
+                // Fallback for browsers that don't support clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = this.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up initial state
+            document.getElementById('homeScreen').style.display = 'flex';
+            document.getElementById('gameScreen').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
