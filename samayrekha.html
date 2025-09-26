@@ -3,7 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samayrekha - A Completely Free Timeline Visualizer Tool</title>
+    <title>Samayrekha - Free AI Timeline Visualizer Tool | Create Timelines Instantly</title>
+    <meta name="description" content="Create stunning timelines for free with AI! Samayrekha is a completely free timeline visualizer and generator. No registration required. Generate historical, personal, and educational timelines instantly.">
+    <meta name="keywords" content="free timeline maker, AI timeline generator, timeline visualizer, timeline creator, free timeline tool, historical timeline, educational timeline, timeline maker online, AI powered timeline">
+    <meta name="author" content="Chinurag">
+    <meta property="og:title" content="Samayrekha - Free AI Timeline Visualizer Tool">
+    <meta property="og:description" content="Create stunning timelines for free with AI! No registration, completely free timeline generator and visualizer.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Samayrekha - Free AI Timeline Visualizer">
+    <meta name="twitter:description" content="Create stunning timelines for free with AI! No registration required.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://your-domain.com">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playfair+Display:wght@400;500;600;700;800&family=Source+Sans+Pro:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -173,6 +186,23 @@
             color: var(--secondary-text);
             margin-bottom: 40px;
             font-weight: 400;
+        }
+
+        .hero .free-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #00c851, #007e33);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .greeting-message {
@@ -378,7 +408,6 @@
         .timeline-display {
             display: none;
             padding: 40px 0;
-            /* Remove background to allow bubbles to show */
         }
 
         .timeline-container {
@@ -491,6 +520,18 @@
             100% { transform: rotate(360deg); }
         }
 
+        .loading-text {
+            font-family: var(--ui-font);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .loading-time {
+            font-family: var(--ui-font);
+            font-size: 14px;
+            color: var(--secondary-text);
+        }
+
         .api-key-section {
             background: var(--hover-color);
             padding: 24px;
@@ -525,34 +566,65 @@
         .timeline-controls {
             text-align: center;
             margin-bottom: 40px;
+            position: relative;
         }
 
         .toggle-descriptions-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
             background: var(--button-bg);
             color: var(--button-text);
             border: none;
-            padding: 12px 20px;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
-            font-size: 14px;
-            font-family: var(--ui-font);
-            font-weight: 500;
-            border-radius: 25px;
+            font-size: 18px;
+            border-radius: 50%;
             transition: all 0.3s ease;
-            display: inline-flex;
+            display: none;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
         }
 
         .toggle-descriptions-btn:hover {
-            opacity: 0.8;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-descriptions-btn.visible {
+            display: flex;
+        }
+
+        .download-pdf-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: var(--ui-font);
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 10px;
+        }
+
+        .download-pdf-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .event-description.hidden {
             display: none;
         }
 
-        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -613,6 +685,47 @@
             margin-top: 60px;
         }
 
+        .seo-section {
+            background: var(--hover-color);
+            padding: 40px;
+            margin: 40px 0;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .seo-section h2 {
+            font-family: var(--heading-font);
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: var(--bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .feature-card i {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-family: var(--heading-font);
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -654,6 +767,17 @@
             .theme-toggle, .fullscreen-toggle {
                 padding: 8px 16px;
                 font-size: 12px;
+            }
+
+            .toggle-descriptions-btn {
+                bottom: 15px;
+                left: 15px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -701,13 +825,14 @@
     <main class="main-content" id="mainContent">
         <div class="container">
             <div class="hero" id="heroSection">
+                <div class="free-badge">🆓 100% FREE • NO REGISTRATION • AI POWERED</div>
                 <div id="greetingMessage" class="greeting-message" style="display: none;"></div>
-                <h1>Timeline Visualizer</h1>
-                <p>A Completely Free Timeline Creation & Visualization Tool</p>
+                <h1>Free AI Timeline Visualizer</h1>
+                <p>Create Beautiful Timelines Instantly with AI • Completely Free Forever</p>
                 <div class="action-buttons">
                     <button class="btn btn-primary" onclick="showCreateNew()">
-                        <i class="fas fa-plus-circle"></i>
-                        Create New Timeline
+                        <i class="fas fa-robot"></i>
+                        Generate with AI (Free)
                     </button>
                     <button class="btn btn-secondary" onclick="uploadTimeline()">
                         <i class="fas fa-upload"></i>
@@ -715,12 +840,48 @@
                     </button>
                 </div>
                 
+                <div class="seo-section">
+                    <h2>Why Choose Our Free AI Timeline Generator?</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-robot"></i>
+                            <h3>AI-Powered</h3>
+                            <p>Advanced AI creates detailed timelines automatically from your topic</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-free-code-camp"></i>
+                            <h3>100% Free</h3>
+                            <p>No hidden costs, no premium plans, completely free forever</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-user-slash"></i>
+                            <h3>No Registration</h3>
+                            <p>Start creating immediately, no account required</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-download"></i>
+                            <h3>Export PDF</h3>
+                            <p>Download your timeline as a professional PDF document</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-palette"></i>
+                            <h3>Multiple Styles</h3>
+                            <p>Choose from story-like, formal, educational, or creative writing styles</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-history"></i>
+                            <h3>Any Topic</h3>
+                            <p>Historical events, personal journeys, project timelines, and more</p>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="credit-section">
                     <a href="https://www.google.com/search?q=chinurag&oq=chinurag&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgYIARBFGEAyDAgCEC4YDRixAxiABDIJCAMQABgNGIAEMgkIBBAAGA0YgAQyCQgFEAAYDRiABDIJCAYQABgNGIAEMgYIBxBFGD3SAQgyMDQ4ajBqN6gCCLACAfEFyPfDwlHGhGc&sourceid=chrome&ie=UTF-8" 
                        target="_blank" 
                        class="credit-link">
                         <i class="fas fa-heart"></i>
-                        View more from Chinurag
+                        More Free Tools by Chinurag
                     </a>
                 </div>
             </div>
@@ -782,7 +943,7 @@
                 <div class="action-buttons">
                     <button class="btn btn-primary" onclick="generateDirectlyWithAI()">
                         <i class="fas fa-robot"></i>
-                        Generate with AI
+                        Generate with AI (Free)
                     </button>
                     <button class="btn btn-secondary" onclick="generateTimelineTemplate()">
                         <i class="fas fa-file-alt"></i>
@@ -792,7 +953,8 @@
 
                 <div class="loading-animation" id="loadingAnimation">
                     <div class="spinner"></div>
-                    <p>Generating your timeline with AI...</p>
+                    <div class="loading-text">Generating your timeline with AI...</div>
+                    <div class="loading-time" id="loadingTime">Estimated time: Calculating...</div>
                 </div>
 
                 <div id="templateSection" style="display: none;">
@@ -827,25 +989,27 @@
                 <p id="timelineCreator" style="font-family: var(--ui-font); color: var(--secondary-text);"></p>
             </div>
             
-            <div class="timeline-controls">
-                <button class="toggle-descriptions-btn" onclick="toggleDescriptions()" id="toggleDescBtn">
-                    <i class="fas fa-eye-slash"></i>
-                    Hide Descriptions
-                </button>
-            </div>
-            
             <div class="timeline-container">
                 <div class="timeline-line"></div>
                 <div id="timelineEvents"></div>
             </div>
+            
             <div class="timeline-footer">
                 <button class="btn btn-secondary" onclick="goBack()">
                     <i class="fas fa-arrow-left"></i>
                     Back to Editor
                 </button>
+                <button class="download-pdf-btn" onclick="downloadPDF()">
+                    <i class="fas fa-file-pdf"></i>
+                    Download PDF
+                </button>
             </div>
         </div>
     </div>
+
+    <button class="toggle-descriptions-btn" onclick="toggleDescriptions()" id="toggleDescBtn">
+        <i class="fas fa-eye"></i>
+    </button>
 
     <!-- API Key Modal -->
     <div class="modal" id="apiKeyModal">
@@ -906,11 +1070,15 @@
 
     <input type="file" id="fileInput" class="file-input" accept=".json,.txt" onchange="loadUploadedFile()">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <script>
-    let currentStyle = 'story';
+let currentStyle = 'story';
     let currentEventCount = '8-15';
     let timelineData = null;
     let descriptionsVisible = true;
+    let generationStartTime = null;
 
     function createFloatingCircles() {
         const container = document.getElementById('backgroundAnimation');
@@ -932,6 +1100,52 @@
             circle.style.animationDelay = Math.random() * 40 + 's';
             
             container.appendChild(circle);
+        }
+    }
+
+    function getEstimatedTime(eventCount) {
+        const cacheKey = `generation_times_${eventCount}`;
+        const cachedTimes = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+        
+        if (cachedTimes.length === 0) {
+            // Default estimates based on event count
+            switch(eventCount) {
+                case '8-15': return 15;
+                case '15-30': return 25;
+                case '30-50': return 40;
+                default: return 20;
+            }
+        }
+        
+        const avgTime = cachedTimes.reduce((a, b) => a + b, 0) / cachedTimes.length;
+        return Math.round(avgTime);
+    }
+
+    function saveGenerationTime(eventCount, timeInSeconds) {
+        const cacheKey = `generation_times_${eventCount}`;
+        let cachedTimes = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+        
+        cachedTimes.push(timeInSeconds);
+        
+        // Keep only last 5 times
+        if (cachedTimes.length > 5) {
+            cachedTimes = cachedTimes.slice(-5);
+        }
+        
+        localStorage.setItem(cacheKey, JSON.stringify(cachedTimes));
+    }
+
+    function updateLoadingTime() {
+        if (!generationStartTime) return;
+        
+        const elapsed = Math.floor((Date.now() - generationStartTime) / 1000);
+        const estimated = getEstimatedTime(currentEventCount);
+        
+        if (elapsed < estimated) {
+            const remaining = estimated - elapsed;
+            document.getElementById('loadingTime').textContent = `Estimated time remaining: ${remaining}s (avg: ${estimated}s)`;
+        } else {
+            document.getElementById('loadingTime').textContent = `Taking longer than usual... (avg: ${estimated}s)`;
         }
     }
 
@@ -1097,7 +1311,11 @@ ${details ? `Special focus: ${details}` : ''}
 
 Please create a comprehensive timeline with accurate information, proper JSON formatting, and descriptions that match the requested style.`;
 
+        generationStartTime = Date.now();
         document.getElementById('loadingAnimation').style.display = 'block';
+        document.getElementById('loadingTime').textContent = `Estimated time: ${getEstimatedTime(currentEventCount)}s`;
+        
+        const loadingInterval = setInterval(updateLoadingTime, 1000);
 
         try {
             const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', {
@@ -1133,6 +1351,12 @@ Please create a comprehensive timeline with accurate information, proper JSON fo
             if (jsonMatch) {
                 const jsonContent = jsonMatch[0];
                 timelineData = JSON.parse(jsonContent);
+                
+                // Save generation time
+                const generationTime = Math.floor((Date.now() - generationStartTime) / 1000);
+                saveGenerationTime(currentEventCount, generationTime);
+                
+                clearInterval(loadingInterval);
                 document.getElementById('loadingAnimation').style.display = 'none';
                 displayTimeline();
             } else {
@@ -1140,6 +1364,7 @@ Please create a comprehensive timeline with accurate information, proper JSON fo
             }
 
         } catch (error) {
+            clearInterval(loadingInterval);
             document.getElementById('loadingAnimation').style.display = 'none';
             alert('Error generating timeline: ' + error.message);
             console.error('AI Generation error:', error);
@@ -1307,6 +1532,7 @@ Please create a comprehensive timeline with accurate information, proper JSON fo
     function displayTimeline() {
         document.getElementById('mainContent').style.display = 'none';
         document.getElementById('timelineDisplay').style.display = 'block';
+        document.getElementById('toggleDescBtn').classList.add('visible');
         descriptionsVisible = true;
         updateToggleDescriptionsButton();
         
@@ -1381,15 +1607,126 @@ Please create a comprehensive timeline with accurate information, proper JSON fo
     function updateToggleDescriptionsButton() {
         const btn = document.getElementById('toggleDescBtn');
         if (descriptionsVisible) {
-            btn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Descriptions';
+            btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
         } else {
-            btn.innerHTML = '<i class="fas fa-eye"></i> Show Descriptions';
+            btn.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+    }
+
+    async function downloadPDF() {
+        try {
+            // Show loading state
+            const btn = document.querySelector('.download-pdf-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+            btn.disabled = true;
+
+            // Create a temporary container for PDF content
+            const pdfContainer = document.createElement('div');
+            pdfContainer.style.width = '800px';
+            pdfContainer.style.backgroundColor = 'white';
+            pdfContainer.style.color = 'black';
+            pdfContainer.style.padding = '40px';
+            pdfContainer.style.fontFamily = 'Arial, sans-serif';
+            pdfContainer.style.position = 'absolute';
+            pdfContainer.style.left = '-9999px';
+            pdfContainer.style.top = '0';
+
+            // Add timeline content
+            pdfContainer.innerHTML = `
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h1 style="font-size: 28px; margin-bottom: 10px; color: #0066cc;">${timelineData.topic}</h1>
+                    <p style="font-size: 14px; color: #666; margin: 0;">
+                        ${timelineData.creator ? `Created by ${timelineData.creator} • ` : ''}
+                        Generated with Samayrekha Timeline Visualizer
+                    </p>
+                </div>
+            `;
+
+            // Add events
+            const sortedEvents = [...timelineData.events].sort((a, b) => {
+                return new Date(a.date) - new Date(b.date);
+            });
+
+            sortedEvents.forEach((event, index) => {
+                const eventDiv = document.createElement('div');
+                eventDiv.style.marginBottom = '30px';
+                eventDiv.style.borderLeft = '4px solid #0066cc';
+                eventDiv.style.paddingLeft = '20px';
+                eventDiv.innerHTML = `
+                    <div style="font-size: 12px; color: #0066cc; font-weight: bold; margin-bottom: 5px;">
+                        ${event.date}
+                    </div>
+                    <h3 style="font-size: 18px; margin: 0 0 8px 0; color: #000;">
+                        ${event.title}
+                    </h3>
+                    <p style="font-size: 14px; line-height: 1.6; margin: 0 0 8px 0; color: #333;">
+                        ${event.description}
+                    </p>
+                    <span style="background: #0066cc; color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+                        ${event.period}
+                    </span>
+                `;
+                pdfContainer.appendChild(eventDiv);
+            });
+
+            document.body.appendChild(pdfContainer);
+
+            // Use html2canvas to convert to canvas
+            const canvas = await html2canvas(pdfContainer, {
+                backgroundColor: 'white',
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+            });
+
+            document.body.removeChild(pdfContainer);
+
+            // Create PDF using jsPDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 210;
+            const pageHeight = 295;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            // Download the PDF
+            const fileName = `${timelineData.topic.replace(/[^a-zA-Z0-9]/g, '_')}_timeline.pdf`;
+            pdf.save(fileName);
+
+            // Reset button
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            alert('Error generating PDF. Please try again.');
+            
+            // Reset button
+            const btn = document.querySelector('.download-pdf-btn');
+            btn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
+            btn.disabled = false;
         }
     }
 
     function goBack() {
         document.getElementById('timelineDisplay').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('toggleDescBtn').classList.remove('visible');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1551,6 +1888,7 @@ Please create a comprehensive timeline with accurate information, proper JSON fo
             });
         }
     });
-</script>
-</body>
-</html>
+
+    </script>
+    </body>
+    </html>
