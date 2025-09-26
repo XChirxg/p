@@ -312,14 +312,14 @@
             gap: 20px;
         }
 
-        .timeline-scale-options {
+        .style-options, .event-count-options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 10px;
             margin-bottom: 20px;
         }
 
-        .scale-option {
+        .style-option, .count-option {
             padding: 10px;
             border: 2px solid var(--border-color);
             border-radius: 8px;
@@ -330,11 +330,11 @@
             font-weight: 500;
         }
 
-        .scale-option:hover {
+        .style-option:hover, .count-option:hover {
             border-color: var(--accent-color);
         }
 
-        .scale-option.active {
+        .style-option.active, .count-option.active {
             background: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
@@ -377,8 +377,8 @@
 
         .timeline-display {
             display: none;
-            background: var(--bg-color);
             padding: 40px 0;
+            /* Remove background to allow bubbles to show */
         }
 
         .timeline-container {
@@ -470,7 +470,90 @@
             margin-top: 12px;
         }
 
-        .copy-success-modal {
+        .loading-animation {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .api-key-section {
+            background: var(--hover-color);
+            padding: 24px;
+            margin: 20px 0;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .api-key-section h4 {
+            font-family: var(--heading-font);
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .api-key-section p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            color: var(--secondary-text);
+        }
+
+        .api-key-section a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .api-key-section a:hover {
+            text-decoration: underline;
+        }
+
+        .timeline-controls {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .toggle-descriptions-btn {
+            background: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: var(--ui-font);
+            font-weight: 500;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-descriptions-btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        .event-description.hidden {
+            display: none;
+        }
+
+        /* Modal styles */
+        .modal {
             display: none;
             position: fixed;
             top: 0;
@@ -482,7 +565,7 @@
             animation: fadeIn 0.3s ease;
         }
 
-        .copy-success-content {
+        .modal-content {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -490,26 +573,24 @@
             background: var(--bg-color);
             padding: 30px;
             border-radius: 12px;
-            text-align: center;
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-        .copy-success-content h3 {
+        .modal h3 {
             font-family: var(--heading-font);
             font-size: 24px;
             margin-bottom: 16px;
-            color: #4caf50;
         }
 
-        .copy-success-content p {
+        .modal p {
             font-family: var(--body-font);
             margin-bottom: 12px;
             line-height: 1.6;
         }
 
-        .copy-success-content .close-btn {
+        .modal .close-btn {
             background: var(--accent-color);
             color: white;
             border: none;
@@ -546,7 +627,7 @@
                 grid-template-columns: 1fr;
             }
             
-            .timeline-scale-options {
+            .style-options, .event-count-options {
                 grid-template-columns: repeat(2, 1fr);
             }
 
@@ -673,24 +754,46 @@
 
                 <div class="form-group">
                     <label>
-                        <i class="fas fa-clock"></i>
-                        Timeline Scale:
+                        <i class="fas fa-palette"></i>
+                        Writing Style/Tone:
                     </label>
-                    <div class="timeline-scale-options">
-                        <div class="scale-option active" data-scale="hours">Hours</div>
-                        <div class="scale-option" data-scale="days">Days</div>
-                        <div class="scale-option" data-scale="weeks">Weeks</div>
-                        <div class="scale-option" data-scale="months">Months</div>
-                        <div class="scale-option" data-scale="years">Years</div>
-                        <div class="scale-option" data-scale="decades">Decades</div>
-                        <div class="scale-option" data-scale="centuries">Centuries</div>
+                    <div class="style-options">
+                        <div class="style-option active" data-style="story">Story-like</div>
+                        <div class="style-option" data-style="formal">Formal</div>
+                        <div class="style-option" data-style="educational">Educational</div>
+                        <div class="style-option" data-style="casual">Casual</div>
+                        <div class="style-option" data-style="roasting">Roasting</div>
+                        <div class="style-option" data-style="poetic">Poetic</div>
                     </div>
                 </div>
 
-                <button class="btn btn-primary" onclick="generateTimelineTemplate()">
-                    <i class="fas fa-magic"></i>
-                    Generate AI Template
-                </button>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-list-ol"></i>
+                        Number of Events:
+                    </label>
+                    <div class="event-count-options">
+                        <div class="count-option active" data-count="8-15">8-15 Events<br><small>Fast</small></div>
+                        <div class="count-option" data-count="15-30">15-30 Events<br><small>Medium</small></div>
+                        <div class="count-option" data-count="30-50">30-50 Events<br><small>Slow</small></div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="generateDirectlyWithAI()">
+                        <i class="fas fa-robot"></i>
+                        Generate with AI
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateTimelineTemplate()">
+                        <i class="fas fa-file-alt"></i>
+                        Get Template for External AI
+                    </button>
+                </div>
+
+                <div class="loading-animation" id="loadingAnimation">
+                    <div class="spinner"></div>
+                    <p>Generating your timeline with AI...</p>
+                </div>
 
                 <div id="templateSection" style="display: none;">
                     <h3 style="font-family: var(--heading-font); font-size: 24px; margin: 30px 0 20px 0;">Copy this template and paste it to your AI tool:</h3>
@@ -723,6 +826,14 @@
                 <h2 id="timelineTitle" style="font-family: var(--heading-font); font-size: 36px; margin-bottom: 10px;"></h2>
                 <p id="timelineCreator" style="font-family: var(--ui-font); color: var(--secondary-text);"></p>
             </div>
+            
+            <div class="timeline-controls">
+                <button class="toggle-descriptions-btn" onclick="toggleDescriptions()" id="toggleDescBtn">
+                    <i class="fas fa-eye-slash"></i>
+                    Hide Descriptions
+                </button>
+            </div>
+            
             <div class="timeline-container">
                 <div class="timeline-line"></div>
                 <div id="timelineEvents"></div>
@@ -736,8 +847,49 @@
         </div>
     </div>
 
-    <div class="copy-success-modal" id="copySuccessModal">
-        <div class="copy-success-content">
+    <!-- API Key Modal -->
+    <div class="modal" id="apiKeyModal">
+        <div class="modal-content">
+            <h3><i class="fas fa-key"></i> Google Gemini API Key Required</h3>
+            <p><strong>To use AI generation, you need a Google Gemini API key:</strong></p>
+            <p>1. Go to <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a></p>
+            <p>2. Sign in with your Google account</p>
+            <p>3. Click "Create API Key" button</p>
+            <p>4. Copy the generated API key</p>
+            <p>5. Paste it below</p>
+            
+            <div class="api-key-section">
+                <h4>Security Notice:</h4>
+                <p>• Your API key will be stored securely in your browser's cache</p>
+                <p>• It never leaves your device or gets sent to any servers</p>
+                <p>• Only used to communicate directly with Google's AI</p>
+                <p>• You can clear it anytime from browser settings</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="apiKeyInput">
+                    <i class="fas fa-key"></i>
+                    Enter your Google Gemini API Key:
+                </label>
+                <input type="password" id="apiKeyInput" placeholder="AIza...">
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn btn-primary" onclick="saveApiKey()">
+                    <i class="fas fa-save"></i>
+                    Save & Continue
+                </button>
+                <button class="btn btn-secondary" onclick="closeApiKeyModal()" style="margin-left: 10px;">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Success Modal -->
+    <div class="modal" id="copySuccessModal">
+        <div class="modal-content">
             <h3><i class="fas fa-check-circle"></i> Template Copied!</h3>
             <p><strong>Next Steps:</strong></p>
             <p>1. Open your preferred AI tool (ChatGPT, Claude, Gemini, etc.)</p>
@@ -755,161 +907,175 @@
     <input type="file" id="fileInput" class="file-input" accept=".json,.txt" onchange="loadUploadedFile()">
 
 <script>
-    let currentScale = 'hours';
-let timelineData = null;
+    let currentStyle = 'story';
+    let currentEventCount = '8-15';
+    let timelineData = null;
+    let descriptionsVisible = true;
 
-function createFloatingCircles() {
-    const container = document.getElementById('backgroundAnimation');
-    container.innerHTML = '';
-    
-    const circleCount = 15;
-    
-    for (let i = 0; i < circleCount; i++) {
-        const circle = document.createElement('div');
-        circle.className = 'floating-circle';
+    function createFloatingCircles() {
+        const container = document.getElementById('backgroundAnimation');
+        container.innerHTML = '';
         
-        const size = Math.random() * 130 + 20;
-        circle.style.width = size + 'px';
-        circle.style.height = size + 'px';
+        const circleCount = 15;
         
-        circle.style.left = Math.random() * window.innerWidth + 'px';
-        circle.style.top = Math.random() * window.innerHeight + 'px';
-        
-        circle.style.animationDelay = Math.random() * 40 + 's';
-        
-        container.appendChild(circle);
-    }
-}
-
-function toggleTheme() {
-    document.body.classList.toggle('dark-theme');
-    
-    const themeIcon = document.querySelector('.theme-toggle i');
-    if (document.body.classList.contains('dark-theme')) {
-        themeIcon.className = 'fas fa-sun';
-    } else {
-        themeIcon.className = 'fas fa-moon';
-    }
-    
-    localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-}
-
-function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-        document.querySelector('.fullscreen-toggle i').className = 'fas fa-compress';
-    } else {
-        document.exitFullscreen();
-        document.querySelector('.fullscreen-toggle i').className = 'fas fa-expand';
-    }
-}
-
-function loadTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-        const themeIcon = document.querySelector('.theme-toggle i');
-        themeIcon.className = 'fas fa-sun';
-    }
-}
-
-function showGreeting(name) {
-    const greetingElement = document.getElementById('greetingMessage');
-    const greetings = [
-        `Welcome back, ${name}!`,
-        `Hello ${name}! Ready to create timelines?`,
-        `Good to see you again, ${name}!`,
-        `Hey ${name}! Let's visualize history!`
-    ];
-    
-    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-    greetingElement.textContent = randomGreeting;
-    greetingElement.style.display = 'block';
-}
-
-function showCreateNew() {
-    document.getElementById('inputSection').style.display = 'block';
-    document.getElementById('heroSection').style.display = 'none';
-    document.getElementById('topicName').focus();
-}
-
-function uploadTimeline() {
-    document.getElementById('fileInput').click();
-}
-
-function loadUploadedFile() {
-    const file = document.getElementById('fileInput').files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const content = e.target.result;
-                const jsonData = JSON.parse(content);
-                
-                document.getElementById('jsonInput').value = content;
-                showCreateNew();
-                document.getElementById('templateSection').style.display = 'block';
-                
-                if (jsonData.topic) {
-                    document.getElementById('topicName').value = jsonData.topic;
-                }
-                if (jsonData.creator) {
-                    document.getElementById('creatorName').value = jsonData.creator;
-                    showGreeting(jsonData.creator);
-                }
-                if (jsonData.scale) {
-                    setTimelineScale(jsonData.scale);
-                }
-                
-                alert('Timeline loaded successfully! You can now visualize it.');
-                
-            } catch (error) {
-                alert('Error loading file. Please make sure it\'s a valid JSON file with the correct timeline structure.');
-                console.error('File parsing error:', error);
-            }
-        };
-        reader.readAsText(file);
-    }
-}
-
-function setTimelineScale(scale) {
-    document.querySelectorAll('.scale-option').forEach(option => {
-        option.classList.remove('active');
-        if (option.dataset.scale === scale) {
-            option.classList.add('active');
-            currentScale = scale;
+        for (let i = 0; i < circleCount; i++) {
+            const circle = document.createElement('div');
+            circle.className = 'floating-circle';
+            
+            const size = Math.random() * 130 + 20;
+            circle.style.width = size + 'px';
+            circle.style.height = size + 'px';
+            
+            circle.style.left = Math.random() * window.innerWidth + 'px';
+            circle.style.top = Math.random() * window.innerHeight + 'px';
+            
+            circle.style.animationDelay = Math.random() * 40 + 's';
+            
+            container.appendChild(circle);
         }
-    });
-}
-
-function generateTimelineTemplate() {
-    const topic = document.getElementById('topicName').value.trim();
-    const creator = document.getElementById('creatorName').value.trim();
-    const details = document.getElementById('additionalDetails').value.trim();
-    
-    if (!topic) {
-        alert('Please enter a timeline topic');
-        document.getElementById('topicName').focus();
-        return;
     }
 
-    const template = `Create a detailed timeline about "${topic}" in JSON format. Follow this exact structure:
+    function toggleTheme() {
+        document.body.classList.toggle('dark-theme');
+        
+        const themeIcon = document.querySelector('.theme-toggle i');
+        if (document.body.classList.contains('dark-theme')) {
+            themeIcon.className = 'fas fa-sun';
+        } else {
+            themeIcon.className = 'fas fa-moon';
+        }
+        
+        localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+            document.querySelector('.fullscreen-toggle i').className = 'fas fa-compress';
+        } else {
+            document.exitFullscreen();
+            document.querySelector('.fullscreen-toggle i').className = 'fas fa-expand';
+        }
+    }
+
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            const themeIcon = document.querySelector('.theme-toggle i');
+            themeIcon.className = 'fas fa-sun';
+        }
+    }
+
+    function showGreeting(name) {
+        const greetingElement = document.getElementById('greetingMessage');
+        const greetings = [
+            `Welcome back, ${name}!`,
+            `Hello ${name}! Ready to create timelines?`,
+            `Good to see you again, ${name}!`,
+            `Hey ${name}! Let's visualize history!`
+        ];
+        
+        const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+        greetingElement.textContent = randomGreeting;
+        greetingElement.style.display = 'block';
+    }
+
+    function showCreateNew() {
+        document.getElementById('inputSection').style.display = 'block';
+        document.getElementById('heroSection').style.display = 'none';
+        document.getElementById('topicName').focus();
+    }
+
+    function uploadTimeline() {
+        document.getElementById('fileInput').click();
+    }
+
+    function loadUploadedFile() {
+        const file = document.getElementById('fileInput').files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const jsonData = JSON.parse(content);
+                    
+                    document.getElementById('jsonInput').value = content;
+                    showCreateNew();
+                    document.getElementById('templateSection').style.display = 'block';
+                    
+                    if (jsonData.topic) {
+                        document.getElementById('topicName').value = jsonData.topic;
+                    }
+                    if (jsonData.creator) {
+                        document.getElementById('creatorName').value = jsonData.creator;
+                        showGreeting(jsonData.creator);
+                    }
+                    
+                    alert('Timeline loaded successfully! You can now visualize it.');
+                    
+                } catch (error) {
+                    alert('Error loading file. Please make sure it\'s a valid JSON file with the correct timeline structure.');
+                    console.error('File parsing error:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+    }
+
+    function generateDirectlyWithAI() {
+        const topic = document.getElementById('topicName').value.trim();
+        if (!topic) {
+            alert('Please enter a timeline topic');
+            document.getElementById('topicName').focus();
+            return;
+        }
+
+        const apiKey = localStorage.getItem('gemini_api_key');
+        if (!apiKey) {
+            document.getElementById('apiKeyModal').style.display = 'block';
+            return;
+        }
+
+        generateWithGeminiAI();
+    }
+
+    async function generateWithGeminiAI() {
+        const topic = document.getElementById('topicName').value.trim();
+        const creator = document.getElementById('creatorName').value.trim();
+        const details = document.getElementById('additionalDetails').value.trim();
+        const apiKey = localStorage.getItem('gemini_api_key');
+
+        const styleDescriptions = {
+            'story': 'engaging, narrative, story-like descriptions that paint vivid pictures',
+            'formal': 'professional, academic, formal tone with precise language',
+            'educational': 'informative, instructional tone suitable for learning',
+            'casual': 'conversational, friendly, easy-to-understand language',
+            'roasting': 'humorous, witty, with playful commentary and jokes',
+            'poetic': 'lyrical, artistic, with beautiful and expressive language'
+        };
+
+        const prompt = `Create a detailed timeline about "${topic}" in JSON format. Follow this exact structure:
 
 **IMPORTANT JSON STRUCTURE:**
 {
   "topic": "${topic}",
   "creator": "${creator || 'Anonymous'}",
-  "scale": "${currentScale}",
+  "scale": "auto-determined based on topic scope",
   "description": "Brief description of the timeline",
   "events": [
     {
-      "date": "Specific date/time in appropriate format for ${currentScale}",
+      "date": "Appropriate date/time format based on topic scope",
       "title": "Event title",
-      "description": "Detailed story-like description of the event that reads like a narrative, engaging and vivid",
+      "description": "Detailed description in ${currentStyle} style - ${styleDescriptions[currentStyle]}",
       "period": "Relevant period/phase name based on the topic context"
     }
   ]
 }
+
+**WRITING STYLE:** ${styleDescriptions[currentStyle]}
+
+**NUMBER OF EVENTS:** Create ${currentEventCount} events
 
 **PERIOD CATEGORIES (create contextually relevant periods based on your topic):**
 Examples for different topics:
@@ -917,300 +1083,474 @@ Examples for different topics:
 - Personal life: "Childhood Years", "School Days", "College Life", "Career Beginnings", "Family Years"
 - Technology: "Pre-Digital Age", "Computer Revolution", "Internet Era", "Mobile Age", "AI Era"
 - Scientific: "Classical Physics Era", "Quantum Revolution", "Space Age", "Genetic Era", "Digital Biology Age"
-- Daily routine: "Early Morning", "Morning Hours", "Afternoon", "Evening Time", "Night Hours"
-- Wars/Conflicts: "Pre-War Period", "Early Conflict", "Major Battles", "Turning Point", "Post-War Reconstruction"
 
-**DATE FORMAT GUIDELINES:**
-- For hours: "14:30" or "2:30 PM"
-- For days: "March 15, 2024"
-- For weeks: "Week of March 15, 2024"
-- For months: "March 2024"
-- For years: "1969"
-- For decades: "1960s"
-- For centuries: "15th Century"
+**AUTO-DETERMINE TIME SCALE based on topic scope:**
+- For historical events spanning centuries: use years/decades/centuries
+- For wars/conflicts: use days/weeks/months/years as appropriate
+- For personal life: use years/decades
+- For daily routines: use hours/minutes
+- For scientific discoveries: use years/decades
 
 **DESCRIPTION REQUIREMENTS:**
-- Write descriptions like engaging stories, not dry facts
-- Use vivid, descriptive language that paints a picture
-- Include emotions, atmosphere, and context
-- Make it read like a narrative that could tell a complete story
-- Example: Instead of "Gandhi was born", write "In the coastal town of Porbandar, a child was born who would one day shake the foundations of an empire through the simple power of truth and non-violence. Young Mohandas Gandhi entered a world where the British Raj seemed unshakeable, yet his birth marked the beginning of a revolution that would be fought not with weapons, but with unwavering moral conviction."
+Write descriptions in ${currentStyle} style: ${styleDescriptions[currentStyle]}
+${details ? `Special focus: ${details}` : ''}
 
-**REQUIREMENTS:**
-- Include at least 8-15 events
-- Use chronological order
-- Create period names that fit the topic context naturally
-- Make descriptions engaging, story-like, and vivid
-- ${details ? `Special focus: ${details}` : ''}
+Please create a comprehensive timeline with accurate information, proper JSON formatting, and descriptions that match the requested style.`;
 
-Please create a comprehensive timeline with accurate information, proper JSON formatting, and story-like descriptions that bring the events to life.`;
+        document.getElementById('loadingAnimation').style.display = 'block';
 
-    document.getElementById('templateDisplay').textContent = template;
-    document.getElementById('templateSection').style.display = 'block';
-    
-    document.getElementById('templateSection').scrollIntoView({ behavior: 'smooth' });
-}
+        try {
+            const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-goog-api-key': apiKey
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                })
+            });
 
-function copyTemplate() {
-    const template = document.getElementById('templateDisplay').textContent;
-    
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(template).then(() => {
-            showCopySuccessModal();
-        }).catch(() => {
-            fallbackCopy(template);
-        });
-    } else {
-        fallbackCopy(template);
-    }
-}
-
-function fallbackCopy(text) {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-    showCopySuccessModal();
-}
-
-function showCopySuccessModal() {
-    document.getElementById('copySuccessModal').style.display = 'block';
-}
-
-function closeCopySuccessModal() {
-    document.getElementById('copySuccessModal').style.display = 'none';
-}
-
-function createTimeline() {
-    const jsonContent = document.getElementById('jsonInput').value.trim();
-    
-    if (!jsonContent) {
-        alert('Please paste the AI-generated JSON content in the text area above.');
-        document.getElementById('jsonInput').focus();
-        return;
-    }
-
-    try {
-        timelineData = JSON.parse(jsonContent);
-        
-        if (!timelineData.events || !Array.isArray(timelineData.events)) {
-            throw new Error('Invalid JSON structure - events array not found');
-        }
-
-        if (timelineData.events.length === 0) {
-            throw new Error('No events found in timeline');
-        }
-
-        for (let i = 0; i < timelineData.events.length; i++) {
-            const event = timelineData.events[i];
-            if (!event.date || !event.title || !event.description) {
-                throw new Error(`Event ${i + 1} is missing required fields (date, title, or description)`);
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('Invalid API key. Please check your Google Gemini API key.');
+                } else if (response.status === 429) {
+                    throw new Error('API quota exceeded. Please try again later or check your quota limits.');
+                } else {
+                    throw new Error(`API error: ${response.status}`);
+                }
             }
-        }
 
-        displayTimeline();
-    } catch (error) {
-        alert('Error parsing JSON: ' + error.message + '\n\nPlease check your JSON format and try again.');
-        console.error('JSON parsing error:', error);
-        document.getElementById('jsonInput').focus();
-    }
-}
-
-function displayTimeline() {
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('timelineDisplay').style.display = 'block';
-    
-    document.getElementById('timelineTitle').textContent = timelineData.topic || 'Timeline';
-    document.getElementById('timelineCreator').textContent = timelineData.creator ? 
-        `Created by ${timelineData.creator}` : '';
-    
-    const eventsContainer = document.getElementById('timelineEvents');
-    eventsContainer.innerHTML = '';
-    
-    const sortedEvents = [...timelineData.events].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
-    });
-    
-    // Generate dynamic colors for periods
-    const periods = [...new Set(sortedEvents.map(event => event.period))];
-    const periodColors = {};
-    periods.forEach((period, index) => {
-        const hue = (index * 360 / periods.length) % 360;
-        periodColors[period] = `hsl(${hue}, 60%, 50%)`;
-    });
-    
-    sortedEvents.forEach((event, index) => {
-        const eventDiv = document.createElement('div');
-        eventDiv.className = 'timeline-event';
-        
-        const periodColor = periodColors[event.period] || '#0066cc';
-        
-        eventDiv.innerHTML = `
-            <div class="event-marker" style="background-color: ${periodColor};"></div>
-            <div class="event-content">
-                <div class="event-date">${event.date}</div>
-                <div class="event-title">${event.title}</div>
-                <div class="event-description">${event.description}</div>
-                <div class="event-period" style="background-color: ${periodColor};">
-                    ${event.period}
-                </div>
-            </div>
-        `;
-        
-        eventDiv.style.opacity = '0';
-        eventDiv.style.transform = 'translateY(30px)';
-        eventDiv.style.transition = 'all 0.6s ease';
-        eventDiv.style.animationDelay = `${index * 0.1}s`;
-        
-        eventsContainer.appendChild(eventDiv);
-        
-        setTimeout(() => {
-            eventDiv.style.opacity = '1';
-            eventDiv.style.transform = 'translateY(0)';
-        }, index * 100);
-    });
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function goBack() {
-    document.getElementById('timelineDisplay').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function setupAutoSave() {
-    const creatorInput = document.getElementById('creatorName');
-    const topicInput = document.getElementById('topicName');
-    
-    creatorInput.addEventListener('input', (e) => {
-        const name = e.target.value.trim();
-        if (name) {
-            showGreeting(name);
-            localStorage.setItem('creatorName', name);
-        }
-    });
-    
-    const formInputs = [creatorInput, topicInput, document.getElementById('additionalDetails')];
-    formInputs.forEach(input => {
-        input.addEventListener('input', () => {
-            localStorage.setItem(input.id, input.value);
-        });
-    });
-}
-
-function loadSavedData() {
-    const savedCreator = localStorage.getItem('creatorName');
-    const savedTopic = localStorage.getItem('topicName');
-    const savedDetails = localStorage.getItem('additionalDetails');
-    
-    if (savedCreator) {
-        document.getElementById('creatorName').value = savedCreator;
-        showGreeting(savedCreator);
-    }
-    if (savedTopic) {
-        document.getElementById('topicName').value = savedTopic;
-    }
-    if (savedDetails) {
-        document.getElementById('additionalDetails').value = savedDetails;
-    }
-}
-
-function setupEventListeners() {
-    document.querySelectorAll('.scale-option').forEach(option => {
-        option.addEventListener('click', () => {
-            document.querySelectorAll('.scale-option').forEach(opt => opt.classList.remove('active'));
-            option.classList.add('active');
-            currentScale = option.dataset.scale;
-        });
-    });
-
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('copy-success-modal')) {
-            closeCopySuccessModal();
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-            if (document.getElementById('inputSection').style.display !== 'none') {
-                generateTimelineTemplate();
+            const data = await response.json();
+            const generatedText = data.candidates[0].content.parts[0].text;
+            
+            // Extract JSON from the response
+            const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const jsonContent = jsonMatch[0];
+                timelineData = JSON.parse(jsonContent);
+                document.getElementById('loadingAnimation').style.display = 'none';
+                displayTimeline();
+            } else {
+                throw new Error('No valid JSON found in AI response');
             }
+
+        } catch (error) {
+            document.getElementById('loadingAnimation').style.display = 'none';
+            alert('Error generating timeline: ' + error.message);
+            console.error('AI Generation error:', error);
+        }
+    }
+
+    function saveApiKey() {
+        const apiKey = document.getElementById('apiKeyInput').value.trim();
+        if (!apiKey) {
+            alert('Please enter your API key');
+            return;
         }
         
-        if (e.key === 'Escape') {
-            closeCopySuccessModal();
+        if (!apiKey.startsWith('AIza')) {
+            alert('Invalid API key format. Google API keys typically start with "AIza"');
+            return;
         }
 
-        if (e.key === 'F11') {
-            e.preventDefault();
-            toggleFullscreen();
-        }
-    });
+        localStorage.setItem('gemini_api_key', apiKey);
+        document.getElementById('apiKeyModal').style.display = 'none';
+        document.getElementById('apiKeyInput').value = '';
+        generateWithGeminiAI();
+    }
 
-    // Handle fullscreen change events
-    document.addEventListener('fullscreenchange', () => {
-        const fullscreenBtn = document.querySelector('.fullscreen-toggle i');
-        if (document.fullscreenElement) {
-            fullscreenBtn.className = 'fas fa-compress';
+    function closeApiKeyModal() {
+        document.getElementById('apiKeyModal').style.display = 'none';
+        document.getElementById('apiKeyInput').value = '';
+    }
+
+    function generateTimelineTemplate() {
+        const topic = document.getElementById('topicName').value.trim();
+        const creator = document.getElementById('creatorName').value.trim();
+        const details = document.getElementById('additionalDetails').value.trim();
+        
+        if (!topic) {
+            alert('Please enter a timeline topic');
+            document.getElementById('topicName').focus();
+            return;
+        }
+
+        const styleDescriptions = {
+            'story': 'engaging, narrative, story-like descriptions that paint vivid pictures',
+            'formal': 'professional, academic, formal tone with precise language',
+            'educational': 'informative, instructional tone suitable for learning',
+            'casual': 'conversational, friendly, easy-to-understand language',
+            'roasting': 'humorous, witty, with playful commentary and jokes',
+            'poetic': 'lyrical, artistic, with beautiful and expressive language'
+        };
+
+        const template = `Create a detailed timeline about "${topic}" in JSON format. Follow this exact structure:
+
+**IMPORTANT JSON STRUCTURE:**
+{
+  "topic": "${topic}",
+  "creator": "${creator || 'Anonymous'}",
+  "scale": "auto-determined based on topic scope",
+  "description": "Brief description of the timeline",
+  "events": [
+    {
+      "date": "Appropriate date/time format based on topic scope",
+      "title": "Event title",
+      "description": "Detailed description in ${currentStyle} style - ${styleDescriptions[currentStyle]}",
+      "period": "Relevant period/phase name based on the topic context"
+    }
+  ]
+}
+
+**WRITING STYLE:** ${styleDescriptions[currentStyle]}
+
+**NUMBER OF EVENTS:** Create ${currentEventCount} events
+
+**PERIOD CATEGORIES (create contextually relevant periods based on your topic):**
+Examples for different topics:
+- Historical topics: "Pre-Independence Era", "Colonial Period", "World War Era", "Cold War Period", "Modern Era"
+- Personal life: "Childhood Years", "School Days", "College Life", "Career Beginnings", "Family Years"
+- Technology: "Pre-Digital Age", "Computer Revolution", "Internet Era", "Mobile Age", "AI Era"
+- Scientific: "Classical Physics Era", "Quantum Revolution", "Space Age", "Genetic Era", "Digital Biology Age"
+
+**AUTO-DETERMINE TIME SCALE based on topic scope:**
+- For historical events spanning centuries: use years/decades/centuries
+- For wars/conflicts: use days/weeks/months/years as appropriate
+- For personal life: use years/decades
+- For daily routines: use hours/minutes
+- For scientific discoveries: use years/decades
+
+**DESCRIPTION REQUIREMENTS:**
+Write descriptions in ${currentStyle} style: ${styleDescriptions[currentStyle]}
+${details ? `Special focus: ${details}` : ''}
+
+Please create a comprehensive timeline with accurate information, proper JSON formatting, and descriptions that match the requested style.`;
+
+        document.getElementById('templateDisplay').textContent = template;
+        document.getElementById('templateSection').style.display = 'block';
+        
+        document.getElementById('templateSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyTemplate() {
+        const template = document.getElementById('templateDisplay').textContent;
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(template).then(() => {
+                showCopySuccessModal();
+            }).catch(() => {
+                fallbackCopy(template);
+            });
         } else {
-            fullscreenBtn.className = 'fas fa-expand';
+            fallbackCopy(template);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showCopySuccessModal();
+    }
+
+    function showCopySuccessModal() {
+        document.getElementById('copySuccessModal').style.display = 'block';
+    }
+
+    function closeCopySuccessModal() {
+        document.getElementById('copySuccessModal').style.display = 'none';
+    }
+
+    function createTimeline() {
+        const jsonContent = document.getElementById('jsonInput').value.trim();
+        
+        if (!jsonContent) {
+            alert('Please paste the AI-generated JSON content in the text area above.');
+            document.getElementById('jsonInput').focus();
+            return;
+        }
+
+        try {
+            timelineData = JSON.parse(jsonContent);
+            
+            if (!timelineData.events || !Array.isArray(timelineData.events)) {
+                throw new Error('Invalid JSON structure - events array not found');
+            }
+
+            if (timelineData.events.length === 0) {
+                throw new Error('No events found in timeline');
+            }
+
+            for (let i = 0; i < timelineData.events.length; i++) {
+                const event = timelineData.events[i];
+                if (!event.date || !event.title || !event.description) {
+                    throw new Error(`Event ${i + 1} is missing required fields (date, title, or description)`);
+                }
+            }
+
+            displayTimeline();
+        } catch (error) {
+            alert('Error parsing JSON: ' + error.message + '\n\nPlease check your JSON format and try again.');
+            console.error('JSON parsing error:', error);
+            document.getElementById('jsonInput').focus();
+        }
+    }
+
+    function displayTimeline() {
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('timelineDisplay').style.display = 'block';
+        descriptionsVisible = true;
+        updateToggleDescriptionsButton();
+        
+        document.getElementById('timelineTitle').textContent = timelineData.topic || 'Timeline';
+        document.getElementById('timelineCreator').textContent = timelineData.creator ? 
+            `Created by ${timelineData.creator}` : '';
+        
+        const eventsContainer = document.getElementById('timelineEvents');
+        eventsContainer.innerHTML = '';
+        
+        const sortedEvents = [...timelineData.events].sort((a, b) => {
+            return new Date(a.date) - new Date(b.date);
+        });
+        
+        // Generate dynamic colors for periods
+        const periods = [...new Set(sortedEvents.map(event => event.period))];
+        const periodColors = {};
+        periods.forEach((period, index) => {
+            const hue = (index * 360 / periods.length) % 360;
+            periodColors[period] = `hsl(${hue}, 60%, 50%)`;
+        });
+        
+        sortedEvents.forEach((event, index) => {
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'timeline-event';
+            
+            const periodColor = periodColors[event.period] || '#0066cc';
+            
+            eventDiv.innerHTML = `
+                <div class="event-marker" style="background-color: ${periodColor};"></div>
+                <div class="event-content">
+                    <div class="event-date">${event.date}</div>
+                    <div class="event-title">${event.title}</div>
+                    <div class="event-description">${event.description}</div>
+                    <div class="event-period" style="background-color: ${periodColor};">
+                        ${event.period}
+                    </div>
+                </div>
+            `;
+            
+            eventDiv.style.opacity = '0';
+            eventDiv.style.transform = 'translateY(30px)';
+            eventDiv.style.transition = 'all 0.6s ease';
+            eventDiv.style.animationDelay = `${index * 0.1}s`;
+            
+            eventsContainer.appendChild(eventDiv);
+            
+            setTimeout(() => {
+                eventDiv.style.opacity = '1';
+                eventDiv.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleDescriptions() {
+        descriptionsVisible = !descriptionsVisible;
+        const descriptions = document.querySelectorAll('.event-description');
+        
+        descriptions.forEach(desc => {
+            if (descriptionsVisible) {
+                desc.classList.remove('hidden');
+            } else {
+                desc.classList.add('hidden');
+            }
+        });
+        
+        updateToggleDescriptionsButton();
+    }
+
+    function updateToggleDescriptionsButton() {
+        const btn = document.getElementById('toggleDescBtn');
+        if (descriptionsVisible) {
+            btn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Descriptions';
+        } else {
+            btn.innerHTML = '<i class="fas fa-eye"></i> Show Descriptions';
+        }
+    }
+
+    function goBack() {
+        document.getElementById('timelineDisplay').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setupAutoSave() {
+        const creatorInput = document.getElementById('creatorName');
+        const topicInput = document.getElementById('topicName');
+        
+        creatorInput.addEventListener('input', (e) => {
+            const name = e.target.value.trim();
+            if (name) {
+                showGreeting(name);
+                localStorage.setItem('creatorName', name);
+            }
+        });
+        
+        const formInputs = [creatorInput, topicInput, document.getElementById('additionalDetails')];
+        formInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                localStorage.setItem(input.id, input.value);
+            });
+        });
+    }
+
+    function loadSavedData() {
+        const savedCreator = localStorage.getItem('creatorName');
+        const savedTopic = localStorage.getItem('topicName');
+        const savedDetails = localStorage.getItem('additionalDetails');
+        
+        if (savedCreator) {
+            document.getElementById('creatorName').value = savedCreator;
+            showGreeting(savedCreator);
+        }
+        if (savedTopic) {
+            document.getElementById('topicName').value = savedTopic;
+        }
+        if (savedDetails) {
+            document.getElementById('additionalDetails').value = savedDetails;
+        }
+    }
+
+    function setupEventListeners() {
+        // Style options
+        document.querySelectorAll('.style-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.style-option').forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                currentStyle = option.dataset.style;
+            });
+        });
+
+        // Event count options
+        document.querySelectorAll('.count-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.count-option').forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                currentEventCount = option.dataset.count;
+            });
+        });
+
+        // Modal close on outside click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                if (e.target.id === 'copySuccessModal') {
+                    closeCopySuccessModal();
+                } else if (e.target.id === 'apiKeyModal') {
+                    closeApiKeyModal();
+                }
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                if (document.getElementById('inputSection').style.display !== 'none') {
+                    const apiKey = localStorage.getItem('gemini_api_key');
+                    if (apiKey) {
+                        generateDirectlyWithAI();
+                    } else {
+                        generateTimelineTemplate();
+                    }
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                closeCopySuccessModal();
+                closeApiKeyModal();
+            }
+
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+        });
+
+        // Handle fullscreen change events
+        document.addEventListener('fullscreenchange', () => {
+            const fullscreenBtn = document.querySelector('.fullscreen-toggle i');
+            if (document.fullscreenElement) {
+                fullscreenBtn.className = 'fas fa-compress';
+            } else {
+                fullscreenBtn.className = 'fas fa-expand';
+            }
+        });
+
+        // Form validation
+        const requiredInputs = document.querySelectorAll('input[required], textarea[required]');
+        requiredInputs.forEach(input => {
+            input.addEventListener('blur', validateInput);
+            input.addEventListener('input', clearValidationError);
+        });
+    }
+
+    function validateInput(e) {
+        const input = e.target;
+        if (input.hasAttribute('required') && !input.value.trim()) {
+            input.style.borderColor = '#e74c3c';
+            input.style.boxShadow = '0 0 0 2px rgba(231, 76, 60, 0.2)';
+        }
+    }
+
+    function clearValidationError(e) {
+        const input = e.target;
+        input.style.borderColor = '';
+        input.style.boxShadow = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        createFloatingCircles();
+        loadTheme();
+        setupAutoSave();
+        setupEventListeners();
+        loadSavedData();
+        
+        const activeStyle = document.querySelector('.style-option.active');
+        if (activeStyle) {
+            currentStyle = activeStyle.dataset.style;
+        }
+
+        const activeCount = document.querySelector('.count-option.active');
+        if (activeCount) {
+            currentEventCount = activeCount.dataset.count;
+        }
+        
+        console.log('Samayrekha Timeline Visualizer loaded successfully!');
+    });
+
+    window.addEventListener('resize', () => {
+        createFloatingCircles();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            document.querySelectorAll('.floating-circle').forEach(circle => {
+                circle.style.animationPlayState = 'paused';
+            });
+        } else {
+            document.querySelectorAll('.floating-circle').forEach(circle => {
+                circle.style.animationPlayState = 'running';
+            });
         }
     });
-
-    const requiredInputs = document.querySelectorAll('input[required], textarea[required]');
-    requiredInputs.forEach(input => {
-        input.addEventListener('blur', validateInput);
-        input.addEventListener('input', clearValidationError);
-    });
-}
-
-function validateInput(e) {
-    const input = e.target;
-    if (input.hasAttribute('required') && !input.value.trim()) {
-        input.style.borderColor = '#e74c3c';
-        input.style.boxShadow = '0 0 0 2px rgba(231, 76, 60, 0.2)';
-    }
-}
-
-function clearValidationError(e) {
-    const input = e.target;
-    input.style.borderColor = '';
-    input.style.boxShadow = '';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    createFloatingCircles();
-    loadTheme();
-    setupAutoSave();
-    setupEventListeners();
-    loadSavedData();
-    
-    const activeScale = document.querySelector('.scale-option.active');
-    if (activeScale) {
-        currentScale = activeScale.dataset.scale;
-    }
-    
-    console.log('Samayrekha Timeline Visualizer loaded successfully!');
-});
-
-window.addEventListener('resize', () => {
-    createFloatingCircles();
-});
-
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        document.querySelectorAll('.floating-circle').forEach(circle => {
-            circle.style.animationPlayState = 'paused';
-        });
-    } else {
-        document.querySelectorAll('.floating-circle').forEach(circle => {
-            circle.style.animationPlayState = 'running';
-        });
-    }
-});
 </script>
 </body>
 </html>
