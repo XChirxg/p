@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Teleprompter</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      overflow-y: scroll;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .section {
+      background: #1a1a1a;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    .section h2 {
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-size: 14px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    button {
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    button.secondary {
+      background: #2196F3;
+    }
+    button.secondary:hover {
+      background: #0b7dda;
+    }
+    button.delete {
+      background: #f44336;
+    }
+    button.delete:hover {
+      background: #da190b;
+    }
+    .word-options {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .word-option {
+      flex: 1;
+      padding: 15px;
+      background: #2a2a2a;
+      border: 2px solid #444;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .word-option.selected {
+      border-color: #4CAF50;
+      background: #1a4d1a;
+    }
+    .word-option small {
+      display: block;
+      margin-top: 5px;
+      color: #888;
+      font-size: 12px;
+    }
+    .saved-scripts {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .script-item {
+      background: #2a2a2a;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border-left: 4px solid #4CAF50;
+    }
+    .script-item h3 {
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+    .script-item p {
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+    .script-item .preview {
+      font-size: 13px;
+      color: #ccc;
+      margin-bottom: 10px;
+      max-height: 60px;
+      overflow: hidden;
+    }
+    .api-info {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+    .api-info a {
+      color: #4CAF50;
+    }
+    #teleprompter {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 9999;
+    }
+    #teleprompter.active {
+      display: block;
+    }
+    #prompter-text {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      padding: 50px;
+      font-size: 32px;
+      line-height: 1.6;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #prompter-text.mirror {
+      transform: scaleX(-1);
+    }
+    #controls {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.9);
+      padding: 20px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    #controls.visible {
+      opacity: 1;
+    }
+    #controls button {
+      padding: 10px 20px;
+    }
+    #controls input[type="range"] {
+      width: 150px;
+    }
+    .control-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .loading {
+      text-align: center;
+      color: #4CAF50;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI Teleprompter</h1>
+
+    <div class="section">
+      <h2>Generate Script with AI</h2>
+      <label>Name:</label>
+      <input type="text" id="name" placeholder="Your name">
+      
+      <label>Topic:</label>
+      <input type="text" id="topic" placeholder="What's your script about?">
+      
+      <label>Description (Optional):</label>
+      <textarea id="description" placeholder="Additional details..."></textarea>
+      
+      <label>Tone:</label>
+      <select id="tone">
+        <option value="professional">Professional</option>
+        <option value="casual">Casual</option>
+        <option value="enthusiastic">Enthusiastic</option>
+        <option value="serious">Serious</option>
+        <option value="humorous">Humorous</option>
+      </select>
+      
+      <label>Google AI API Key:</label>
+      <input type="password" id="apikey" placeholder="Enter your API key">
+      <div class="api-info">
+        🎉 <strong>Free API!</strong> Get your Google AI API key here: 
+        <a href="https://aistudio.google.com/apikey" target="_blank">https://aistudio.google.com/apikey</a>
+      </div>
+      
+      <label>Script Length:</label>
+      <div class="word-options">
+        <div class="word-option" data-words="100">
+          <strong>Short</strong><br>~100 words
+          <small>Fast generation</small>
+        </div>
+        <div class="word-option selected" data-words="250">
+          <strong>Medium</strong><br>~250 words
+          <small>Balanced</small>
+        </div>
+        <div class="word-option" data-words="500">
+          <strong>Long</strong><br>~500 words
+          <small>Slower generation</small>
+        </div>
+      </div>
+      
+      <button onclick="generateScript()">Generate Script</button>
+      <div id="loading" class="loading" style="display:none;">Generating your script...</div>
+    </div>
+
+    <div class="section">
+      <h2>Manual Text Entry</h2>
+      <textarea id="manual-text" placeholder="Type or paste your script here..."></textarea>
+      <button onclick="saveManualText()">Save Manual Script</button>
+    </div>
+
+    <div class="section">
+      <h2>Saved Scripts</h2>
+      <div id="saved-scripts" class="saved-scripts"></div>
+    </div>
+  </div>
+
+  <div id="teleprompter">
+    <div id="prompter-text"></div>
+    <div id="controls">
+      <div class="control-group">
+        <button onclick="playPause()">▶ Play</button>
+        <button onclick="resetScroll()">⟲ Reset</button>
+      </div>
+      <div class="control-group">
+        <label>Speed:</label>
+        <input type="range" id="speed" min="1" max="10" value="3" oninput="updateSpeed()">
+      </div>
+      <div class="control-group">
+        <label>Size:</label>
+        <input type="range" id="fontsize" min="16" max="72" value="32" oninput="updateFontSize()">
+      </div>
+      <div class="control-group">
+        <button onclick="toggleMirror()">🔄 Mirror</button>
+        <button onclick="toggleTheme()">🎨 Theme</button>
+        <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        <button onclick="closeTeleprompter()">✕ Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    let scripts = JSON.parse(localStorage.getItem('teleprompter-scripts') || '[]');
+    let settings = JSON.parse(localStorage.getItem('teleprompter-settings') || '{"speed":3,"fontSize":32,"theme":"dark","mirror":false}');
+    let selectedWords = 250;
+    let isPlaying = false;
+    let scrollInterval;
+    let tapCount = 0;
+    let tapTimer;
+
+    // Load API key if saved
+    const savedApiKey = localStorage.getItem('gemini-api-key');
+    if (savedApiKey) document.getElementById('apikey').value = savedApiKey;
+
+    // Load settings
+    document.getElementById('speed').value = settings.speed;
+    document.getElementById('fontsize').value = settings.fontSize;
+
+    // Word option selection
+    document.querySelectorAll('.word-option').forEach(opt => {
+      opt.addEventListener('click', function() {
+        document.querySelectorAll('.word-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedWords = parseInt(this.dataset.words);
+      });
+    });
+
+    window.generateScript = async function() {
+      const name = document.getElementById('name').value.trim();
+      const topic = document.getElementById('topic').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const tone = document.getElementById('tone').value;
+      const apikey = document.getElementById('apikey').value.trim();
+
+      if (!name || !topic) {
+        alert('Please enter your name and topic');
+        return;
+      }
+
+      if (!apikey) {
+        alert('Please enter your Google AI API key');
+        return;
+      }
+
+      // Save API key
+      localStorage.setItem('gemini-api-key', apikey);
+
+      const loading = document.getElementById('loading');
+      loading.style.display = 'block';
+
+      try {
+        const prompt = `Write a ${tone} teleprompter script about "${topic}" for ${name}. ${description ? 'Additional context: ' + description : ''} The script should be approximately ${selectedWords} words. Make it engaging and easy to read aloud.`;
+
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=' + apikey, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error.message);
+        }
+
+        const text = data.candidates[0].content.parts[0].text;
+        
+        const script = {
+          id: Date.now(),
+          name,
+          topic,
+          text,
+          date: new Date().toLocaleString(),
+          type: 'ai'
+        };
+
+        scripts.unshift(script);
+        localStorage.setItem('teleprompter-scripts', JSON.stringify(scripts));
+        renderScripts();
+        
+        // Clear form
+        document.getElementById('name').value = '';
+        document.getElementById('topic').value = '';
+        document.getElementById('description').value = '';
+
+      } catch (error) {
+        alert('Error generating script: ' + error.message);
+      }
+
+      loading.style.display = 'none';
+    };
+
+    window.saveManualText = function() {
+      const text = document.getElementById('manual-text').value.trim();
+      if (!text) {
+        alert('Please enter some text');
+        return;
+      }
+
+      const script = {
+        id: Date.now(),
+        name: 'Manual Entry',
+        topic: 'Custom Script',
+        text,
+        date: new Date().toLocaleString(),
+        type: 'manual'
+      };
+
+      scripts.unshift(script);
+      localStorage.setItem('teleprompter-scripts', JSON.stringify(scripts));
+      renderScripts();
+      document.getElementById('manual-text').value = '';
+    };
+
+    function renderScripts() {
+      const container = document.getElementById('saved-scripts');
+      if (scripts.length === 0) {
+        container.innerHTML = '<p style="color:#888;">No saved scripts yet.</p>';
+        return;
+      }
+
+      container.innerHTML = scripts.map(script => `
+        <div class="script-item">
+          <h3>${script.topic}</h3>
+          <p>By ${script.name} • ${script.date} • ${script.type === 'ai' ? '🤖 AI Generated' : '📝 Manual'}</p>
+          <div class="preview">${script.text.substring(0, 150)}...</div>
+          <button onclick="loadScript(${script.id})">Load in Teleprompter</button>
+          <button class="delete" onclick="deleteScript(${script.id})">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    window.loadScript = function(id) {
+      const script = scripts.find(s => s.id === id);
+      if (!script) return;
+
+      const prompterText = document.getElementById('prompter-text');
+      prompterText.textContent = script.text;
+      prompterText.style.fontSize = settings.fontSize + 'px';
+      
+      if (settings.theme === 'light') {
+        prompterText.style.background = '#fff';
+        prompterText.style.color = '#000';
+      } else {
+        prompterText.style.background = '#000';
+        prompterText.style.color = '#fff';
+      }
+
+      if (settings.mirror) {
+        prompterText.classList.add('mirror');
+      }
+
+      document.getElementById('teleprompter').classList.add('active');
+      
+      // Show controls for 3 seconds
+      const controls = document.getElementById('controls');
+      controls.classList.add('visible');
+      setTimeout(() => controls.classList.remove('visible'), 3000);
+    };
+
+    window.deleteScript = function(id) {
+      if (!confirm('Delete this script?')) return;
+      scripts = scripts.filter(s => s.id !== id);
+      localStorage.setItem('teleprompter-scripts', JSON.stringify(scripts));
+      renderScripts();
+    };
+
+    window.closeTeleprompter = function() {
+      document.getElementById('teleprompter').classList.remove('active');
+      if (isPlaying) playPause();
+    };
+
+    window.playPause = function() {
+      isPlaying = !isPlaying;
+      const btn = event.target;
+      
+      if (isPlaying) {
+        btn.textContent = '⏸ Pause';
+        const speed = parseInt(document.getElementById('speed').value);
+        scrollInterval = setInterval(() => {
+          document.getElementById('prompter-text').scrollTop += speed;
+        }, 50);
+      } else {
+        btn.textContent = '▶ Play';
+        clearInterval(scrollInterval);
+      }
+    };
+
+    window.resetScroll = function() {
+      document.getElementById('prompter-text').scrollTop = 0;
+    };
+
+    window.updateSpeed = function() {
+      settings.speed = parseInt(document.getElementById('speed').value);
+      localStorage.setItem('teleprompter-settings', JSON.stringify(settings));
+    };
+
+    window.updateFontSize = function() {
+      const size = parseInt(document.getElementById('fontsize').value);
+      settings.fontSize = size;
+      document.getElementById('prompter-text').style.fontSize = size + 'px';
+      localStorage.setItem('teleprompter-settings', JSON.stringify(settings));
+    };
+
+    window.toggleMirror = function() {
+      settings.mirror = !settings.mirror;
+      document.getElementById('prompter-text').classList.toggle('mirror');
+      localStorage.setItem('teleprompter-settings', JSON.stringify(settings));
+    };
+
+    window.toggleTheme = function() {
+      const text = document.getElementById('prompter-text');
+      if (settings.theme === 'dark') {
+        settings.theme = 'light';
+        text.style.background = '#fff';
+        text.style.color = '#000';
+      } else {
+        settings.theme = 'dark';
+        text.style.background = '#000';
+        text.style.color = '#fff';
+      }
+      localStorage.setItem('teleprompter-settings', JSON.stringify(settings));
+    };
+
+    window.toggleFullscreen = function() {
+      if (!document.fullscreenElement) {
+        document.getElementById('teleprompter').requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    };
+
+    // Double tap to show controls
+    document.getElementById('teleprompter').addEventListener('click', function() {
+      tapCount++;
+      if (tapCount === 1) {
+        tapTimer = setTimeout(() => { tapCount = 0; }, 300);
+      } else if (tapCount === 2) {
+        clearTimeout(tapTimer);
+        tapCount = 0;
+        const controls = document.getElementById('controls');
+        controls.classList.add('visible');
+        setTimeout(() => controls.classList.remove('visible'), 3000);
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (document.getElementById('teleprompter').classList.contains('active')) {
+        if (e.key === 'F11') {
+          e.preventDefault();
+          toggleFullscreen();
+        } else if (e.key === ' ') {
+          e.preventDefault();
+          playPause();
+        }
+      }
+    });
+
+    renderScripts();
+  </script>
+</body>
+</html>
