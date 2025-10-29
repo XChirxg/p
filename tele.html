@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Teleprompter</title>
+    <title>Professional Teleprompter Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -46,7 +46,7 @@
             border: 1px solid #333;
             border-radius: 12px;
             padding: 40px;
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
@@ -92,8 +92,8 @@
         }
 
         .api-helper a {
-            text-decoration: none;
-            font-weight: bold;
+            color: #00d4ff;
+            text-decoration: underline;
             cursor: pointer;
         }
 
@@ -334,11 +334,16 @@
             border-color: #00d4ff;
         }
 
+        .playback-btn.active {
+            background: #00d4ff;
+            color: #000;
+        }
+
         .timer {
             font-size: 18px;
             color: #00d4ff;
             font-weight: bold;
-            min-width: 80px;
+            min-width: 120px;
             text-align: center;
         }
 
@@ -357,11 +362,20 @@
             border: 1px solid #333;
             font-size: 12px;
             transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .history-item:hover {
             background: #1a1a1a;
             border-color: #00d4ff;
+        }
+
+        .history-delete {
+            color: #ff4444;
+            cursor: pointer;
+            padding: 4px 8px;
         }
 
         .mirror {
@@ -400,6 +414,101 @@
             margin-top: 10px;
             font-size: 12px;
         }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #00d4ff;
+            width: 0%;
+            transition: width 0.1s;
+            z-index: 600;
+        }
+
+        .bookmark-indicator {
+            position: absolute;
+            right: 20px;
+            background: rgba(255, 215, 0, 0.3);
+            border-left: 4px solid gold;
+            padding: 2px;
+            width: 20px;
+            cursor: pointer;
+        }
+
+        .cue-marker {
+            background: rgba(255, 107, 107, 0.2);
+            border-left: 4px solid #ff6b6b;
+            padding-left: 8px;
+            margin-left: -8px;
+        }
+
+        .voice-control-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            z-index: 700;
+            display: none;
+        }
+
+        .voice-control-status.active {
+            display: block;
+            border-color: #00d4ff;
+        }
+
+        .teleprompter-marker {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: rgba(255, 0, 0, 0.3);
+            pointer-events: none;
+            z-index: 300;
+            display: none;
+        }
+
+        .teleprompter-marker.visible {
+            display: block;
+        }
+
+        .export-menu {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .export-btn {
+            width: 100%;
+            padding: 8px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        .speaker-notes {
+            font-size: 0.6em;
+            color: #888;
+            font-style: italic;
+            display: block;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -408,8 +517,8 @@
             <h2><i class="fas fa-cog"></i> Setup Teleprompter</h2>
             
             <div class="form-group">
-                <label>Script Name</label>
-                <input type="text" id="scriptName" placeholder="My Presentation">
+                <label>Speaker Name</label>
+                <input type="text" id="speakerName" placeholder="e.g., John Doe">
             </div>
 
             <div class="form-group">
@@ -432,8 +541,9 @@
                 <label>Word Count</label>
                 <div class="options-grid">
                     <button type="button" class="option-btn" data-words="300">Short (300 words)</button>
-                    <button type="button" class="option-btn" data-words="600">Medium (600 words)</button>
+                    <button type="button" class="option-btn active" data-words="600">Medium (600 words)</button>
                     <button type="button" class="option-btn" data-words="1200">Long (1200 words)</button>
+                    <button type="button" class="option-btn" data-words="2000">Extended (2000 words)</button>
                 </div>
             </div>
 
@@ -446,7 +556,7 @@
                 <label>Google AI API Key</label>
                 <input type="password" id="apiKey" placeholder="Paste your API key here">
                 <div class="api-helper">
-                    Don't have an API key? <a onclick="window.open('https://aistudio.google.com/app/apikey', '_blank')">Get one free here →</a>
+                    Don't have an API key? <a href="https://aistudio.google.com/app/apikey" target="_blank">Get one free here →</a>
                 </div>
                 <div id="apiError" class="error"></div>
             </div>
@@ -467,23 +577,32 @@
 
     <div id="countdownOverlay" class="countdown-overlay" style="display: none;">
         <div class="countdown-number">3</div>
+        <div style="font-size: 24px; margin-top: 20px;" id="countdownSpeaker"></div>
+    </div>
+
+    <div class="voice-control-status" id="voiceStatus">
+        <i class="fas fa-microphone"></i> Voice Control Active
     </div>
 
     <div class="container">
         <div class="prompter-container">
-            <div class="prompter-text" id="prompterText">Tap screen twice to show controls</div>
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="teleprompter-marker" id="readingGuide"></div>
+            <div class="prompter-text" id="prompterText">
+                <div style="font-size: 0.5em; color: #666;">Double-tap screen to show controls</div>
+            </div>
             
             <div class="controls-overlay" id="controlsOverlay">
                 <div class="controls-bar">
                     <div class="control-group">
                         <label>Speed</label>
-                        <input type="range" id="speedSlider" min="0.5" max="3" step="0.1" value="1" onchange="updateSpeed(this.value)">
+                        <input type="range" id="speedSlider" min="0.5" max="4" step="0.1" value="1" onchange="updateSpeed(this.value)">
                         <span id="speedValue">1.0x</span>
                     </div>
 
                     <div class="control-group">
                         <label>Font Size</label>
-                        <input type="range" id="fontSlider" min="40" max="120" step="5" value="72" onchange="updateFontSize(this.value)">
+                        <input type="range" id="fontSlider" min="40" max="140" step="5" value="72" onchange="updateFontSize(this.value)">
                     </div>
 
                     <div class="control-group">
@@ -493,6 +612,7 @@
                             <option value="light">Light</option>
                             <option value="green">Green Screen</option>
                             <option value="blue">Blue Tint</option>
+                            <option value="sepia">Sepia</option>
                         </select>
                     </div>
 
@@ -503,11 +623,16 @@
                             <option value="'Georgia'">Georgia</option>
                             <option value="'Courier New'">Courier New</option>
                             <option value="'Arial'">Arial</option>
+                            <option value="'Times New Roman'">Times New Roman</option>
                         </select>
                     </div>
 
                     <div class="control-icon" onclick="toggleMirror()" title="Mirror"><i class="fas fa-mirror"></i></div>
                     <div class="control-icon" onclick="toggleLineHeight()" title="Line Spacing"><i class="fas fa-arrows-alt-v"></i></div>
+                    <div class="control-icon" onclick="toggleReadingGuide()" title="Reading Guide"><i class="fas fa-minus"></i></div>
+                    <div class="control-icon" onclick="toggleVoiceControl()" title="Voice Control" id="voiceBtn"><i class="fas fa-microphone"></i></div>
+                    <div class="control-icon" onclick="addBookmark()" title="Add Bookmark"><i class="fas fa-bookmark"></i></div>
+                    <div class="control-icon" onclick="exportScript()" title="Export Script"><i class="fas fa-download"></i></div>
                     <div class="control-icon" onclick="setFullscreen()" title="Fullscreen"><i class="fas fa-expand"></i></div>
                     <div class="control-icon" onclick="showSettings()" title="New Script"><i class="fas fa-plus"></i></div>
                 </div>
@@ -515,13 +640,16 @@
 
             <div class="bottom-bar">
                 <div class="playback-controls">
-                    <button class="playback-btn" onclick="toggleAutoScroll()" title="Auto Scroll"><i class="fas fa-play"></i></button>
+                    <button class="playback-btn" onclick="toggleAutoScroll()" title="Auto Scroll" id="playBtn"><i class="fas fa-play"></i></button>
+                    <button class="playback-btn" onclick="pauseTimer()" title="Pause Timer" id="pauseBtn"><i class="fas fa-pause"></i></button>
                     <button class="playback-btn" onclick="resetScroll()" title="Reset"><i class="fas fa-redo"></i></button>
                 </div>
-                <div class="timer" id="timer">00:00</div>
+                <div class="timer" id="timer">00:00 / 00:00</div>
                 <div class="playback-controls">
                     <button class="playback-btn" onclick="scrollUp()" title="Scroll Up"><i class="fas fa-chevron-up"></i></button>
                     <button class="playback-btn" onclick="scrollDown()" title="Scroll Down"><i class="fas fa-chevron-down"></i></button>
+                    <button class="playback-btn" onclick="adjustSpeed(-0.1)" title="Slower"><i class="fas fa-minus"></i></button>
+                    <button class="playback-btn" onclick="adjustSpeed(0.1)" title="Faster"><i class="fas fa-plus"></i></button>
                 </div>
             </div>
         </div>
@@ -535,37 +663,189 @@
         let currentTheme = 'dark';
         let timerInterval;
         let elapsedTime = 0;
+        let isPaused = false;
+        let estimatedDuration = 0;
+        let bookmarks = [];
+        let voiceRecognition = null;
+        let isVoiceActive = false;
+        let lastTapTime = 0;
+        let speakerName = '';
 
-        // Load settings from cache
+        // NEW FEATURE 1: Voice Control
+        function initVoiceControl() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                voiceRecognition = new SpeechRecognition();
+                voiceRecognition.continuous = true;
+                voiceRecognition.interimResults = false;
+
+                voiceRecognition.onresult = (event) => {
+                    const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                    handleVoiceCommand(command);
+                };
+
+                voiceRecognition.onerror = (event) => {
+                    console.log('Voice error:', event.error);
+                };
+            }
+        }
+
+        function toggleVoiceControl() {
+            if (!voiceRecognition) {
+                alert('Voice recognition not supported in this browser');
+                return;
+            }
+
+            isVoiceActive = !isVoiceActive;
+            const status = document.getElementById('voiceStatus');
+            const btn = document.getElementById('voiceBtn');
+
+            if (isVoiceActive) {
+                voiceRecognition.start();
+                status.classList.add('active');
+                btn.classList.add('active');
+            } else {
+                voiceRecognition.stop();
+                status.classList.remove('active');
+                btn.classList.remove('active');
+            }
+        }
+
+        function handleVoiceCommand(command) {
+            if (command.includes('play') || command.includes('start')) {
+                if (!autoScrolling) toggleAutoScroll();
+            } else if (command.includes('pause') || command.includes('stop')) {
+                if (autoScrolling) toggleAutoScroll();
+            } else if (command.includes('faster')) {
+                adjustSpeed(0.2);
+            } else if (command.includes('slower')) {
+                adjustSpeed(-0.2);
+            } else if (command.includes('reset')) {
+                resetScroll();
+            } else if (command.includes('bookmark')) {
+                addBookmark();
+            }
+        }
+
+        // NEW FEATURE 2: Progress Bar
+        function updateProgressBar() {
+            const text = document.getElementById('prompterText');
+            const progress = (text.scrollTop / (text.scrollHeight - text.clientHeight)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // NEW FEATURE 3: Reading Guide Line
+        function toggleReadingGuide() {
+            document.getElementById('readingGuide').classList.toggle('visible');
+        }
+
+        // NEW FEATURE 4: Bookmarks
+        function addBookmark() {
+            const text = document.getElementById('prompterText');
+            const scrollPos = text.scrollTop;
+            bookmarks.push(scrollPos);
+            
+            const marker = document.createElement('div');
+            marker.className = 'bookmark-indicator';
+            marker.style.top = scrollPos + 'px';
+            marker.onclick = () => {
+                text.scrollTop = scrollPos;
+            };
+            text.parentElement.appendChild(marker);
+            
+            alert('Bookmark added!');
+        }
+
+        // NEW FEATURE 5: Estimated Duration Calculator
+        function calculateDuration(text) {
+            const words = text.split(/\s+/).length;
+            const averageWPM = 150;
+            const minutes = Math.ceil(words / averageWPM);
+            const seconds = ((words / averageWPM) % 1) * 60;
+            estimatedDuration = minutes * 60 + seconds;
+            return `${String(minutes).padStart(2, '0')}:${String(Math.floor(seconds)).padStart(2, '0')}`;
+        }
+
+        // NEW FEATURE 6: Export Script
+        function exportScript() {
+            const text = document.getElementById('prompterText').innerText;
+            const format = prompt('Export as:\n1 - Plain Text (.txt)\n2 - PDF\n3 - Word Doc (.docx)\n\nEnter 1, 2, or 3:');
+            
+            if (format === '1') {
+                const blob = new Blob([text], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `script-${speakerName || 'untitled'}.txt`;
+                a.click();
+            } else if (format === '2') {
+                alert('PDF export: Copy the script and use a browser Print > Save as PDF');
+                window.print();
+            } else if (format === '3') {
+                alert('DOCX export: Copy the script and paste into Microsoft Word or Google Docs');
+            }
+        }
+
+        // NEW FEATURE 7: Speed Adjustment Buttons
+        function adjustSpeed(delta) {
+            const currentSpeed = parseFloat(document.getElementById('speedSlider').value);
+            const newSpeed = Math.max(0.5, Math.min(4, currentSpeed + delta));
+            document.getElementById('speedSlider').value = newSpeed;
+            updateSpeed(newSpeed);
+        }
+
+        // NEW FEATURE 8: Pause Timer
+        function pauseTimer() {
+            isPaused = !isPaused;
+            const btn = document.getElementById('pauseBtn');
+            btn.classList.toggle('active', isPaused);
+            
+            if (isPaused && timerInterval) {
+                clearInterval(timerInterval);
+            } else if (!isPaused && !timerInterval) {
+                startTimer();
+            }
+        }
+
+        // Load settings from memory (not localStorage)
+        let savedSettings = {
+            fontSize: '72px',
+            fontFamily: "'Segoe UI'",
+            theme: 'dark',
+            apiKey: ''
+        };
+
+        let scriptHistory = [];
+
         function loadSettings() {
-            const settings = JSON.parse(localStorage.getItem('teleprompterSettings') || '{}');
-            if (settings.fontSize) document.getElementById('prompterText').style.fontSize = settings.fontSize + 'px';
-            if (settings.fontFamily) document.getElementById('prompterText').style.fontFamily = settings.fontFamily;
-            if (settings.theme) changeTheme(settings.theme);
-            if (settings.apiKey) document.getElementById('apiKey').value = settings.apiKey;
+            if (savedSettings.fontSize) document.getElementById('prompterText').style.fontSize = savedSettings.fontSize;
+            if (savedSettings.fontFamily) document.getElementById('prompterText').style.fontFamily = savedSettings.fontFamily;
+            if (savedSettings.theme) changeTheme(savedSettings.theme);
+            if (savedSettings.apiKey) document.getElementById('apiKey').value = savedSettings.apiKey;
         }
 
         function saveSettings() {
-            const settings = {
+            const apiKeyInput = document.getElementById('apiKey');
+            savedSettings = {
                 fontSize: document.getElementById('prompterText').style.fontSize,
                 fontFamily: document.getElementById('prompterText').style.fontFamily,
                 theme: currentTheme,
-                apiKey: document.getElementById('apiKey').value
+                apiKey: apiKeyInput ? apiKeyInput.value : savedSettings.apiKey || ''
             };
-            localStorage.setItem('teleprompterSettings', JSON.stringify(settings));
         }
 
         function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('scriptHistory') || '[]');
             const container = document.getElementById('textHistory');
-            if (history.length > 0) {
+            if (scriptHistory.length > 0) {
                 container.innerHTML = '<h3 style="font-size: 14px; margin-top: 20px; color: #aaa;">Recent Scripts</h3>';
-                history.slice(-5).forEach((item, idx) => {
+                scriptHistory.slice(-5).forEach((item, idx) => {
                     const el = document.createElement('div');
                     el.className = 'history-item';
-                    el.innerHTML = `<strong>${item.name}</strong><br><span style="color: #666; font-size: 11px;">` + item.text.substring(0, 50) + '...</span>';
+                    el.innerHTML = `<div><strong>${item.speaker}</strong><br><span style="color: #666; font-size: 11px;">${item.text.substring(0, 50)}...</span></div>
+                                   <span class="history-delete" onclick="deleteHistory(${scriptHistory.indexOf(item)}); event.stopPropagation();"><i class="fas fa-trash"></i></span>`;
                     el.onclick = () => {
                         document.getElementById('prompterText').innerHTML = item.text;
+                        speakerName = item.speaker;
                         document.getElementById('setupModal').style.display = 'none';
                         showCountdown();
                     };
@@ -574,13 +854,18 @@
             }
         }
 
+        function deleteHistory(index) {
+            scriptHistory.splice(index, 1);
+            loadHistory();
+        }
+
         async function generateScript() {
             const apiKey = document.getElementById('apiKey').value.trim();
             const topic = document.getElementById('topic').value.trim();
             const tone = document.getElementById('tone').value;
             const words = document.querySelector('.option-btn.active')?.dataset.words || 600;
             const description = document.getElementById('description').value.trim();
-            const scriptName = document.getElementById('scriptName').value.trim() || 'Untitled';
+            speakerName = document.getElementById('speakerName').value.trim() || 'Speaker';
 
             if (!topic) {
                 document.getElementById('apiError').textContent = 'Please enter a topic';
@@ -595,51 +880,81 @@
             document.querySelector('.modal').innerHTML = '<div class="loading"><div class="spinner"></div><p>Generating your script...</p></div>';
 
             try {
-                const prompt = `Write a ${words}-word teleprompter script about "${topic}" in a ${tone} tone. ${description ? 'Focus on: ' + description : ''}\n\nIMPORTANT: Write ONLY the script content. Make it sound natural and conversational - not like someone reading from a teleprompter. Use short sentences and pauses (represented with "..."). Use line breaks to indicate where the speaker should pause. Avoid jargon unless necessary. Make it engaging and dynamic. Format important terms in BOLD using **term** notation.`;
+                const prompt = `Write a ${words}-word teleprompter script about "${topic}" in a ${tone} tone. ${description ? 'Focus on: ' + description : ''}
 
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+CRITICAL INSTRUCTIONS:
+- Write ONLY the script content that the speaker will read
+- Make it sound natural and conversational for ${speakerName}
+- Use short, punchy sentences
+- Add natural pauses with "..." between thoughts
+- Use paragraph breaks to indicate longer pauses
+- Make key terms BOLD using **term** notation
+- Include occasional [PAUSE] markers for dramatic effect
+- NO introductions like "Here's a script" - start directly with the content
+- Make it engaging and easy to read aloud`;
+
+                // Updated API call for Gemini 2.0
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         contents: [{
-                            parts: [{ text: prompt }]
+                            parts: [{ 
+                                text: prompt 
+                            }]
                         }],
                         generationConfig: {
-                            maxOutputTokens: Math.ceil(words / 0.75)
-                        }
+                            temperature: 0.8,
+                            maxOutputTokens: Math.ceil(words * 1.5),
+                            topP: 0.95,
+                            topK: 40
+                        },
+                        safetySettings: [
+                            {
+                                category: "HARM_CATEGORY_HARASSMENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_HATE_SPEECH",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            }
+                        ]
                     })
                 });
 
-                const data = await response.json();
-
                 if (!response.ok) {
-                    throw new Error(data.error?.message || 'API Error: ' + response.status);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || `API Error: ${response.status} - ${response.statusText}`);
                 }
 
-                if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-                    throw new Error('Invalid API response - no content generated');
+                const data = await response.json();
+
+                if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    throw new Error('Invalid API response - no content generated. The AI may have rejected the request.');
                 }
 
                 let scriptText = data.candidates[0].content.parts[0].text;
 
-                // Convert **text** to HTML bold
+                // Format the script
                 scriptText = scriptText.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                scriptText = scriptText.replace(/\[PAUSE\]/g, '<span class="cue-marker">[PAUSE]</span>');
+                scriptText = scriptText.replace(/\n\n/g, '<br><br>');
                 
                 // Save to history
-                const history = JSON.parse(localStorage.getItem('scriptHistory') || '[]');
-                history.push({ name: scriptName, text: scriptText });
-                localStorage.setItem('scriptHistory', JSON.stringify(history.slice(-20)));
+                scriptHistory.push({ speaker: speakerName, text: scriptText });
                 
                 // Save API key
-                localStorage.setItem('teleprompterSettings', JSON.stringify({
-                    fontSize: '72px',
-                    fontFamily: "'Segoe UI'",
-                    theme: 'dark',
-                    apiKey: apiKey
-                }));
+                savedSettings.apiKey = apiKey;
 
                 document.getElementById('prompterText').innerHTML = scriptText;
                 document.getElementById('setupModal').style.display = 'none';
+                
+                // Calculate estimated duration
+                const duration = calculateDuration(scriptText);
+                document.getElementById('timer').textContent = `00:00 / ${duration}`;
+                
                 showCountdown();
 
             } catch (error) {
@@ -649,10 +964,12 @@
                     <h2 style="color: #ff4444;"><i class="fas fa-exclamation-circle"></i> Error</h2>
                     <p style="margin: 15px 0; color: #ccc;">${error.message}</p>
                     <p style="font-size: 12px; color: #888;">Troubleshooting tips:</p>
-                    <ul style="font-size: 12px; color: #888; margin: 10px 0 20px 20px;">
-                        <li>Make sure your API key is correct</li>
-                        <li>Check your Google AI Studio quota limits</li>
-                        <li>Try a different topic or shorter word count</li>
+                    <ul style="font-size: 12px; color: #888; margin: 10px 0 20px 20px; line-height: 1.8;">
+                        <li>Verify your API key is correct and active</li>
+                        <li>Check Google AI Studio quota limits</li>
+                        <li>Ensure your API key has Gemini access enabled</li>
+                        <li>Try a shorter word count or simpler topic</li>
+                        <li>Check your internet connection</li>
                     </ul>
                     <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 20px;">Try Again</button>
                 </div>`;
@@ -661,30 +978,36 @@
 
         function useManualText() {
             const text = document.getElementById('manualText').value.trim();
-            const scriptName = document.getElementById('scriptName').value.trim() || 'Manual Script';
+            speakerName = document.getElementById('speakerName').value.trim() || 'Speaker';
 
             if (!text) {
                 alert('Please enter some text');
                 return;
             }
 
-            const history = JSON.parse(localStorage.getItem('scriptHistory') || '[]');
-            history.push({ name: scriptName, text: text });
-            localStorage.setItem('scriptHistory', JSON.stringify(history.slice(-20)));
+            scriptHistory.push({ speaker: speakerName, text: text });
 
-            document.getElementById('prompterText').innerHTML = text;
+            document.getElementById('prompterText').innerHTML = text.replace(/\n/g, '<br>');
             document.getElementById('setupModal').style.display = 'none';
+            
+            const duration = calculateDuration(text);
+            document.getElementById('timer').textContent = `00:00 / ${duration}`;
+            
             showCountdown();
         }
 
         function showCountdown() {
             const countdown = document.getElementById('countdownOverlay');
+            const speakerEl = document.getElementById('countdownSpeaker');
+            speakerEl.textContent = speakerName;
             countdown.style.display = 'flex';
             let count = 3;
+            
             const interval = setInterval(() => {
-                countdown.querySelector('.countdown-number').textContent = count;
-                count--;
-                if (count < 0) {
+                if (count > 0) {
+                    countdown.querySelector('.countdown-number').textContent = count;
+                    count--;
+                } else {
                     clearInterval(interval);
                     countdown.style.display = 'none';
                     startTimer();
@@ -693,29 +1016,84 @@
         }
 
         function startTimer() {
-            elapsedTime = 0;
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                elapsedTime++;
-                const mins = Math.floor(elapsedTime / 60);
-                const secs = elapsedTime % 60;
-                document.getElementById('timer').textContent = 
-                    (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
-            }, 1000);
+            if (!isPaused) {
+                elapsedTime = 0;
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    if (!isPaused) {
+                        elapsedTime++;
+                        const mins = Math.floor(elapsedTime / 60);
+                        const secs = elapsedTime % 60;
+                        const elapsed = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                        const estMins = Math.floor(estimatedDuration / 60);
+                        const estSecs = estimatedDuration % 60;
+                        const estimated = `${String(estMins).padStart(2, '0')}:${String(Math.floor(estSecs)).padStart(2, '0')}`;
+                        document.getElementById('timer').textContent = `${elapsed} / ${estimated}`;
+                    }
+                }, 1000);
+            }
         }
 
-        document.addEventListener('click', () => {
-            tapCount++;
-            if (tapCount === 2) {
+        // NEW FEATURE 9: Double-tap detection with timing
+        document.addEventListener('click', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            if (tapLength < 300 && tapLength > 0) {
                 const overlay = document.getElementById('controlsOverlay');
                 overlay.classList.toggle('visible');
-                tapCount = 0;
-
+                
                 if (overlay.classList.contains('visible')) {
                     setTimeout(() => {
                         overlay.classList.remove('visible');
-                    }, 5000);
+                    }, 8000);
                 }
+            }
+            lastTapTime = currentTime;
+        });
+
+        // NEW FEATURE 10: Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('setupModal').style.display !== 'none') return;
+            
+            switch(e.key) {
+                case ' ':
+                    e.preventDefault();
+                    toggleAutoScroll();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    scrollUp();
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    scrollDown();
+                    break;
+                case 'r':
+                    resetScroll();
+                    break;
+                case 'f':
+                    setFullscreen();
+                    break;
+                case 'm':
+                    toggleMirror();
+                    break;
+                case 'b':
+                    addBookmark();
+                    break;
+                case '+':
+                case '=':
+                    adjustSpeed(0.1);
+                    break;
+                case '-':
+                    adjustSpeed(-0.1);
+                    break;
+                case 'p':
+                    pauseTimer();
+                    break;
+                case 'v':
+                    toggleVoiceControl();
+                    break;
             }
         });
 
@@ -749,11 +1127,14 @@
                 container.style.background = '#fff';
                 text.style.color = '#000';
             } else if (theme === 'green') {
-                container.style.background = '#001a00';
-                text.style.color = '#00ff00';
+                container.style.background = '#00ff00';
+                text.style.color = '#000';
             } else if (theme === 'blue') {
                 container.style.background = '#001a4d';
                 text.style.color = '#00d4ff';
+            } else if (theme === 'sepia') {
+                container.style.background = '#f4ecd8';
+                text.style.color = '#5c4a3a';
             }
             saveSettings();
         }
@@ -782,12 +1163,19 @@
 
         function resetScroll() {
             document.getElementById('prompterText').scrollTop = 0;
+            elapsedTime = 0;
+            if (!autoScrolling) {
+                const estMins = Math.floor(estimatedDuration / 60);
+                const estSecs = estimatedDuration % 60;
+                document.getElementById('timer').textContent = `00:00 / ${String(estMins).padStart(2, '0')}:${String(Math.floor(estSecs)).padStart(2, '0')}`;
+            }
         }
 
         function toggleAutoScroll() {
             autoScrolling = !autoScrolling;
-            const btn = event.target.closest('.playback-btn');
+            const btn = document.getElementById('playBtn');
             btn.classList.toggle('active', autoScrolling);
+            btn.innerHTML = autoScrolling ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
 
             if (autoScrolling) {
                 const text = document.getElementById('prompterText');
@@ -797,6 +1185,7 @@
                         return;
                     }
                     text.scrollTop += scrollSpeed;
+                    updateProgressBar();
                 }, 50);
             }
         }
@@ -817,6 +1206,10 @@
         // Initialize
         loadSettings();
         loadHistory();
+        initVoiceControl();
+
+        // Scroll listener for progress
+        document.getElementById('prompterText').addEventListener('scroll', updateProgressBar);
     </script>
 </body>
 </html>
