@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>वार्ड 7 - रहीघाट | चुनाव विश्लेषण डैशबोर्ड</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a40;
+    --accent: #e8a045;
+    --accent2: #c45c8a;
+    --accent3: #4a9eff;
+    --accent4: #52d48a;
+    --text: #f0eee8;
+    --text-dim: #888899;
+    --gold: #d4a843;
+    --card-glow: rgba(232, 160, 69, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* Header */
+  .header {
+    position: relative;
+    padding: 48px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(232,160,69,0.05) 0%, transparent 60%);
+    overflow: hidden;
+  }
+
+  .header::after {
+    content: 'चुनाव';
+    position: absolute;
+    right: -20px;
+    top: -30px;
+    font-family: 'Playfair Display', serif;
+    font-size: 200px;
+    font-weight: 900;
+    color: rgba(232,160,69,0.04);
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .header-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-meta::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--text) 40%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .header-sub {
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    gap: 24px;
+    transition: opacity 0.5s ease;
+  }
+
+  .loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .loader-ring {
+    width: 64px;
+    height: 64px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loader-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  /* Main layout */
+  .main {
+    padding: 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 56px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: none; }
+  }
+
+  .section:nth-child(1) { animation-delay: 0.1s; }
+  .section:nth-child(2) { animation-delay: 0.2s; }
+  .section:nth-child(3) { animation-delay: 0.3s; }
+  .section:nth-child(4) { animation-delay: 0.4s; }
+  .section:nth-child(5) { animation-delay: 0.5s; }
+  .section:nth-child(6) { animation-delay: 0.6s; }
+  .section:nth-child(7) { animation-delay: 0.7s; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* KPI Grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.2s;
+    cursor: default;
+  }
+
+  .kpi-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .kpi-card:hover::before { opacity: 1; }
+
+  .kpi-icon {
+    font-size: 22px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .kpi-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+
+  .kpi-card.blue .kpi-value { color: var(--accent3); }
+  .kpi-card.blue:hover { border-color: var(--accent3); }
+  .kpi-card.blue::before { background: var(--accent3); }
+
+  .kpi-card.pink .kpi-value { color: var(--accent2); }
+  .kpi-card.pink:hover { border-color: var(--accent2); }
+  .kpi-card.pink::before { background: var(--accent2); }
+
+  .kpi-card.green .kpi-value { color: var(--accent4); }
+  .kpi-card.green:hover { border-color: var(--accent4); }
+  .kpi-card.green::before { background: var(--accent4); }
+
+  /* Charts */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 20px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: border-color 0.3s;
+  }
+
+  .chart-card:hover { border-color: rgba(232,160,69,0.3); }
+
+  .chart-card.full { grid-column: 1 / -1; }
+
+  .chart-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .chart-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 260px;
+  }
+
+  .chart-wrap.tall { height: 320px; }
+
+  /* Age distribution bar */
+  .age-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .age-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 60px;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .age-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  .age-bar-bg {
+    background: var(--surface2);
+    border-radius: 4px;
+    height: 28px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .age-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #000;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    min-width: 0;
+  }
+
+  .age-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  /* House list */
+  .house-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .house-table th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+  }
+
+  .house-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .house-table tr:hover td { background: var(--surface2); }
+
+  .table-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .table-scroll::-webkit-scrollbar { width: 6px; }
+  .table-scroll::-webkit-scrollbar-track { background: var(--surface); }
+  .table-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Search */
+  .search-box {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text-dim); }
+
+  /* Voter card popup style */
+  .voter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .voter-grid::-webkit-scrollbar { width: 6px; }
+  .voter-grid::-webkit-scrollbar-track { background: var(--surface); }
+  .voter-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .voter-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color 0.2s;
+  }
+
+  .voter-card:hover { border-color: var(--accent3); }
+
+  .voter-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .voter-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .voter-meta {
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .badge-m { background: rgba(74,158,255,0.15); color: var(--accent3); }
+  .badge-f { background: rgba(196,92,138,0.15); color: var(--accent2); }
+
+  /* Priority voters section */
+  .priority-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .priority-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .priority-card h4 {
+    font-size: 13px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .priority-item {
+    font-size: 13px;
+    color: var(--text);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .priority-item:last-child { border-bottom: none; }
+
+  .priority-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent4);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* Progress bars */
+  .stat-row {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .stat-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .stat-name {
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .stat-bar-bg {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .stat-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .stat-pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  /* Tabs */
+  .tab-nav {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 20px;
+    width: fit-content;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    padding: 8px 18px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    color: #000;
+    font-weight: 600;
+  }
+
+  .tab-btn:hover:not(.active) { color: var(--text); background: var(--surface2); }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* Insights banner */
+  .insight-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .insight-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .insight-item.blue { border-left-color: var(--accent3); }
+  .insight-item.pink { border-left-color: var(--accent2); }
+  .insight-item.green { border-left-color: var(--accent4); }
+
+  .insight-item strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .insight-item.blue strong { color: var(--accent3); }
+  .insight-item.pink strong { color: var(--accent2); }
+  .insight-item.green strong { color: var(--accent4); }
+
+  /* House dot map */
+  .house-map {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 16px;
+  }
+
+  .house-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .house-dot:hover {
+    transform: scale(1.2);
+    z-index: 10;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .house-dot.large { background: rgba(232,160,69,0.15); border-color: rgba(232,160,69,0.4); }
+  .house-dot.medium { background: rgba(74,158,255,0.1); border-color: rgba(74,158,255,0.3); }
+  .house-dot.small { background: rgba(82,212,138,0.08); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .footer span { color: var(--accent); }
+
+  /* Scrollbar global */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  @media (max-width: 768px) {
+    .main { padding: 20px; }
+    .header { padding: 32px 20px 28px; }
+    .chart-grid { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="loader-ring"></div>
+  <div class="loader-text">डेटा लोड हो रहा है...</div>
+</div>
+
+<div class="header">
+  <div class="header-meta">राज्य निर्वाचन आयोग हिमाचल प्रदेश &nbsp;•&nbsp; अंतिम मतदाता सूची 2025</div>
+  <h1>वार्ड 7 — रहीघाट<br>चुनाव विश्लेषण</h1>
+  <div class="header-sub">नगर पंचायत: ठियोग &nbsp;|&nbsp; जिला: शिमला &nbsp;|&nbsp; 233 मतदाता &nbsp;|&nbsp; डेटा: 13 नवम्बर 2025</div>
+</div>
+
+<div class="main" id="mainContent" style="display:none;">
+
+  <!-- SECTION 1: KPIs -->
+  <div class="section">
+    <div class="section-label">मुख्य आँकड़े — Key Statistics</div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+  </div>
+
+  <!-- SECTION 2: Gender & Age Charts -->
+  <div class="section">
+    <div class="section-label">लिंग एवं आयु विश्लेषण — Gender & Age Analysis</div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">लिंग अनुपात</div>
+        <div class="chart-desc">पुरुष vs महिला मतदाता वितरण</div>
+        <div class="chart-wrap"><canvas id="genderChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">आयु समूह वितरण</div>
+        <div class="chart-desc">उम्र के अनुसार मतदाता (पुरुष / महिला)</div>
+        <div class="chart-wrap"><canvas id="ageGroupChart"></canvas></div>
+      </div>
+      <div class="chart-card full">
+        <div class="chart-title">आयु वर्ग विस्तृत विश्लेषण</div>
+        <div class="chart-desc">हर 10 साल के अंतराल में मतदाता — चुनावी रणनीति के लिए</div>
+        <div style="margin-top: 8px;" id="ageBarsContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Household Analysis -->
+  <div class="section">
+    <div class="section-label">घरेलू विश्लेषण — Household Analysis</div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">परिवार आकार वितरण</div>
+        <div class="chart-desc">हर घर में कितने मतदाता</div>
+        <div class="chart-wrap"><canvas id="houseSizeChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">शीर्ष 10 बड़े परिवार</div>
+        <div class="chart-desc">सबसे अधिक मतदाता वाले घर</div>
+        <div class="chart-wrap"><canvas id="topHousesChart"></canvas></div>
+      </div>
+      <div class="chart-card full">
+        <div class="chart-title">सभी घरों का नक्शा</div>
+        <div class="chart-desc">रंग: 🟡 बड़े परिवार (4+) &nbsp;|&nbsp; 🔵 मध्यम (2-3) &nbsp;|&nbsp; 🟢 एकल (1)</div>
+        <div class="house-map" id="houseMap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: Surname & Family Names -->
+  <div class="section">
+    <div class="section-label">उपनाम विश्लेषण — Surname Analysis</div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">प्रमुख उपनाम / जाति समूह</div>
+        <div class="chart-desc">सर्वाधिक सामान्य उपनाम</div>
+        <div class="chart-wrap"><canvas id="surnameChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">मतदाता ID उपसर्ग</div>
+        <div class="chart-desc">ID श्रृंखला वितरण</div>
+        <div class="chart-wrap"><canvas id="idPrefixChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: Priority Voter Lists (Tabs) -->
+  <div class="section">
+    <div class="section-label">प्राथमिक मतदाता सूचियाँ — Priority Voter Lists</div>
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('senior')">वरिष्ठ नागरिक</button>
+      <button class="tab-btn" onclick="switchTab('youth')">युवा मतदाता</button>
+      <button class="tab-btn" onclick="switchTab('women')">महिला मतदाता</button>
+      <button class="tab-btn" onclick="switchTab('couples')">दम्पती</button>
+      <button class="tab-btn" onclick="switchTab('single')">एकल निवासी</button>
+    </div>
+
+    <div id="tab-senior" class="tab-pane active">
+      <div class="voter-grid" id="seniorList"></div>
+    </div>
+    <div id="tab-youth" class="tab-pane">
+      <div class="voter-grid" id="youthList"></div>
+    </div>
+    <div id="tab-women" class="tab-pane">
+      <div class="voter-grid" id="womenList"></div>
+    </div>
+    <div id="tab-couples" class="tab-pane">
+      <div id="couplesList"></div>
+    </div>
+    <div id="tab-single" class="tab-pane">
+      <div class="voter-grid" id="singleList"></div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: Voter Search -->
+  <div class="section">
+    <div class="section-label">मतदाता खोज — Voter Search</div>
+    <div class="search-box">
+      <input class="search-input" id="searchInput" placeholder="नाम / मकान नं / Voter ID से खोजें..." oninput="searchVoters()">
+      <input class="search-input" id="ageFilter" type="number" placeholder="न्यूनतम उम्र..." style="max-width:150px;" oninput="searchVoters()">
+      <input class="search-input" id="ageFilterMax" type="number" placeholder="अधिकतम उम्र..." style="max-width:150px;" oninput="searchVoters()">
+      <select class="search-input" id="genderFilter" onchange="searchVoters()" style="max-width:160px;">
+        <option value="">सभी लिंग</option>
+        <option value="पुरुष">पुरुष</option>
+        <option value="महिला">महिला</option>
+      </select>
+    </div>
+    <div id="searchResults" class="voter-grid"></div>
+    <div id="searchCount" style="margin-top:12px; font-size:13px; color:var(--text-dim); font-family:'JetBrains Mono',monospace;"></div>
+  </div>
+
+  <!-- SECTION 7: Strategic Insights -->
+  <div class="section">
+    <div class="section-label">चुनावी रणनीति — Electoral Strategy Insights</div>
+    <div class="insight-list" id="insightList"></div>
+  </div>
+
+  <!-- SECTION 8: House-wise complete breakdown -->
+  <div class="section">
+    <div class="section-label">घरवार विवरण — House-wise Complete Breakdown</div>
+    <div class="search-box">
+      <input class="search-input" id="houseSearch" placeholder="मकान नं से खोजें..." oninput="filterHouseTable()">
+    </div>
+    <div class="table-scroll">
+      <table class="house-table" id="houseTable">
+        <thead>
+          <tr>
+            <th>मकान नं</th>
+            <th>मतदाता</th>
+            <th>पुरुष</th>
+            <th>महिला</th>
+            <th>औसत उम्र</th>
+            <th>सबसे बड़े</th>
+            <th>सबसे छोटे</th>
+          </tr>
+        </thead>
+        <tbody id="houseTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>वार्ड 7 — रहीघाट चुनाव विश्लेषण</span> &nbsp;|&nbsp; नगर पंचायत ठियोग, शिमला &nbsp;|&nbsp; डेटा स्रोत: राज्य निर्वाचन आयोग हिमाचल प्रदेश
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  DATA — embedded from CSV (same folder fetch)
+// ─────────────────────────────────────────────
+const CSV_DATA = `Serial No,Voter ID,Name,Parent/Spouse Name,Relation Type,Age,Gender,House No
+1,TZZ0056770,कन्हैया लाल,हरि प्रसाद,पिता,39,पुरुष,47/13
+2,TZZ0321794,रिंकी गुप्ता,कन्हैया गुप्ता,पति,36,महिला,47/13
+3,CRW0598615,गीता शर्मा,श्याम शर्मा,पति,56,महिला,52/18
+4,TZZ0174268,शशांक शर्मा,श्याम शर्मा,पिता,29,पुरुष,52/18
+5,TZZ0474221,हरप्रीत सिंह,गुरचरण सिंह,पिता,36,पुरुष,5/2
+6,HP/01/007/111097,सावित्री,बालकराम,पति,78,महिला,1
+7,TZZ0468769,दिनेश सिंह,बालकराम,पिता,53,पुरुष,1
+8,CRW0531228,अनिता,दिनेश,पति,50,महिला,1
+9,TZZ0322008,ऋतिक वर्मा,दिनेश वर्मा,पिता,24,पुरुष,1
+10,TZZ0408666,ऋतिक वर्मा,दिनेश वर्मा,पिता,24,पुरुष,1
+11,TZZ0408674,अमन वर्मा,दिनेश वर्मा,पिता,23,पुरुष,1
+12,TZZ0503458,रीना,बलदेव,पिता,20,महिला,1
+13,HP/01/007/111555,बिमला,ज्ञान सिंह,पति,66,महिला,2
+14,CRW0658245,विवेक,ज्ञान सिंह,पिता,40,पुरुष,2
+15,CRW0594879,विपिन,ज्ञान सिंह,पिता,38,पुरुष,2
+16,TZZ0212928,निशा वर्मा,विपिन वर्मा,पति,38,महिला,2
+17,TZZ0300145,दिनेश शर्मा,शिव राम शर्मा,पिता,49,पुरुष,4
+18,TZZ0374512,रवीना,गौरव,पिता,36,महिला,4
+19,TZZ0474361,वंशज,दिनेश शर्मा,पिता,22,पुरुष,4
+20,TZZ0519280,विभूति शर्मा,दिनेश,पिता,19,महिला,4
+21,HP/01/007/111327,प्रेम सिंह,सीता राम,पिता,67,पुरुष,6/1
+22,CRW0594440,सुनिल,प्रेम सिंह,पिता,41,पुरुष,6/1
+23,TZZ0322016,सोनू वर्मा,सुनील वर्मा,पति,36,महिला,6/1
+24,TZZ0457507,इंदर सिंह कमल,बसिया राम कमल,पिता,62,पुरुष,6/2क
+25,CRW0658237,ओम प्रकाश,आजि राम,पिता,55,पुरुष,6/2क
+26,CRW0594887,सुभद्रा शर्मा,ओम प्रकाश,पति,52,महिला,6/2क
+27,TZZ0198580,पूनम कमल,इन्द्र सिंह,पिता,28,महिला,6/2क
+28,TZZ0457648,चिराग शर्मा,ओम प्रकाश शर्मा,पिता,22,पुरुष,6/2क
+29,HP/01/007/111277,केदार सिंह,गंगा राम,पिता,59,पुरुष,8/1
+30,HP/01/007/111278,राधा,केदार सिंह,पति,56,महिला,8/1
+31,HP/01/007/111746,विनायक सिंह,गंगा राम,पिता,54,पुरुष,8/1
+32,CRW0531095,रमा देवी,विनायक,पति,51,महिला,8/1
+33,TZZ0322032,शुभम वर्मा,विनायक सिंह वर्मा,पिता,29,पुरुष,8/1
+34,TZZ0322040,मीरा वर्मा,विनायक वर्मा,पिता,27,महिला,8/1
+35,CRW0531376,विरेन्द्र,दीवान चन्द,पिता,43,पुरुष,8/3
+36,CRW0594960,विनोद,दीवान चंद,पिता,39,पुरुष,8/3
+37,TZZ0515601,काजल शर्मा,वीरेंद्र,पति,35,महिला,8/3
+38,TZZ0435230,भावना वर्मा,विनोद,पति,33,महिला,8/3
+39,TZZ0216523,अनिल कुमार,बनवार लाल,पिता,30,पुरुष,10
+40,TZZ0216515,सुनील कुमार,बनवार लाल,पिता,28,पुरुष,10
+41,CRW0595041,द्रौपदा,मोती राम,पति,60,महिला,10/1
+42,CRW0531749,गीता देवी,महेश कुमार,पति,56,महिला,10/क
+43,TZZ0057257,अमर गुप्ता,महेश गुप्ता,पिता,34,पुरुष,10/क
+44,TZZ0156372,नीरज गुप्ता,महेश गुप्ता,पिता,31,पुरुष,10/क
+45,TZZ0006569,शारदा,राजेन्द्र,पति,54,महिला,11/1
+46,TZZ0474429,मीना,रमेश चौहान,पति,50,महिला,11/1
+47,TZZ0042366,भीम सिंह,परमा नन्द,पिता,47,पुरुष,11/1
+48,CRW0495135,सुरेश,परमा नन्द,पिता,43,पुरुष,11/1
+49,TZZ0130195,सुनिल,राजीन्द्र सिंह,पिता,36,पुरुष,11/1
+50,TZZ0192989,अनीता,सुनील वेकटा,पति,33,महिला,11/1
+51,TZZ0192997,साहिल वेकटा,शारदा देवी,माता,33,पुरुष,11/1
+52,TZZ0470211,शैलजा,सुरेश,पति,30,महिला,11/1
+53,TZZ0457945,रंजना देवी,साहिल वेकटा,पति,27,महिला,11/1
+54,CRW0595025,सुन्नी देवी,राजेन्द्र प्रकाश,पति,74,महिला,15/2
+55,TZZ0356022,बिमला देवी,कौशल किशोर,पति,57,महिला,17/3
+56,CRW0658344,अनुप गुप्ता,कौशल युगल,पिता,40,पुरुष,17/3
+57,CRW0594846,किशन सिंह,ध्यान सिंह,पिता,82,पुरुष,17/6
+58,CRW0594572,अयोध्या,किशन सिंह,पति,74,महिला,17/6
+59,CRW0496968,वन्दना,संजीव,पति,49,महिला,17/6
+60,TZZ0359539,संजीव,किशन सिंह,पिता,46,पुरुष,17/6
+61,CRW0402339,कैलाश,हरवंश लाल,पति,61,महिला,17/8
+62,TZZ0068973,सुमित ग्रोवर,हरवंश लाल ग्रोवर,पिता,36,पुरुष,17/8
+63,TZZ0519363,वैष्णवी ठाकुर,संजीव ठाकुर,पिता,20,महिला,17/9
+64,CRW0531541,गीता,पप्पू,पति,47,महिला,18/1
+65,CRW0531533,पप्पू,छिंदूलाल,पिता,47,पुरुष,18/1
+66,TZZ0135715,सविता सोनी,तुलसी राम,पिता,38,महिला,18/1
+67,HP/01/007/111107,केहर सिंह,जीवन सिंह,पिता,88,पुरुष,18/14
+68,HP/01/007/111236,राजेश,केहर सिंह,पिता,50,पुरुष,18/14
+69,TZZ0359836,रमेश,केहर सिंह,पिता,48,पुरुष,18/14
+70,CRW0493940,राकेश,केहर सिंह,पिता,47,पुरुष,18/14
+71,CRW0496182,नीना,राजेश,पति,47,महिला,18/14
+72,CRW0680520,अल्पना,राकेश,पति,38,महिला,18/14
+73,TZZ0470229,प्रिया वर्मा,रमेश वर्मा,पिता,20,महिला,18/14
+74,TZZ0470237,विकेश वर्मा,राजेश वर्मा,पिता,20,पुरुष,18/14
+75,TZZ0457606,सीमा,सुरज,पति,27,महिला,18/15
+76,TZZ0217604,सूरज,पप्पू,पिता,27,पुरुष,18/15
+77,TZZ0404889,कृष्ण मोहन कुमार पंडित,शिवनाथ पंडित,पिता,33,पुरुष,18/6
+78,TZZ0135335,अतुल सोनी,तुलसी राम,पिता,31,पुरुष,18/7
+79,HP/01/007/111311,मोती देवी,हेत राम,पति,70,महिला,20/1
+80,TZZ0499533,हेम राज,हेत राम,पिता,58,पुरुष,20/1
+81,TZZ0357822,सरिता वर्मा,हेम राज,पति,54,महिला,20/1
+82,TZZ0359521,राजेश,हेत राम,पिता,52,पुरुष,20/1
+83,CRW0658419,दीपिका,राजेश,पति,50,महिला,20/1
+84,TZZ0093534,सुरजीत सिंह,रूप सिंह,पिता,49,पुरुष,20/1
+85,TZZ0093542,अनिता कुमार,सुरजीत सिंह,पति,47,महिला,20/1
+86,TZZ0180208,आकाश वर्मा,हेमराज वर्मा,पिता,29,पुरुष,20/1
+87,TZZ0284646,दीक्षा वर्मा,हेम राज वर्मा,पिता,27,महिला,20/1
+88,TZZ0403568,मुस्कान वर्मा,राजेश वर्मा,पिता,23,महिला,20/1
+89,TZZ0500512,अभिनीत सिंह,सुरजीत सिंह,पिता,22,पुरुष,20/1
+90,CRW0483925,पवन,सूरत राम,पिता,53,पुरुष,20/1क
+91,TZZ0042457,निर्मला,पवन,पति,52,महिला,20/1क
+92,TZZ0006593,देवा नन्द,सूरत राम,पिता,45,पुरुष,20/1क
+93,TZZ0075556,प्रदीप,सूरत राम,पिता,41,पुरुष,20/1क
+94,TZZ0361881,राकेश चन्द,बतन चन्द,पिता,68,पुरुष,20/2
+95,TZZ0357889,सुभद्रा,राकेश चन्द,पति,68,महिला,20/2
+96,TZZ0457804,करनैल सिंह,अनंत राम,पिता,53,पुरुष,20/2
+97,TZZ0457762,वीरेंद्र कुमार,राजन कुमार,पति,35,महिला,20/2
+98,TZZ0457515,पूजा देवी,संदीप कुमार,पति,32,महिला,20/2
+99,TZZ0457408,विभोर तोमर,राजू तोमर,पिता,21,पुरुष,20/2
+100,TZZ0006361,राजेश कुमार,बदन सिंह,पिता,44,पुरुष,20/2क
+101,CRW0594713,राजन,राकेश चंद,पिता,44,पुरुष,20/2क
+102,TZZ0006346,रीना,राजेश कुमार,पति,41,महिला,20/2क
+103,CRW0594499,राजू तोमर,प्रकाश तोमर,पिता,54,पुरुष,20/2ङ
+104,CRW0594366,तृप्ति तोमर,राजू तोमर,पति,50,महिला,20/2ङ
+105,TZZ0371161,जगवती,श्री प्रसाद,पति,75,महिला,20/2ड
+106,TZZ0489948,नदीम,बाबू,पिता,31,पुरुष,20/2ड
+107,TZZ0338780,संदीप कुमार,राकेश चंद,पिता,34,पुरुष,20/2 रहघाट ठियोग
+108,CRW0401570,कांशी राम,माठूराम,पिता,74,पुरुष,20/3
+109,CRW0594549,शारदा,कांशी राम,पति,63,महिला,20/3
+110,CRW0401547,सुनिल,कांशी राम,पिता,45,पुरुष,20/3
+111,CRW0401562,सतीश,कांशी राम,पिता,45,पुरुष,20/3
+112,CRW0594556,वीना,सतीश,पति,41,महिला,20/3
+113,TZZ0371211,यशोदा शर्मा,भूपेन्द्र शर्मा,पति,65,महिला,20/3क
+114,TZZ0371179,अक्षय शर्मा,भूपेंद्र शर्मा,पिता,35,पुरुष,20/3क
+115,TZZ0376632,दीपिका,अमन शर्मा,पति,33,महिला,20/3क
+116,TZZ0371187,अमन शर्मा,भूपेंद्र शर्मा,पिता,32,पुरुष,20/3क
+117,TZZ0371229,पूजा,अक्षय शर्मा,पति,30,महिला,20/3क
+118,TZZ0006155,शोभा वर्मा,परस राम वर्मा,पति,73,महिला,20/5
+119,TZZ0006130,सुभद्रा वर्मा,परस राम वर्मा,पिता,55,महिला,20/5
+120,TZZ0042317,वीरेन्द्र वर्मा,परस राम वर्मा,पिता,53,पुरुष,20/5
+121,TZZ0042341,उषा वर्मा,वीरेन्द्र वर्मा,पति,48,महिला,20/5
+122,TZZ0006163,संजीव वर्मा,परस राम वर्मा,पिता,47,पुरुष,20/5
+123,TZZ0056937,उषा वर्मा,संजीव वर्मा,पति,38,महिला,20/5
+124,TZZ0507392,नियति तोमर,राजू तोमर,पिता,19,महिला,20/5डी
+125,TZZ0321984,सुनीता कश्यप,इन्द्र सिंह कश्यप,पति,66,महिला,22/1
+126,TZZ0322057,भारती कश्यप,इन्द्र सिंह कश्यप,पिता,30,महिला,22/1
+127,TZZ0056978,राधा,शिव राम,पति,60,महिला,22/7ग
+128,TZZ0056994,पूजा,शिव राम,पिता,35,महिला,22/7ग
+129,TZZ0151753,राज कुमार,कमल चन्द,पिता,60,पुरुष,25
+130,TZZ0151761,शशी बाला,राज कुमार,पति,57,महिला,25
+131,TZZ0155671,रश पाल सिंह,राज कुमार,पिता,32,पुरुष,25
+132,TZZ0193003,मोनिका,सोहन लाल,पति,36,महिला,25/ए
+133,TZZ0151779,सोहन लाल,राज कुमार,पिता,36,पुरुष,25/क
+134,TZZ0284687,मेघा,कमल जीत ग्रोवर,पति,33,महिला,30/1
+135,TZZ0061838,प्रकाश चंद,ध्यान चंद,पिता,69,पुरुष,30/1क
+136,CRW0645275,सुमित्रा,सुरेश,पति,49,महिला,51/4
+137,TZZ0322172,सुरभि शर्मा,श्याम शर्मा,पिता,25,महिला,52/18
+138,HP/01/007/111482,सोमा,रामा नंद,पति,75,महिला,54/4
+139,HP/01/007/111422,अरुणा,ज्ञान प्रकाश,पति,78,महिला,62/4
+140,HP/01/007/111443,अक्षय कुमार,ज्ञान प्रकाश,पिता,51,पुरुष,62/4
+141,TZZ0067173,राजेश गुलाटी,अर्जुन देव गुलाटी,पिता,51,पुरुष,62/4
+142,CRW0494963,अतुल,ज्ञान प्रकाश,पिता,48,पुरुष,62/4
+143,CRW0401950,अंकुर,ज्ञान प्रकाश,पिता,45,पुरुष,62/4
+144,CRW0658286,तृप्ति सूद,अक्षय कुमार,पति,43,महिला,62/4
+145,TZZ0108092,सुनिता गुलाटी,राजेश गुलाटी,पति,44,महिला,62/49
+146,TZZ0338335,संजीव कुमार,शालग राम,पिता,50,पुरुष,63
+147,TZZ0338343,अंजू बाला,संजीव कुमार,पति,45,महिला,63
+148,TZZ0006429,निशा देवी,पवन कुमार,पति,50,महिला,63/1
+149,HP/01/007/111377,राज कुमार,अबीर राम,पिता,54,पुरुष,63/3
+150,HP/01/007/111474,फूला देवी,राज कुमार,पति,51,महिला,63/3
+151,TZZ0195560,सुरेन्द्र कुमार,राज कुमार,पिता,31,पुरुष,63/3
+152,CRW0402214,अजय,परस राम,पिता,48,पुरुष,63/4
+153,TZZ0104232,दुर्गा सिंह खाची,गंगा राम खाची,पिता,60,पुरुष,63/4क
+154,CRW0531558,विद्या सागर,हरि नन्द,पिता,63,पुरुष,65/1ख
+155,CRW0531442,वनीता,विद्या सागर,पति,53,महिला,65/1ख
+156,TZZ0468942,प्रतिभा शर्मा,विद्या सागर शर्मा,पिता,26,महिला,65/1ख
+157,TZZ0385435,अभिषेक,विद्या सागर,पिता,23,पुरुष,65/1ख
+158,CRW0594994,सुनीता,गीता राम,पति,49,महिला,92/5
+159,TZZ0359695,मोहन लाल,ब्रह्मा नन्द,पिता,68,पुरुष,92/9
+160,TZZ0359877,स्वर्णा देवी,मोहन लाल,पति,65,महिला,92/9
+161,TZZ0359869,रानी देवी,राकेश,पति,56,महिला,92/9
+162,TZZ0359851,मनोज,ब्रह्म नंद,पिता,55,पुरुष,92/9
+163,CRW0594523,सुमन,मनोज,पति,48,महिला,92/9
+164,CRW0658278,वरुण शर्मा,मोहन लाल,पिता,40,पुरुष,92/9
+165,TZZ0217612,अंशुल शर्मा,राकेश शर्मा,पिता,31,पुरुष,92/9
+166,TZZ0284778,श्रुति शर्मा,राकेश शर्मा,पिता,30,महिला,92/9
+167,HP/01/007/111251,ज्ञान सिंह,नारायण सिंह,पिता,68,पुरुष,97/2क
+168,HP/01/007/111252,विद्या,ज्ञान सिंह,पति,65,महिला,97/2क
+169,CRW0531517,मीरा,नारायण सिंह,पिता,59,महिला,97/2क
+170,HP/01/007/111655,सुरेन्द्र,बालकराम,पिता,61,पुरुष,100/4
+171,CRW9927286,ललता ठाकुर,एस एस ठाकुर,पति,61,महिला,100/4
+172,TZZ0217638,अंशुल ठाकुर,सुरेन्द्र सिंह ठाकुर,पिता,28,महिला,100/4
+173,TZZ0403410,आंचल ठाकुर,सुरेन्द्र ठाकुर,पिता,25,महिला,100/4
+174,TZZ0385187,अदिति ठाकूर,सुरेंद्र सिंह,पिता,23,महिला,100/4
+175,HP/01/007/111220,सुंदर,कांशी राम,पति,70,महिला,101/1
+176,CRW0594291,पुष्पा शर्मा,तारा दत्त,पति,51,महिला,101/1
+177,HP/01/007/111200,कृष्ण दत्त,कांशी राम,पिता,48,पुरुष,101/1
+178,HP/01/007/111684,तारा दत्त,कांशी राम,पिता,44,पुरुष,101/1
+179,CRW0594341,सारिका,कृष्ण दत्त,पति,43,महिला,101/1
+180,TZZ0474577,ज्योति शर्मा,तारा दत्त,पिता,23,महिला,101/1
+181,TZZ0457812,आयुष शर्मा,कृष्ण दत्त शर्मा,पिता,22,पुरुष,101/1
+182,TZZ0457820,नियति शर्मा,कृष्ण दत्त शर्मा,पिता,20,महिला,101/1
+183,CRW0594457,पद्मा देवी,ज्ञान सिंह,पति,61,महिला,104/2
+184,TZZ0519355,सुलोचना देवी,संजीव कुमार,पति,48,महिला,104/2
+185,CRW0486670,संजीव कुमार,ज्ञान सिंह,पिता,45,पुरुष,104/2
+186,HP/01/007/111515,निरम दास,आत्मा राम,पिता,71,पुरुष,105/5
+187,HP/01/007/111518,सावित्री,निरम दास,पति,69,महिला,105/5
+188,CRW0531020,रोहित,नीरम दास,पिता,47,पुरुष,105/5
+189,TZZ0130179,काजल,रोहित,पति,38,महिला,105/5
+190,HP/01/007/111164,हिम्मत सिंह,हरिदत्त,पिता,72,पुरुष,106/8
+191,CRW0485565,संदीप,हिम्मत सिंह,पिता,48,पुरुष,106/8
+192,CRW0402594,प्रदीप,हिम्मत सिंह,पिता,47,पुरुष,106/8
+193,HP/01/007/111163,राजीव,रति राम,पिता,60,पुरुष,106/9
+194,HP/01/007/111286,संजीव,रति राम,पिता,52,पुरुष,106/9
+195,HP/01/007/111287,अनिता,राजीव,पति,51,महिला,106/9
+196,CRW0483545,बीना,धीरज,पति,49,महिला,106/9
+197,TZZ0493023,शंकर चौहान,राम प्रकाश,पिता,46,पुरुष,106/9
+198,TZZ0495671,राखी चौहान,शंकर चौहान,पति,38,महिला,106/9
+199,TZZ0328419,अभिषेक वर्मा,धीरज वर्मा,पिता,24,पुरुष,106/9
+200,HP/01/007/111609,लीला देवी,सुरेश,पति,57,महिला,108/3
+201,CRW0402792,निशांत,सुरेश,पिता,41,पुरुष,108/3
+202,TZZ0050120,विकास,सुरेश,पिता,38,पुरुष,108/3
+203,CRW0594812,राधिका,देव राज,पति,45,महिला,108/5
+204,TZZ0252387,ट्विंकल शर्मा,देव राज शर्मा,पिता,26,महिला,108/5
+205,TZZ0304824,दितिका शर्मा,देव राज शर्मा,पिता,25,महिला,108/5
+206,HP/01/007/111195,सावित्री,हरिदत्त,पति,74,महिला,108/7
+207,CRW0130062,सत्या,हरिदत्त,पिता,56,महिला,108/7
+208,CRW0129270,राजेन्द्र,हरिदत्त,पिता,55,पुरुष,108/7
+209,TZZ0078188,संगीता देवी,राजेन्द्र वेकटा,पति,48,महिला,108/7
+210,TZZ0338137,वंशिता वेकटा,राजेन्द्र वेकटा,पिता,24,महिला,108/7
+211,TZZ0515593,ऋषिता वेकटा,राजेंद्र वेकटा,पिता,21,महिला,108/7
+212,CRW0594234,सरोज,उद राम,पति,79,महिला,110
+213,TZZ0284752,राहुल गुप्ता,राम फेर,पिता,28,पुरुष,210
+214,TZZ0104257,सतवन्त कौर,राम स्वरूप,पति,94,महिला,301
+215,CRW0531244,कुलदीप सिंह,राम स्वरूप,पिता,70,पुरुष,301/1
+216,CRW0486381,सुरेन्द्र सिंह,राम स्वरूप,पिता,59,पुरुष,301/1
+217,CRW0486399,मनजीत कौर,सुरेन्द्र,पति,53,महिला,301/1
+218,TZZ0068999,कमलजीत ग्रोवर,कुलदीप ग्रोवर,पिता,34,पुरुष,301/1
+219,TZZ0069005,परमजीत सिंह,कुलदीप,पिता,34,पुरुष,301/1
+220,TZZ0163493,अवनीत ग्रोवर,सुरेन्द्र सिंह,पिता,30,महिला,301/1
+221,TZZ0457580,हर्षवीर ग्रोवर,सुरेंद्र सिंह ग्रोवर,पिता,26,पुरुष,301/1
+222,TZZ0192948,अंजल शर्मा,रमेश शर्मा,पिता,30,महिला,310
+223,TZZ0393470,अंशुल शर्मा,रमेश शर्मा,पिता,23,पुरुष,310
+224,TZZ0427989,साहिल भंडार,दोजैलामा,सम्बन्धी,22,पुरुष,972
+225,TZZ0505842,प्रथा वर्मा,धीरज वर्मा,पिता,21,महिला,कोकिला निवास
+226,TZZ0337956,अमन शर्मा,यशोदा शर्मा,माता,32,पुरुष,यशोदा निवास
+227,TZZ0360537,प्रवीण कुमार,प्यारे लाल,पिता,52,पुरुष,28/4
+228,CRW0597203,रमा देवी,प्रवीण कुमार,पति,47,महिला,28/4
+229,CRW0402040,सुनीता,राकेश,पति,45,महिला,28/4
+230,TZZ0335398,वैशाली,राकेश कुमार,पिता,25,महिला,28/4
+231,HP/01/007/111058,कृष्ण देव,चिंत राम,पिता,60,पुरुष,3/1
+232,HP/01/007/111263,रीना,कृष्ण देव,पति,52,महिला,3/1
+233,TZZ0333054,शानुज कौशल,कृष्ण देव कौशल,पिता,25,पुरुष,3/1`;
+
+// ─────────────────────────────────────────────
+//  PARSE CSV
+// ─────────────────────────────────────────────
+function parseCSV(csv) {
+  const lines = csv.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    const vals = line.split(',');
+    const obj = {};
+    headers.forEach((h, i) => obj[h.trim()] = (vals[i] || '').trim());
+    obj.Age = parseInt(obj.Age) || 0;
+    return obj;
+  });
+}
+
+let voters = [];
+let houseData = {};
+let allSearchResults = [];
+
+function init() {
+  voters = parseCSV(CSV_DATA);
+
+  // Build house map
+  voters.forEach(v => {
+    const h = v['House No'];
+    if (!houseData[h]) houseData[h] = [];
+    houseData[h].push(v);
+  });
+
+  buildKPIs();
+  buildCharts();
+  buildAgeBars();
+  buildHouseMap();
+  buildPriorityLists();
+  buildInsights();
+  buildHouseTable();
+  searchVoters();
+
+  document.getElementById('mainContent').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('loadingScreen').classList.add('hidden');
+  }, 400);
+}
+
+// ─────────────────────────────────────────────
+//  KPIs
+// ─────────────────────────────────────────────
+function buildKPIs() {
+  const total = voters.length;
+  const male = voters.filter(v => v.Gender === 'पुरुष').length;
+  const female = voters.filter(v => v.Gender === 'महिला').length;
+  const ages = voters.map(v => v.Age).filter(a => a > 0);
+  const avgAge = (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1);
+  const maxAge = Math.max(...ages);
+  const minAge = Math.min(...ages);
+  const houses = Object.keys(houseData).length;
+  const senior = voters.filter(v => v.Age >= 60).length;
+  const youth = voters.filter(v => v.Age >= 18 && v.Age <= 35).length;
+  const firstTime = voters.filter(v => v.Age >= 18 && v.Age <= 22).length;
+  const couples = findCouples().length;
+  const singleHouses = Object.values(houseData).filter(h => h.length === 1).length;
+  const largeFamily = Object.values(houseData).filter(h => h.length >= 5).length;
+  const oldestVoter = voters.find(v => v.Age === maxAge);
+  const womenPct = ((female/total)*100).toFixed(1);
+
+  // TZZ IDs (possibly new registrations)
+  const tzzCount = voters.filter(v => v['Voter ID'].startsWith('TZZ')).length;
+  const hpCount = voters.filter(v => v['Voter ID'].startsWith('HP')).length;
+  const crwCount = voters.filter(v => v['Voter ID'].startsWith('CRW')).length;
+
+  const kpis = [
+    { label: 'कुल मतदाता', value: total, icon: '🗳️', color: '' },
+    { label: 'पुरुष मतदाता', value: male, icon: '👨', color: 'blue' },
+    { label: 'महिला मतदाता', value: female, icon: '👩', color: 'pink' },
+    { label: 'औसत आयु', value: avgAge + ' वर्ष', icon: '📊', color: '' },
+    { label: 'कुल घर / मकान', value: houses, icon: '🏠', color: 'green' },
+    { label: 'वरिष्ठ नागरिक (60+)', value: senior, icon: '👴', color: '' },
+    { label: 'युवा मतदाता (18-35)', value: youth, icon: '🧑', color: 'blue' },
+    { label: 'पहली बार (18-22)', value: firstTime, icon: '✨', color: 'green' },
+    { label: 'दम्पती (पहचाने)', value: couples, icon: '👫', color: 'pink' },
+    { label: 'सबसे बड़े मतदाता', value: maxAge + ' वर्ष', icon: '🎖️', color: '' },
+    { label: 'सबसे छोटे मतदाता', value: minAge + ' वर्ष', icon: '🌱', color: 'green' },
+    { label: 'एकल निवासी घर', value: singleHouses, icon: '🏡', color: 'blue' },
+    { label: 'बड़े परिवार (5+)', value: largeFamily, icon: '👨‍👩‍👧‍👦', color: 'pink' },
+    { label: 'महिला प्रतिशत', value: womenPct + '%', icon: '⚖️', color: '' },
+    { label: 'TZZ ID (नए)', value: tzzCount, icon: '🆕', color: 'green' },
+    { label: 'HP पुराने ID', value: hpCount, icon: '📋', color: 'blue' },
+  ];
+
+  const grid = document.getElementById('kpiGrid');
+  grid.innerHTML = kpis.map(k => `
+    <div class="kpi-card ${k.color}">
+      <span class="kpi-icon">${k.icon}</span>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-label">${k.label}</div>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────
+//  CHARTS
+// ─────────────────────────────────────────────
+const COLORS = ['#e8a045','#4a9eff','#c45c8a','#52d48a','#f06292','#ab47bc','#26c6da','#ffa726','#66bb6a','#ef5350'];
+
+function buildCharts() {
+  const male = voters.filter(v => v.Gender === 'पुरुष').length;
+  const female = voters.filter(v => v.Gender === 'महिला').length;
+
+  // Gender donut
+  new Chart(document.getElementById('genderChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['पुरुष', 'महिला'],
+      datasets: [{ data: [male, female], backgroundColor: ['#4a9eff','#c45c8a'], borderWidth: 0, hoverOffset: 8 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#888899', font: { family: 'DM Sans', size: 13 }, padding: 20 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} (${((ctx.parsed/(male+female))*100).toFixed(1)}%)` } }
+      },
+      cutout: '68%'
+    }
+  });
+
+  // Age group stacked bar
+  const ageGroups = ['18-25','26-35','36-45','46-55','56-65','66-75','76+'];
+  const maleAges = ageGroups.map(g => {
+    const [lo, hi] = g === '76+' ? [76, 999] : g.split('-').map(Number);
+    return voters.filter(v => v.Gender==='पुरुष' && v.Age>=lo && v.Age<=hi).length;
+  });
+  const femaleAges = ageGroups.map(g => {
+    const [lo, hi] = g === '76+' ? [76, 999] : g.split('-').map(Number);
+    return voters.filter(v => v.Gender==='महिला' && v.Age>=lo && v.Age<=hi).length;
+  });
+
+  new Chart(document.getElementById('ageGroupChart'), {
+    type: 'bar',
+    data: {
+      labels: ageGroups,
+      datasets: [
+        { label: 'पुरुष', data: maleAges, backgroundColor: 'rgba(74,158,255,0.8)', borderRadius: 4 },
+        { label: 'महिला', data: femaleAges, backgroundColor: 'rgba(196,92,138,0.8)', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#888899', font: { family: 'DM Sans' } } } },
+      scales: {
+        x: { grid: { color: '#2a2a40' }, ticks: { color: '#888899' }, stacked: false },
+        y: { grid: { color: '#2a2a40' }, ticks: { color: '#888899' } }
+      }
+    }
+  });
+
+  // House size distribution
+  const sizeCounts = {};
+  Object.values(houseData).forEach(h => {
+    const s = h.length;
+    sizeCounts[s] = (sizeCounts[s] || 0) + 1;
+  });
+  const sizeLabels = Object.keys(sizeCounts).sort((a,b)=>a-b);
+
+  new Chart(document.getElementById('houseSizeChart'), {
+    type: 'bar',
+    data: {
+      labels: sizeLabels.map(s => `${s} मतदाता`),
+      datasets: [{ data: sizeLabels.map(s => sizeCounts[s]), backgroundColor: COLORS, borderRadius: 6, borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#2a2a40' }, ticks: { color: '#888899' } },
+        y: { grid: { color: '#2a2a40' }, ticks: { color: '#888899' } }
+      }
+    }
+  });
+
+  // Top 10 houses
+  const topHouses = Object.entries(houseData)
+    .sort((a,b) => b[1].length - a[1].length).slice(0, 10);
+
+  new Chart(document.getElementById('topHousesChart'), {
+    type: 'bar',
+    data: {
+      labels: topHouses.map(([h]) => 'मकान ' + h),
+      datasets: [{ data: topHouses.map(([,v]) => v.length), backgroundColor: '#e8a045aa', borderRadius: 4, borderWidth: 0 }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#2a2a40' }, ticks: { color: '#888899' } },
+        y: { grid: { color: '#2a2a40' }, ticks: { color: '#888899', font: { size: 11 } } }
+      }
+    }
+  });
+
+  // Surname chart
+  const surnames = {};
+  voters.forEach(v => {
+    const parts = v.Name.split(' ');
+    const last = parts[parts.length - 1];
+    const commonSurnames = ['शर्मा','वर्मा','सिंह','गुप्ता','ठाकुर','कश्यप','सोनी','तोमर','ग्रोवर','चौहान','कुमार','देवी','राम','कौर'];
+    commonSurnames.forEach(s => {
+      if (v.Name.includes(s)) surnames[s] = (surnames[s] || 0) + 1;
+    });
+  });
+  const sortedSurnames = Object.entries(surnames).sort((a,b)=>b[1]-a[1]).slice(0,10);
+
+  new Chart(document.getElementById('surnameChart'), {
+    type: 'bar',
+    data: {
+      labels: sortedSurnames.map(([s]) => s),
+      datasets: [{ data: sortedSurnames.map(([,c]) => c), backgroundColor: COLORS, borderRadius: 4, borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#2a2a40' }, ticks: { color: '#888899' } },
+        y: { grid: { color: '#2a2a40' }, ticks: { color: '#888899' } }
+      }
+    }
+  });
+
+  // ID Prefix
+  const prefixes = { TZZ: 0, CRW: 0, 'HP/01': 0, Other: 0 };
+  voters.forEach(v => {
+    const id = v['Voter ID'];
+    if (id.startsWith('TZZ')) prefixes.TZZ++;
+    else if (id.startsWith('CRW')) prefixes.CRW++;
+    else if (id.startsWith('HP')) prefixes['HP/01']++;
+    else prefixes.Other++;
+  });
+
+  new Chart(document.getElementById('idPrefixChart'), {
+    type: 'pie',
+    data: {
+      labels: Object.keys(prefixes),
+      datasets: [{ data: Object.values(prefixes), backgroundColor: ['#e8a045','#4a9eff','#c45c8a','#52d48a'], borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#888899', font: { family: 'DM Sans', size: 13 }, padding: 16 } }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────────────────────
+//  AGE BARS
+// ─────────────────────────────────────────────
+function buildAgeBars() {
+  const groups = [
+    { label: '18-25 वर्ष', lo: 18, hi: 25, color: '#52d48a' },
+    { label: '26-35 वर्ष', lo: 26, hi: 35, color: '#4a9eff' },
+    { label: '36-45 वर्ष', lo: 36, hi: 45, color: '#e8a045' },
+    { label: '46-55 वर्ष', lo: 46, hi: 55, color: '#ffa726' },
+    { label: '56-65 वर्ष', lo: 56, hi: 65, color: '#c45c8a' },
+    { label: '66-75 वर्ष', lo: 66, hi: 75, color: '#ab47bc' },
+    { label: '76+ वर्ष',   lo: 76, hi: 999, color: '#ef5350' },
+  ];
+
+  const total = voters.length;
+  const container = document.getElementById('ageBarsContainer');
+  container.className = 'age-bars';
+
+  groups.forEach(g => {
+    const count = voters.filter(v => v.Age >= g.lo && v.Age <= g.hi).length;
+    const pct = ((count / total) * 100).toFixed(1);
+    const row = document.createElement('div');
+    row.className = 'age-row';
+    row.innerHTML = `
+      <div class="age-label">${g.label}</div>
+      <div class="age-bar-bg">
+        <div class="age-bar-fill" style="width:0%;background:${g.color};" data-width="${pct}">
+          ${pct > 5 ? pct + '%' : ''}
+        </div>
+      </div>
+      <div class="age-count">${count}</div>
+    `;
+    container.appendChild(row);
+  });
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.age-bar-fill').forEach(el => {
+      el.style.width = el.dataset.width + '%';
+    });
+  }, 500);
+}
+
+// ─────────────────────────────────────────────
+//  HOUSE MAP
+// ─────────────────────────────────────────────
+function buildHouseMap() {
+  const container = document.getElementById('houseMap');
+  const sorted = Object.entries(houseData).sort((a,b) => b[1].length - a[1].length);
+
+  sorted.forEach(([house, voters]) => {
+    const dot = document.createElement('div');
+    const size = voters.length;
+    dot.className = 'house-dot ' + (size >= 5 ? 'large' : size >= 3 ? 'medium' : 'small');
+    dot.textContent = size;
+    dot.title = `मकान ${house}: ${size} मतदाता\n${voters.map(v=>v.Name).join(', ')}`;
+    container.appendChild(dot);
+  });
+}
+
+// ─────────────────────────────────────────────
+//  COUPLES DETECTION
+// ─────────────────────────────────────────────
+function findCouples() {
+  const couples = [];
+  const used = new Set();
+
+  voters.forEach(v => {
+    if (used.has(v['Voter ID'])) return;
+    if (v['Relation Type'] === 'पति') {
+      // Find husband in same house
+      const spouseName = v['Parent/Spouse Name'];
+      const husband = voters.find(h =>
+        h['House No'] === v['House No'] &&
+        h.Gender === 'पुरुष' &&
+        (h.Name === spouseName || h.Name.includes(spouseName.split(' ')[0])) &&
+        !used.has(h['Voter ID'])
+      );
+      if (husband) {
+        couples.push({ wife: v, husband });
+        used.add(v['Voter ID']);
+        used.add(husband['Voter ID']);
+      }
+    }
+  });
+  return couples;
+}
+
+// ─────────────────────────────────────────────
+//  PRIORITY LISTS
+// ─────────────────────────────────────────────
+function voterCard(v) {
+  return `
+    <div class="voter-card">
+      <div class="voter-name">${v.Name}</div>
+      <div class="voter-id">${v['Voter ID']}</div>
+      <div class="voter-meta">
+        <span class="badge ${v.Gender==='पुरुष'?'badge-m':'badge-f'}">${v.Gender}</span>
+        <span>आयु: ${v.Age}</span>
+        <span>मकान: ${v['House No']}</span>
+      </div>
+    </div>
+  `;
+}
+
+function buildPriorityLists() {
+  // Seniors
+  const seniors = voters.filter(v => v.Age >= 60).sort((a,b) => b.Age - a.Age);
+  document.getElementById('seniorList').innerHTML = seniors.map(voterCard).join('');
+
+  // Youth
+  const youth = voters.filter(v => v.Age >= 18 && v.Age <= 35).sort((a,b) => a.Age - b.Age);
+  document.getElementById('youthList').innerHTML = youth.map(voterCard).join('');
+
+  // Women
+  const women = voters.filter(v => v.Gender === 'महिला').sort((a,b) => a.Age - b.Age);
+  document.getElementById('womenList').innerHTML = women.map(voterCard).join('');
+
+  // Couples
+  const couples = findCouples();
+  document.getElementById('couplesList').innerHTML = couples.map(c => `
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:11px;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">पति</div>
+        <div style="font-weight:600;">${c.husband.Name}</div>
+        <div style="font-size:12px;color:var(--text-dim);">आयु: ${c.husband.Age} | ${c.husband['Voter ID']}</div>
+      </div>
+      <div style="color:var(--accent2);font-size:20px;">👫</div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:11px;color:var(--accent2);font-family:'JetBrains Mono',monospace;margin-bottom:4px;">पत्नी</div>
+        <div style="font-weight:600;">${c.wife.Name}</div>
+        <div style="font-size:12px;color:var(--text-dim);">आयु: ${c.wife.Age} | ${c.wife['Voter ID']}</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;">मकान: ${c.wife['House No']}</div>
+    </div>
+  `).join('') || '<div style="color:var(--text-dim);padding:20px;">डेटा उपलब्ध नहीं</div>';
+
+  // Single households
+  const singleHouses = Object.values(houseData).filter(h => h.length === 1).map(h => h[0]);
+  document.getElementById('singleList').innerHTML = singleHouses.map(voterCard).join('');
+}
+
+// ─────────────────────────────────────────────
+//  SEARCH
+// ─────────────────────────────────────────────
+function searchVoters() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const ageMin = parseInt(document.getElementById('ageFilter').value) || 0;
+  const ageMax = parseInt(document.getElementById('ageFilterMax').value) || 999;
+  const gender = document.getElementById('genderFilter').value;
+
+  const results = voters.filter(v => {
+    const matchQuery = !query ||
+      v.Name.includes(query) ||
+      v['Voter ID'].toLowerCase().includes(query) ||
+      v['House No'].toLowerCase().includes(query) ||
+      v['Parent/Spouse Name'].includes(query);
+    const matchAge = v.Age >= ageMin && v.Age <= ageMax;
+    const matchGender = !gender || v.Gender === gender;
+    return matchQuery && matchAge && matchGender;
+  });
+
+  document.getElementById('searchResults').innerHTML = results.slice(0, 50).map(voterCard).join('');
+  document.getElementById('searchCount').textContent = `${results.length} मतदाता मिले ${results.length > 50 ? '(शीर्ष 50 दिखाए जा रहे हैं)' : ''}`;
+}
+
+// ─────────────────────────────────────────────
+//  INSIGHTS
+// ─────────────────────────────────────────────
+function buildInsights() {
+  const total = voters.length;
+  const male = voters.filter(v => v.Gender === 'पुरुष').length;
+  const female = voters.filter(v => v.Gender === 'महिला').length;
+  const senior = voters.filter(v => v.Age >= 60).length;
+  const youth = voters.filter(v => v.Age >= 18 && v.Age <= 35).length;
+  const firstTime = voters.filter(v => v.Age >= 18 && v.Age <= 22).length;
+  const ages = voters.map(v => v.Age).filter(a => a > 0);
+  const avgAge = (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1);
+  const houses = Object.keys(houseData).length;
+  const largeFamily = Object.values(houseData).filter(h => h.length >= 5);
+  const largeFamilyVoters = largeFamily.reduce((a,h) => a + h.length, 0);
+  const couples = findCouples().length;
+  const midAge = voters.filter(v => v.Age >= 36 && v.Age <= 55).length;
+  const topHouse = Object.entries(houseData).sort((a,b) => b[1].length - a[1].length)[0];
+  const oldestVoter = voters.find(v => v.Age === Math.max(...ages));
+  const vermanCount = voters.filter(v => v.Name.includes('वर्मा')).length;
+  const sharmaCount = voters.filter(v => v.Name.includes('शर्मा')).length;
+  const singhCount = voters.filter(v => v.Name.includes('सिंह')).length;
+  const singleWomen = voters.filter(v => v.Gender === 'महिला' && houseData[v['House No']].length === 1).length;
+
+  const insights = [
+    { text: `<strong>महिला मतदाता बहुमत में हैं:</strong> ${female} महिला vs ${male} पुरुष — महिला-केंद्रित मुद्दे जैसे पानी, सफाई, सुरक्षा, और स्वास्थ्य को अभियान में प्रमुखता दें।`, color: 'pink' },
+    { text: `<strong>युवा शक्ति:</strong> 18-35 आयु वर्ग में ${youth} मतदाता (${((youth/total)*100).toFixed(0)}%) हैं। सोशल मीडिया और डिजिटल माध्यम से जोड़ना जरूरी है।`, color: 'blue' },
+    { text: `<strong>पहली बार मतदाता:</strong> ${firstTime} नए मतदाता (18-22 वर्ष) — इनसे व्यक्तिगत संपर्क सबसे प्रभावी होगा।`, color: 'green' },
+    { text: `<strong>वरिष्ठ नागरिक:</strong> ${senior} मतदाता (60+) — ये प्रायः अधिक मतदान करते हैं। स्वास्थ्य सुविधा और पेंशन के मुद्दे उठाएं। सबसे वरिष्ठ: ${oldestVoter?.Name} (${oldestVoter?.Age} वर्ष)।`, color: '' },
+    { text: `<strong>मध्य आयु (36-55) का बड़ा ब्लॉक:</strong> ${midAge} मतदाता — रोजगार, बिजली, सड़क, और बच्चों की शिक्षा इनके प्रमुख मुद्दे हैं।`, color: 'blue' },
+    { text: `<strong>बड़े परिवार = बड़ा वोट बैंक:</strong> मकान ${topHouse[0]} में ${topHouse[1].length} मतदाता हैं। ${largeFamily.length} परिवारों में 5+ मतदाता हैं जो कुल ${largeFamilyVoters} वोट देते हैं।`, color: 'green' },
+    { text: `<strong>दम्पती मतदाता:</strong> ${couples} जोड़े पहचाने गए — दोनों पति-पत्नी को एक साथ मनाना अधिक प्रभावी है।`, color: 'pink' },
+    { text: `<strong>वर्मा समुदाय सबसे बड़ा:</strong> ${vermanCount} वर्मा, ${sharmaCount} शर्मा, ${singhCount} सिंह — इन समुदायों के प्रभावशाली व्यक्तियों से संपर्क करें।`, color: '' },
+    { text: `<strong>औसत आयु ${avgAge} वर्ष</strong> — अपेक्षाकृत युवा वार्ड। युवा नेतृत्व और आधुनिक विकास का संदेश कारगर होगा।`, color: 'blue' },
+    { text: `<strong>कुल ${houses} घरों में अभियान:</strong> घर-घर जाकर मिलना संभव है। प्रतिदिन 10 घर = ${Math.ceil(houses/10)} दिन में पूरा वार्ड कवर।`, color: 'green' },
+  ];
+
+  document.getElementById('insightList').innerHTML = insights.map(i => `
+    <div class="insight-item ${i.color}">${i.text}</div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────
+//  HOUSE TABLE
+// ─────────────────────────────────────────────
+let houseTableData = [];
+
+function buildHouseTable() {
+  houseTableData = Object.entries(houseData).map(([house, voters]) => {
+    const male = voters.filter(v => v.Gender === 'पुरुष').length;
+    const female = voters.filter(v => v.Gender === 'महिला').length;
+    const ages = voters.map(v => v.Age).filter(a => a > 0);
+    const avgAge = ages.length ? (ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(0) : '-';
+    const oldest = Math.max(...ages);
+    const youngest = Math.min(...ages);
+    return { house, total: voters.length, male, female, avgAge, oldest, youngest };
+  }).sort((a,b) => b.total - a.total);
+
+  renderHouseTable(houseTableData);
+}
+
+function renderHouseTable(data) {
+  document.getElementById('houseTableBody').innerHTML = data.map(r => `
+    <tr>
+      <td><strong>${r.house}</strong></td>
+      <td><strong>${r.total}</strong></td>
+      <td style="color:var(--accent3)">${r.male}</td>
+      <td style="color:var(--accent2)">${r.female}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${r.avgAge}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${r.oldest}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${r.youngest}</td>
+    </tr>
+  `).join('');
+}
+
+function filterHouseTable() {
+  const q = document.getElementById('houseSearch').value.toLowerCase();
+  renderHouseTable(houseTableData.filter(r => r.house.toLowerCase().includes(q)));
+}
+
+// ─────────────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+//  START
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => setTimeout(init, 300));
+</script>
+</body>
+</html>
