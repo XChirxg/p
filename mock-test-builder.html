@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock Test Builder — Any Topic, Your Questions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:wght@500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --paper:#f6f2e9;
+    --ink:#1f2a24;
+    --rule:#c9bfa6;
+    --maroon:#7a2e2e;
+    --pine:#28503f;
+    --gold:#a8823a;
+    --wrong:#a3372f;
+    --right:#28703f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    padding:0 0 60px 0;
+  }
+  .masthead{
+    background:var(--ink);
+    color:var(--paper);
+    padding:22px 24px 18px;
+    text-align:center;
+    border-bottom:6px double var(--gold);
+  }
+  .masthead .eyebrow{
+    letter-spacing:.18em;
+    font-size:11px;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:6px;
+  }
+  .masthead h1{
+    font-family:'Noto Serif',serif;
+    margin:0;
+    font-size:26px;
+  }
+  .masthead .sub{
+    font-family:'Source Serif 4',serif;
+    font-size:14px;
+    opacity:.85;
+    margin-top:6px;
+  }
+  .rulesbar{
+    max-width:900px;
+    margin:18px auto 0;
+    padding:14px 20px;
+    background:#fff9ee;
+    border:1px solid var(--rule);
+    border-left:5px solid var(--maroon);
+    font-size:13.5px;
+    line-height:1.6;
+  }
+  .rulesbar b{color:var(--maroon);}
+
+  /* ---------- setup panel (upload + AI prompt) ---------- */
+  .setup{
+    max-width:900px;
+    margin:20px auto 0;
+    padding:0 20px;
+  }
+  .setup-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media(max-width:700px){.setup-grid{grid-template-columns:1fr;}}
+  .setup-card{
+    background:#fffdf7;
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:18px 18px 16px;
+  }
+  .setup-card h3{
+    font-family:'Noto Serif',serif;
+    margin:0 0 6px;
+    font-size:15.5px;
+    color:var(--maroon);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .setup-card h3 .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--maroon);
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-size:11px;
+    font-weight:700;
+  }
+  .setup-card p.desc{
+    font-size:12.5px;
+    color:#6b6252;
+    line-height:1.5;
+    margin:0 0 12px;
+  }
+  .setup-card label.filebtn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--pine);
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    font-size:13px;
+    font-weight:600;
+    border-radius:5px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .setup-card label.filebtn:hover{background:#1e3c2f;}
+  .setup-card input[type=file]{display:none;}
+  .filename{font-size:11.5px;color:#7a7160;margin-top:8px;}
+  .topic-row{display:flex;gap:8px;margin-bottom:10px;}
+  .topic-row input{
+    flex:1;
+    border:1px solid var(--rule);
+    background:#fdfbf4;
+    border-radius:5px;
+    padding:8px 10px;
+    font-size:13px;
+    font-family:'Inter',sans-serif;
+  }
+  .topic-row input:focus{outline:2px solid var(--pine);outline-offset:1px;}
+  .copybtn{
+    background:var(--gold);
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    font-size:13px;
+    font-weight:600;
+    border-radius:5px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    white-space:nowrap;
+  }
+  .copybtn:hover{background:#8f6d2f;}
+  .copybtn.copied{background:var(--right);}
+  .schema-toggle{
+    font-size:11.5px;
+    color:var(--pine);
+    cursor:pointer;
+    text-decoration:underline;
+    background:none;border:none;padding:0;font-family:'Inter',sans-serif;
+  }
+  pre.schema{
+    display:none;
+    background:#211d15;
+    color:#e8dfc8;
+    font-size:11px;
+    padding:12px;
+    border-radius:5px;
+    overflow-x:auto;
+    margin-top:10px;
+    line-height:1.5;
+  }
+  .load-error{
+    max-width:900px;margin:14px auto 0;padding:12px 18px;
+    background:#fbe9e7;border:1px solid var(--wrong);border-left:5px solid var(--wrong);
+    font-size:13px;color:#5f2019;border-radius:4px;display:none;
+  }
+  .empty-state{
+    max-width:900px;margin:34px auto;padding:40px 24px;text-align:center;
+    border:2px dashed var(--rule);border-radius:8px;
+  }
+  .empty-state .glyph{font-size:30px;margin-bottom:10px;}
+  .empty-state h2{font-family:'Noto Serif',serif;font-size:18px;color:var(--maroon);margin:0 0 8px;}
+  .empty-state p{font-size:13.5px;color:#6b6252;max-width:480px;margin:0 auto;line-height:1.6;}
+
+  /* ---------- toolbar / quiz (unchanged from original mock-test look) ---------- */
+  .toolbar{
+    max-width:900px;
+    margin:16px auto 0;
+    display:none;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:0 20px;
+  }
+  .progress-wrap{flex:1;min-width:220px;}
+  .progress-track{
+    height:8px;background:#e4dbc6;border-radius:4px;overflow:hidden;border:1px solid var(--rule);
+  }
+  .progress-fill{
+    height:100%;background:var(--pine);width:0%;transition:width .25s;
+  }
+  .progress-label{font-size:12px;margin-top:4px;color:#555;}
+  .timer{
+    font-family:'Noto Serif',serif;
+    font-size:15px;
+    background:var(--ink);
+    color:var(--paper);
+    padding:6px 14px;
+    border-radius:4px;
+    letter-spacing:.03em;
+  }
+  .resetbtn{
+    background:none;
+    border:1px solid var(--rule);
+    color:var(--maroon);
+    padding:6px 12px;
+    font-size:12px;
+    border-radius:4px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .resetbtn:hover{border-color:var(--maroon);}
+  .section{
+    max-width:900px;
+    margin:26px auto 0;
+    padding:0 20px;
+  }
+  .section-title{
+    font-family:'Noto Serif',serif;
+    font-size:18px;
+    color:var(--maroon);
+    border-bottom:2px solid var(--maroon);
+    padding-bottom:6px;
+    margin-bottom:4px;
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .section-title span.count{
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    color:#7a7160;
+    font-weight:500;
+  }
+  .q-card{
+    background:#fffdf7;
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:16px 18px;
+    margin:14px 0;
+  }
+  .q-head{
+    display:flex;
+    gap:10px;
+    font-size:15px;
+    line-height:1.55;
+    margin-bottom:10px;
+  }
+  .q-num{
+    font-family:'Noto Serif',serif;
+    font-weight:700;
+    color:var(--pine);
+    min-width:28px;
+  }
+  .q-text[lang="hi"]{font-family:'Noto Serif',serif; font-size:16px;}
+  .options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-left:38px;
+  }
+  @media(max-width:600px){.options{grid-template-columns:1fr;}}
+  .opt{
+    border:1px solid var(--rule);
+    background:#fdfbf4;
+    border-radius:5px;
+    padding:8px 10px;
+    font-size:14px;
+    cursor:pointer;
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    transition:background .15s,border-color .15s;
+  }
+  .opt:hover{border-color:var(--gold);}
+  .opt.selected{
+    background:#eef3ea;
+    border-color:var(--pine);
+    box-shadow:inset 0 0 0 1px var(--pine);
+  }
+  .opt .tag{
+    font-weight:700;
+    color:var(--gold);
+    min-width:14px;
+  }
+  .opt.correct{background:#e7f5e9;border-color:var(--right);}
+  .opt.incorrect{background:#fbe9e7;border-color:var(--wrong);}
+  .opt.disabled{cursor:default;}
+  .explain{
+    margin:10px 0 0 38px;
+    font-size:13px;
+    background:#f4efe0;
+    border-left:3px solid var(--gold);
+    padding:8px 10px;
+    display:none;
+    line-height:1.5;
+  }
+  .marks-tag{
+    font-size:11px;
+    color:#7a7160;
+    margin-left:38px;
+    margin-top:2px;
+  }
+  .submit-bar{
+    max-width:900px;
+    margin:30px auto;
+    padding:0 20px;
+    text-align:center;
+    display:none;
+  }
+  #submitBtn{
+    background:var(--maroon);
+    color:#fff;
+    border:none;
+    padding:14px 40px;
+    font-size:16px;
+    font-family:'Noto Serif',serif;
+    border-radius:5px;
+    cursor:pointer;
+    letter-spacing:.02em;
+  }
+  #submitBtn:hover{background:#5f2222;}
+  .result-panel{
+    max-width:900px;
+    margin:24px auto;
+    padding:22px;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:8px;
+    display:none;
+  }
+  .result-panel h2{
+    font-family:'Noto Serif',serif;
+    margin-top:0;
+    color:var(--gold);
+    border-bottom:1px solid #4a4030;
+    padding-bottom:10px;
+  }
+  .score-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:14px;
+    margin:16px 0;
+  }
+  .score-box{
+    background:#2c352e;
+    padding:12px 14px;
+    border-radius:6px;
+    text-align:center;
+  }
+  .score-box .num{font-family:'Noto Serif',serif;font-size:22px;color:var(--gold);}
+  .score-box .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;opacity:.8;margin-top:4px;}
+  .section-breakdown{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px;}
+  .section-breakdown th,.section-breakdown td{
+    border-bottom:1px solid #4a4030;
+    padding:6px 8px;
+    text-align:left;
+  }
+  .section-breakdown th{color:var(--gold);font-weight:500;font-size:12px;text-transform:uppercase;}
+  footer{
+    text-align:center;
+    font-size:12px;
+    color:#8a7f68;
+    margin-top:30px;
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">Build your own &middot; Any subject, any exam</div>
+  <h1 id="titleText">Mock Test Builder</h1>
+  <div class="sub" id="subText">Upload a question set, or generate one with AI, then sit the test right here</div>
+</div>
+
+<div class="rulesbar" id="rulesbar">
+  <b>How this works:</b> Upload a JSON file of questions <b>or</b> use the prompt below to have an AI generate one on any topic, then drop the result back in. Once loaded, each question carries marks as defined in the file, with a penalty for wrong answers. Select one option per question, then click <b>Submit Test</b> to see your score, section-wise breakdown, and explanations.
+</div>
+
+<div class="setup">
+  <div class="setup-grid">
+    <div class="setup-card">
+      <h3><span class="num">1</span>Upload your questions</h3>
+      <p class="desc">Choose a JSON file matching the schema below. Sections, marks, and timer are all read from the file — nothing is hardcoded.</p>
+      <label class="filebtn" for="jsonFile">Choose JSON file
+        <input type="file" id="jsonFile" accept="application/json,.json">
+      </label>
+      <div class="filename" id="fileNameLabel">No file loaded yet.</div>
+      <button class="schema-toggle" id="schemaToggle" style="margin-top:12px;">View the JSON schema</button>
+      <pre class="schema" id="schemaPre"></pre>
+    </div>
+    <div class="setup-card">
+      <h3><span class="num">2</span>Or generate with AI</h3>
+      <p class="desc">Type a topic, copy the prompt, paste it into your favourite LLM, then upload the JSON it returns using the box on the left.</p>
+      <div class="topic-row">
+        <input type="text" id="topicInput" placeholder="e.g. Cell Biology, Indian Polity, JavaScript closures" />
+        <button class="copybtn" id="copyPromptBtn">Copy prompt</button>
+      </div>
+      <div class="filename">The prompt asks for strict JSON output in the exact schema this page expects.</div>
+    </div>
+  </div>
+</div>
+
+<div class="load-error" id="loadError"></div>
+
+<div class="empty-state" id="emptyState">
+  <div class="glyph">&#128220;</div>
+  <h2>No test loaded</h2>
+  <p>Upload a JSON question file, or copy the AI prompt above, hand it to an LLM, and upload what it gives you back. The test will render here automatically.</p>
+</div>
+
+<div class="toolbar" id="toolbar">
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 0 attempted</div>
+  </div>
+  <div class="timer" id="timer">--:--</div>
+  <button class="resetbtn" id="resetBtn">Load a different test</button>
+</div>
+
+<div id="quizRoot"></div>
+
+<div class="submit-bar" id="submitBar">
+  <button id="submitBtn">Submit Test</button>
+</div>
+
+<div class="result-panel" id="resultPanel">
+  <h2>Your Result</h2>
+  <div class="score-grid" id="scoreGrid"></div>
+  <table class="section-breakdown">
+    <thead><tr><th>Section</th><th>Attempted</th><th>Correct</th><th>Wrong</th><th>Score</th></tr></thead>
+    <tbody id="breakdownBody"></tbody>
+  </table>
+  <p style="margin-top:14px;font-size:13px;">Full solutions with explanations are now shown below each question — scroll up to review.</p>
+</div>
+
+<footer id="footerNote">Built with the Mock Test Builder &middot; bring your own question bank</footer>
+
+<script>
+// ---------------------------------------------------------------
+// Schema shown to the user + used for the AI prompt template
+// ---------------------------------------------------------------
+const SCHEMA_EXAMPLE = {
+  title: "Test title shown at the top",
+  subtitle: "One line describing the coverage, e.g. Topic A (10) \u2022 Topic B (10)",
+  durationMinutes: 30,
+  marksCorrect: 2,
+  marksWrong: 0.25,
+  questions: [
+    {
+      section: "Section name (used to group + label questions)",
+      question: "The question text",
+      options: ["Option A", "Option B", "Option C", "Option D"],
+      answerIndex: 0,
+      explanation: "Why this answer is correct",
+      lang: "en"
+    }
+  ]
+};
+
+document.getElementById('schemaPre').textContent = JSON.stringify(SCHEMA_EXAMPLE, null, 2);
+document.getElementById('schemaToggle').addEventListener('click', ()=>{
+  const pre = document.getElementById('schemaPre');
+  const open = pre.style.display === 'block';
+  pre.style.display = open ? 'none' : 'block';
+  document.getElementById('schemaToggle').textContent = open ? 'View the JSON schema' : 'Hide the JSON schema';
+});
+
+// ---------------------------------------------------------------
+// AI prompt template + copy button
+// ---------------------------------------------------------------
+function buildPrompt(topic){
+  const t = topic && topic.trim() ? topic.trim() : "[YOUR TOPIC HERE]";
+  return `Generate a multiple-choice mock test on the topic: "${t}".
+
+Output ONLY valid JSON \u2014 no markdown formatting, no code fences, no commentary before or after \u2014 in exactly this structure:
+
+{
+  "title": "Short test title",
+  "subtitle": "One line summarising the sections and question counts",
+  "durationMinutes": 30,
+  "marksCorrect": 2,
+  "marksWrong": 0.25,
+  "questions": [
+    {
+      "section": "Section name",
+      "question": "Question text",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "answerIndex": 0,
+      "explanation": "Brief, accurate explanation of the correct answer",
+      "lang": "en"
+    }
+  ]
+}
+
+Rules:
+- Write 25\u201340 questions in total, grouped into 2\u20135 logical sections via the "section" field, all on the topic of "${t}".
+- Every question needs exactly 4 options in "options".
+- "answerIndex" is the 0-based index of the correct option in "options".
+- Every question needs a concise, factually correct "explanation".
+- Vary difficulty from easy to challenging across the set.
+- Only set "lang" to "hi" for questions actually written in Hindi; otherwise use "en" or omit it.
+- Double check facts before including them \u2014 do not invent statistics, dates, or names.
+- Return nothing but the JSON object above \u2014 it will be parsed directly by a program.`;
+}
+
+const topicInput = document.getElementById('topicInput');
+const copyBtn = document.getElementById('copyPromptBtn');
+copyBtn.addEventListener('click', async ()=>{
+  const prompt = buildPrompt(topicInput.value);
+  try{
+    await navigator.clipboard.writeText(prompt);
+  }catch(e){
+    // fallback for environments without clipboard API
+    const ta = document.createElement('textarea');
+    ta.value = prompt;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  copyBtn.textContent = 'Copied \u2713';
+  copyBtn.classList.add('copied');
+  setTimeout(()=>{
+    copyBtn.textContent = 'Copy prompt';
+    copyBtn.classList.remove('copied');
+  }, 1800);
+});
+
+// ---------------------------------------------------------------
+// Test state
+// ---------------------------------------------------------------
+let TEST = null;       // normalized test object
+let DATA = [];         // flat question list
+let SECTIONS = [];
+let userAns = [];
+let submitted = false;
+let timerInt = null;
+let secondsLeft = 0;
+
+const root = document.getElementById('quizRoot');
+const loadError = document.getElementById('loadError');
+
+function showError(msg){
+  loadError.textContent = msg;
+  loadError.style.display = 'block';
+}
+function clearError(){
+  loadError.style.display = 'none';
+  loadError.textContent = '';
+}
+
+// Accepts either the wrapped object {title, questions:[...]} or a bare array of questions.
+function normalizeTest(raw){
+  let obj = Array.isArray(raw) ? { questions: raw } : raw;
+  if(!obj || !Array.isArray(obj.questions) || obj.questions.length === 0){
+    throw new Error('JSON must contain a non-empty "questions" array.');
+  }
+  const questions = obj.questions.map((q, idx)=>{
+    const section = q.section || q.sec || 'General';
+    const question = q.question || q.q;
+    const options = q.options || q.opts;
+    const answerIndex = (q.answerIndex !== undefined) ? q.answerIndex : q.ans;
+    const explanation = q.explanation || q.exp || '';
+    const lang = q.lang;
+    if(!question || !Array.isArray(options) || options.length < 2){
+      throw new Error(`Question ${idx+1} is missing "question" or a valid "options" array.`);
+    }
+    if(typeof answerIndex !== 'number' || answerIndex < 0 || answerIndex >= options.length){
+      throw new Error(`Question ${idx+1} has an invalid "answerIndex".`);
+    }
+    return { section, question, options, answerIndex, explanation, lang };
+  });
+  return {
+    title: obj.title || 'Mock Test',
+    subtitle: obj.subtitle || `${questions.length} Questions`,
+    durationMinutes: (typeof obj.durationMinutes === 'number' && obj.durationMinutes > 0) ? obj.durationMinutes : 30,
+    marksCorrect: (typeof obj.marksCorrect === 'number') ? obj.marksCorrect : 2,
+    marksWrong: (typeof obj.marksWrong === 'number') ? obj.marksWrong : 0.25,
+    questions
+  };
+}
+
+function loadTest(testObj){
+  TEST = testObj;
+  DATA = TEST.questions;
+  SECTIONS = [...new Set(DATA.map(d=>d.section))];
+  userAns = new Array(DATA.length).fill(null);
+  submitted = false;
+  if(timerInt) clearInterval(timerInt);
+
+  document.getElementById('titleText').textContent = TEST.title;
+  document.getElementById('subText').textContent = TEST.subtitle;
+  document.getElementById('rulesbar').innerHTML = `<b>Instructions:</b> Each question carries <b>${TEST.marksCorrect}</b> mark${TEST.marksCorrect===1?'':'s'}. <b>${TEST.marksWrong}</b> mark${TEST.marksWrong===1?'':'s'} will be deducted for every wrong answer. Unattempted questions carry no penalty. Select one option per question, then click <b>Submit Test</b> to see your score, section-wise breakdown, and explanations.`;
+  document.getElementById('footerNote').textContent = `${TEST.title} \u2014 built with the Mock Test Builder`;
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('toolbar').style.display = 'flex';
+  document.getElementById('submitBar').style.display = 'block';
+  document.getElementById('resultPanel').style.display = 'none';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Submit Test';
+  document.getElementById('submitBtn').style.opacity = '1';
+
+  root.innerHTML = '';
+  render();
+  updateProgress();
+
+  secondsLeft = Math.round(TEST.durationMinutes * 60);
+  const timerEl = document.getElementById('timer');
+  timerEl.style.background = 'var(--ink)';
+  updateTimerLabel();
+  timerInt = setInterval(()=>{
+    if(submitted){ clearInterval(timerInt); return; }
+    secondsLeft--;
+    if(secondsLeft<=0){
+      clearInterval(timerInt);
+      submitTest();
+      return;
+    }
+    updateTimerLabel();
+    if(secondsLeft < 300) timerEl.style.background = '#7a2e2e';
+  }, 1000);
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function updateTimerLabel(){
+  const m = Math.floor(secondsLeft/60), s = secondsLeft%60;
+  document.getElementById('timer').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+function render(){
+  SECTIONS.forEach(secName=>{
+    const secDiv = document.createElement('div');
+    secDiv.className = 'section';
+    const secQs = DATA.map((d,i)=>({...d,i})).filter(d=>d.section===secName);
+    secDiv.innerHTML = `<div class="section-title">${secName} <span class="count">${secQs.length} Questions &middot; ${(secQs.length*TEST.marksCorrect).toFixed(TEST.marksCorrect%1===0?0:2)} Marks</span></div>`;
+    secQs.forEach(item=>{
+      const card = document.createElement('div');
+      card.className = 'q-card';
+      card.id = 'q'+item.i;
+      const langAttr = item.lang === 'hi' ? ' lang="hi"' : '';
+      card.innerHTML = `
+        <div class="q-head"><span class="q-num">${item.i+1}.</span><span class="q-text"${langAttr}>${item.question}</span></div>
+        <div class="options" data-qi="${item.i}">
+          ${item.options.map((o,oi)=>`<div class="opt" data-oi="${oi}"><span class="tag">${String.fromCharCode(65+oi)}.</span><span${langAttr}>${o}</span></div>`).join('')}
+        </div>
+        <div class="marks-tag">+${TEST.marksCorrect} for correct &middot; \u2212${TEST.marksWrong} for wrong</div>
+        <div class="explain" id="exp${item.i}"></div>
+      `;
+      secDiv.appendChild(card);
+    });
+    root.appendChild(secDiv);
+  });
+
+  document.querySelectorAll('.options').forEach(optDiv=>{
+    optDiv.addEventListener('click', e=>{
+      if(submitted) return;
+      const opt = e.target.closest('.opt');
+      if(!opt) return;
+      const qi = parseInt(optDiv.dataset.qi);
+      const oi = parseInt(opt.dataset.oi);
+      userAns[qi] = oi;
+      [...optDiv.children].forEach(c=>c.classList.remove('selected'));
+      opt.classList.add('selected');
+      updateProgress();
+    });
+  });
+}
+
+function updateProgress(){
+  const attempted = userAns.filter(a=>a!==null).length;
+  document.getElementById('progressFill').style.width = (DATA.length ? attempted/DATA.length*100 : 0)+'%';
+  document.getElementById('progressLabel').textContent = attempted+' / '+DATA.length+' attempted';
+}
+
+function submitTest(){
+  if(submitted || !TEST) return;
+  submitted = true;
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitBtn').textContent = 'Submitted';
+  document.getElementById('submitBtn').style.opacity = '0.6';
+
+  let totalScore = 0, correct=0, wrong=0, unattempted=0;
+  const secStats = {};
+  SECTIONS.forEach(s=>secStats[s] = {attempted:0,correct:0,wrong:0,score:0});
+
+  DATA.forEach((item,i)=>{
+    const optDiv = document.querySelector(`.options[data-qi="${i}"]`);
+    const opts = optDiv.children;
+    const ua = userAns[i];
+    if(ua===null){
+      unattempted++;
+    } else {
+      secStats[item.section].attempted++;
+      if(ua===item.answerIndex){
+        correct++; totalScore+=TEST.marksCorrect; secStats[item.section].correct++; secStats[item.section].score+=TEST.marksCorrect;
+        opts[ua].classList.add('correct');
+      } else {
+        wrong++; totalScore-=TEST.marksWrong; secStats[item.section].wrong++; secStats[item.section].score-=TEST.marksWrong;
+        opts[ua].classList.add('incorrect');
+        opts[item.answerIndex].classList.add('correct');
+      }
+    }
+    if(ua===null){
+      opts[item.answerIndex].classList.add('correct');
+    }
+    [...opts].forEach(o=>o.classList.add('disabled'));
+    const expDiv = document.getElementById('exp'+i);
+    expDiv.style.display = 'block';
+    expDiv.innerHTML = item.explanation ? ('<b>Explanation:</b> '+item.explanation) : '';
+  });
+
+  const maxScore = DATA.length * TEST.marksCorrect;
+  document.getElementById('scoreGrid').innerHTML = `
+    <div class="score-box"><div class="num">${totalScore.toFixed(2)}</div><div class="lbl">Score / ${maxScore}</div></div>
+    <div class="score-box"><div class="num">${correct}</div><div class="lbl">Correct</div></div>
+    <div class="score-box"><div class="num">${wrong}</div><div class="lbl">Wrong</div></div>
+    <div class="score-box"><div class="num">${unattempted}</div><div class="lbl">Unattempted</div></div>
+  `;
+
+  const tbody = document.getElementById('breakdownBody');
+  tbody.innerHTML = SECTIONS.map(s=>{
+    const st = secStats[s];
+    return `<tr><td>${s}</td><td>${st.attempted}</td><td>${st.correct}</td><td>${st.wrong}</td><td>${st.score.toFixed(2)}</td></tr>`;
+  }).join('');
+
+  document.getElementById('resultPanel').style.display='block';
+  document.getElementById('resultPanel').scrollIntoView({behavior:'smooth'});
+}
+
+document.getElementById('submitBtn').addEventListener('click', submitTest);
+
+// ---------------------------------------------------------------
+// File upload handling
+// ---------------------------------------------------------------
+document.getElementById('jsonFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  clearError();
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    document.getElementById('fileNameLabel').textContent = 'Loaded: ' + file.name;
+    try{
+      const parsed = JSON.parse(ev.target.result);
+      const normalized = normalizeTest(parsed);
+      loadTest(normalized);
+    }catch(err){
+      showError('Could not load this file \u2014 ' + err.message);
+    }
+  };
+  reader.onerror = ()=> showError('Could not read the selected file.');
+  reader.readAsText(file);
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(timerInt) clearInterval(timerInt);
+  TEST = null; DATA = []; SECTIONS = []; userAns = []; submitted = false;
+  root.innerHTML = '';
+  document.getElementById('toolbar').style.display = 'none';
+  document.getElementById('submitBar').style.display = 'none';
+  document.getElementById('resultPanel').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('titleText').textContent = 'Mock Test Builder';
+  document.getElementById('subText').textContent = 'Upload a question set, or generate one with AI, then sit the test right here';
+  document.getElementById('rulesbar').innerHTML = '<b>How this works:</b> Upload a JSON file of questions <b>or</b> use the prompt below to have an AI generate one on any topic, then drop the result back in. Once loaded, each question carries marks as defined in the file, with a penalty for wrong answers. Select one option per question, then click <b>Submit Test</b> to see your score, section-wise breakdown, and explanations.';
+  document.getElementById('jsonFile').value = '';
+  document.getElementById('fileNameLabel').textContent = 'No file loaded yet.';
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+</script>
+</body>
+</html>
